@@ -23,6 +23,8 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [showStationSelector, setShowStationSelector] = useState(false);
   const [volume, setVolume] = useState(0.8); // Default 80% volume
+  const [isMuted, setIsMuted] = useState(false);
+  const preMuteVolumeRef = useRef(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -165,11 +167,33 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
+    if (isMuted && newVolume > 0) {
+      setIsMuted(false);
+    }
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }
     // Update CSS variable for track fill
     e.target.style.setProperty('--volume-percent', `${newVolume * 100}%`);
+  };
+
+  // Toggle mute
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    
+    if (isMuted) {
+      // Unmute - restore previous volume
+      const restoredVolume = preMuteVolumeRef.current || 0.8;
+      setIsMuted(false);
+      setVolume(restoredVolume);
+      audioRef.current.volume = restoredVolume;
+    } else {
+      // Mute - save current volume first
+      preMuteVolumeRef.current = volume;
+      setIsMuted(true);
+      setVolume(0);
+      audioRef.current.volume = 0;
+    }
   };
 
   const handleStationSelect = (newStation: Station) => {
@@ -269,7 +293,16 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       
       {/* Volume Control */}
       <div className="volume-control">
-        <span className="volume-icon">🔊</span>
+        <button 
+          className="mute-button"
+          onClick={toggleMute}
+          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          title={isMuted ? 'Unmute' : 'Mute'}
+        >
+          <span className="mute-icon">
+            {isMuted ? '🔇' : volume < 0.3 ? '🔈' : volume < 0.7 ? '🔉' : '🔊'}
+          </span>
+        </button>
         <input
           type="range"
           className="volume-slider"
@@ -280,7 +313,7 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
           onChange={handleVolumeChange}
           style={{ '--station-color': station.color } as React.CSSProperties}
         />
-        <span className="volume-value">{Math.round(volume * 100)}%</span>
+        <span className="volume-value">{isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}</span>
       </div>
 
       <div className={`status-container ${isPlaying ? 'playing' : ''} ${isLoading ? 'loading' : ''}`}>
