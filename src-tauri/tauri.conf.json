@@ -24,7 +24,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; media-src 'self' https:; connect-src 'self' https:",
+      "csp": "default-src 'self'; media-src 'self' https:; connect-src 'self' https: https://*.sr.de https://*.sr-online.de",
       "assetProtocol": {
         "enable": true,
         "scope": ["$APPDATA/**", "$RESOURCE/**"]

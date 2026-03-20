@@ -25,7 +25,7 @@ interface ShowApiResponse {
   };
 }
 
-const SONG_API_URL = 'http://musikrecherche.sr-online.de/sophora/titelinterpret.php';
+const SONG_API_URL = 'https://musikrecherche.sr-online.de/sophora/titelinterpret.php';
 const SHOW_API_URL = 'https://www.sr.de/sr/epg/nowPlaying.jsp';
 const POLL_INTERVAL = 30000; // 30 seconds
 
@@ -37,6 +37,8 @@ export function subscribeToNowPlaying(
   station: Station,
   callback: (data: NowPlayingData) => void
 ): () => void {
+  console.log(`[NowPlaying] Subscribing to station: ${station.id}`);
+  
   // Add listener
   listeners.push(callback);
   
@@ -61,12 +63,17 @@ export function subscribeToNowPlaying(
 }
 
 async function fetchNowPlaying(stationId: string): Promise<void> {
+  console.log(`[NowPlaying] Fetching data for ${stationId}...`);
+  
   try {
     // Fetch both song and show info
     const [songData, showData] = await Promise.all([
       fetchSongInfo(stationId),
       fetchShowInfo(stationId)
     ]);
+    
+    console.log(`[NowPlaying] Song data:`, songData);
+    console.log(`[NowPlaying] Show data:`, showData);
     
     const data: NowPlayingData = {
       title: songData?.title || '',
@@ -76,9 +83,10 @@ async function fetchNowPlaying(stationId: string): Promise<void> {
     };
     
     // Notify all listeners
+    console.log(`[NowPlaying] Notifying listeners with:`, data);
     listeners.forEach(listener => listener(data));
   } catch (error) {
-    console.error('Failed to fetch now playing:', error);
+    console.error('[NowPlaying] Failed to fetch now playing:', error);
   }
   
   // Schedule next poll
@@ -87,10 +95,15 @@ async function fetchNowPlaying(stationId: string): Promise<void> {
 
 async function fetchSongInfo(stationId: string): Promise<{ title: string; artist: string } | null> {
   try {
+    console.log(`[NowPlaying] Fetching song from: ${SONG_API_URL}`);
     const response = await fetch(SONG_API_URL);
+    console.log(`[NowPlaying] Song API response status:`, response.status);
+    
     if (!response.ok) return null;
     
     const data: SongApiResponse = await response.json();
+    console.log(`[NowPlaying] Song API data:`, data);
+    
     const stationData = data[stationId];
     
     if (stationData && stationData.titel) {
@@ -100,17 +113,24 @@ async function fetchSongInfo(stationId: string): Promise<{ title: string; artist
       };
     }
     return null;
-  } catch {
+  } catch (error) {
+    console.error('[NowPlaying] Error fetching song info:', error);
     return null;
   }
 }
 
 async function fetchShowInfo(stationId: string): Promise<{ show: string; moderator: string } | null> {
   try {
-    const response = await fetch(`${SHOW_API_URL}?welle=${stationId}`);
+    const url = `${SHOW_API_URL}?welle=${stationId}`;
+    console.log(`[NowPlaying] Fetching show from: ${url}`);
+    const response = await fetch(url);
+    console.log(`[NowPlaying] Show API response status:`, response.status);
+    
     if (!response.ok) return null;
     
     const data: ShowApiResponse = await response.json();
+    console.log(`[NowPlaying] Show API data:`, data);
+    
     const stationData = data['now playing']?.[stationId];
     
     if (stationData && stationData.titel) {
@@ -120,7 +140,8 @@ async function fetchShowInfo(stationId: string): Promise<{ show: string; moderat
       };
     }
     return null;
-  } catch {
+  } catch (error) {
+    console.error('[NowPlaying] Error fetching show info:', error);
     return null;
   }
 }
@@ -141,7 +162,7 @@ export async function fetchCurrentSong(stationId: string): Promise<NowPlayingDat
       moderator: showData?.moderator || ''
     };
   } catch (error) {
-    console.error('Failed to fetch current song:', error);
+    console.error('[NowPlaying] Failed to fetch current song:', error);
     return null;
   }
 }
