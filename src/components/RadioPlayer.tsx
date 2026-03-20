@@ -26,14 +26,20 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const [volume, setVolume] = useState(0.8); // Default 80% volume
   const [isMuted, setIsMuted] = useState(false);
   const [nowPlaying, setNowPlaying] = useState<NowPlayingData | null>(null);
+  const [nowPlayingLoading, setNowPlayingLoading] = useState(true);
   const preMuteVolumeRef = useRef(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Subscribe to now playing updates
   useEffect(() => {
+    setNowPlayingLoading(true);
+    setNowPlaying(null);
+    
     const unsubscribe = subscribeToNowPlaying(station, (data) => {
+      console.log('[RadioPlayer] Received now playing data:', data);
       setNowPlaying(data);
+      setNowPlayingLoading(false);
     });
     
     return () => {
@@ -317,14 +323,16 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       <h1 className="station-name">{station.name}</h1>
       
       {/* Now Playing Info */}
-      {nowPlayingText && (
-        <div className="now-playing-container">
-          <div className="now-playing-label">Now Playing</div>
-          <div className="now-playing-text" style={{ color: station.color }}>
-            {nowPlayingText}
-          </div>
+      <div className="now-playing-container">
+        <div className="now-playing-label">Now Playing</div>
+        <div className="now-playing-text" style={{ color: station.color }}>
+          {nowPlayingLoading 
+            ? 'Loading...' 
+            : nowPlayingText 
+              ? nowPlayingText 
+              : 'No track information'}
         </div>
-      )}
+      </div>
       
       {error && (
         <div className="error-message" onClick={() => setError(null)} role="button" tabIndex={0}>
