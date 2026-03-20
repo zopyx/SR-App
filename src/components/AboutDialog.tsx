@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getVersion } from '@tauri-apps/api/app';
 import type { Station } from '../data/stations';
+import { fetchCurrentSong, type NowPlayingData } from '../services/nowPlaying';
 
 interface AboutDialogProps {
   isOpen: boolean;
@@ -17,12 +18,15 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
 }) => {
   const [version, setVersion] = useState<string>('0.0.0');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [nowPlaying, setNowPlaying] = useState<NowPlayingData | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       getVersion().then(setVersion).catch(() => setVersion('0.0.0'));
+      // Fetch current song when dialog opens
+      fetchCurrentSong(currentStation.id).then(setNowPlaying);
     }
-  }, [isOpen]);
+  }, [isOpen, currentStation.id]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -94,6 +98,20 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
               <span className="about-label">Tagline</span>
               <span className="about-value">{currentStation.description}</span>
             </div>
+            
+            {/* Now Playing in About Dialog */}
+            {nowPlaying && (nowPlaying.title || nowPlaying.show) && (
+              <div className="about-info-row">
+                <span className="about-label">Now Playing</span>
+                <span className="about-value" style={{ color: currentStation.color }}>
+                  {nowPlaying.artist && nowPlaying.title 
+                    ? `${nowPlaying.artist} — ${nowPlaying.title}`
+                    : nowPlaying.title || nowPlaying.show
+                  }
+                </span>
+              </div>
+            )}
+            
             <div className="about-info-row">
               <span className="about-label">Quality</span>
               <span className="about-value">256 kbps MP3</span>
