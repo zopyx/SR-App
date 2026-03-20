@@ -1,6 +1,6 @@
 // Library entry point for mobile platforms
 
-use tauri::Manager;
+use tauri::{Manager, Emitter};
 
 pub fn run() {
     tauri::Builder::default()
@@ -15,10 +15,10 @@ pub fn run() {
                 window.set_background_color(Some(tauri::window::Color(18, 18, 18, 255))).ok();
                 
                 // Create native menu
-                use tauri::menu::{Menu, PredefinedMenuItem, Submenu};
+                use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
                 
-                // Create menu items
-                let about_item = PredefinedMenuItem::about(app, None, None)?;
+                // Create About menu item (custom, not predefined)
+                let about_item = MenuItem::with_id(app, "about", "About SR Radio", true, None::<&str>)?;
                 let separator = PredefinedMenuItem::separator(app)?;
                 let hide_item = PredefinedMenuItem::hide(app, None)?;
                 let hide_others_item = PredefinedMenuItem::hide_others(app, None)?;
@@ -96,6 +96,15 @@ pub fn run() {
                 ])?;
                 
                 app.set_menu(menu)?;
+                
+                // Handle menu events
+                let _app_handle = app.handle().clone();
+                app.on_menu_event(move |app, event| {
+                    if event.id() == "about" {
+                        // Emit event to frontend to open about dialog
+                        let _ = app.emit("menu-about-clicked", ());
+                    }
+                });
             }
             
             Ok(())

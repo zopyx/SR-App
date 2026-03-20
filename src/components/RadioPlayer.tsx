@@ -7,13 +7,7 @@ interface RadioPlayerProps {
   allStations?: Station[];
 }
 
-interface AudioErrorDetails {
-  code: number;
-  message: string;
-  networkState: number;
-  readyState: number;
-  currentSrc: string;
-}
+
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;

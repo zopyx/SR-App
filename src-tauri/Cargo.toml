@@ -1,8 +1,8 @@
 [package]
 name = "sr2"
-version = "0.0.0"
+version = "0.1.0"
 description = "SR2 Kultur Radio Player"
-authors = ["you"]
+authors = ["Andreas Jung <info@zopyx.com>"]
 license = ""
 repository = ""
 edition = "2021"
