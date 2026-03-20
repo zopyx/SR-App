@@ -1,11 +1,96 @@
 // Library entry point for mobile platforms
 
 use tauri::{Manager, Emitter};
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
+struct SongApiResponse {
+    #[serde(flatten)]
+    stations: std::collections::HashMap<String, SongData>,
+}
+
+#[derive(Debug, Deserialize)]
+struct SongData {
+    titel: String,
+    interpret: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct ShowApiResponse {
+    #[serde(rename = "now playing")]
+    now_playing: std::collections::HashMap<String, ShowData>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ShowData {
+    titel: String,
+    moderator: String,
+}
+
+#[derive(Debug, serde::Serialize)]
+struct NowPlayingData {
+    title: String,
+    artist: String,
+    show: String,
+    moderator: String,
+}
+
+#[tauri::command]
+async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String> {
+    println!("[Rust] Fetching now playing for station: {}", station_id);
+    
+    let song_url = "https://musikrecherche.sr-online.de/sophora/titelinterpret.php";
+    let show_url = format!("https://www.sr.de/sr/epg/nowPlaying.jsp?welle={}", station_id);
+    
+    // Fetch song info
+    let song_result = reqwest::get(song_url).await;
+    let mut title = String::new();
+    let mut artist = String::new();
+    
+    match song_result {
+        Ok(response) => {
+            if let Ok(json) = response.json::<SongApiResponse>().await {
+                if let Some(data) = json.stations.get(&station_id) {
+                    title = data.titel.clone();
+                    artist = data.interpret.clone();
+                    println!("[Rust] Song: {} - {}", artist, title);
+                }
+            }
+        }
+        Err(e) => println!("[Rust] Error fetching song: {}", e),
+    }
+    
+    // Fetch show info
+    let show_result = reqwest::get(&show_url).await;
+    let mut show = String::new();
+    let mut moderator = String::new();
+    
+    match show_result {
+        Ok(response) => {
+            if let Ok(json) = response.json::<ShowApiResponse>().await {
+                if let Some(data) = json.now_playing.get(&station_id) {
+                    show = data.titel.clone();
+                    moderator = data.moderator.clone();
+                    println!("[Rust] Show: {} (moderator: {})", show, moderator);
+                }
+            }
+        }
+        Err(e) => println!("[Rust] Error fetching show: {}", e),
+    }
+    
+    Ok(NowPlayingData {
+        title,
+        artist,
+        show,
+        moderator,
+    })
+}
 
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .invoke_handler(tauri::generate_handler![fetch_now_playing])
         .setup(|app| {
             let window = app.get_webview_window("main").unwrap();
             
