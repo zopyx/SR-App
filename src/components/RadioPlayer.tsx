@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Station } from '../data/stations';
+import { subscribeToNowPlaying, type NowPlayingData } from '../services/nowPlaying';
 
 interface RadioPlayerProps {
   station: Station;
@@ -24,9 +25,21 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const [showStationSelector, setShowStationSelector] = useState(false);
   const [volume, setVolume] = useState(0.8); // Default 80% volume
   const [isMuted, setIsMuted] = useState(false);
+  const [nowPlaying, setNowPlaying] = useState<NowPlayingData | null>(null);
   const preMuteVolumeRef = useRef(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Subscribe to now playing updates
+  useEffect(() => {
+    const unsubscribe = subscribeToNowPlaying(station, (data) => {
+      setNowPlaying(data);
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, [station]);
 
   // Reset audio when station changes
   useEffect(() => {
@@ -218,6 +231,24 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     }
   }, [station, attemptPlay]);
 
+  // Format now playing text
+  const getNowPlayingText = (): string | null => {
+    if (!nowPlaying) return null;
+    
+    if (nowPlaying.artist && nowPlaying.title) {
+      return `${nowPlaying.artist} — ${nowPlaying.title}`;
+    }
+    if (nowPlaying.title) {
+      return nowPlaying.title;
+    }
+    if (nowPlaying.show) {
+      return nowPlaying.show;
+    }
+    return null;
+  };
+
+  const nowPlayingText = getNowPlayingText();
+
   return (
     <div className="player-container">
       {/* Station Selector Toggle */}
@@ -284,6 +315,16 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       </div>
       
       <h1 className="station-name">{station.name}</h1>
+      
+      {/* Now Playing Info */}
+      {nowPlayingText && (
+        <div className="now-playing-container">
+          <div className="now-playing-label">Now Playing</div>
+          <div className="now-playing-text" style={{ color: station.color }}>
+            {nowPlayingText}
+          </div>
+        </div>
+      )}
       
       {error && (
         <div className="error-message" onClick={() => setError(null)} role="button" tabIndex={0}>
