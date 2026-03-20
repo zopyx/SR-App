@@ -1,0 +1,165 @@
+import { useEffect, useState } from 'react';
+import { getVersion } from '@tauri-apps/api/app';
+import type { Station } from '../data/stations';
+
+interface AboutDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  stations: Station[];
+  currentStation: Station;
+}
+
+export const AboutDialog: React.FC<AboutDialogProps> = ({ 
+  isOpen, 
+  onClose, 
+  stations,
+  currentStation 
+}) => {
+  const [version, setVersion] = useState<string>('0.0.0');
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      getVersion().then(setVersion).catch(() => setVersion('0.0.0'));
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedUrl(text);
+    setTimeout(() => setCopiedUrl(null), 2000);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="about-overlay" onClick={onClose}>
+      <div className="about-dialog about-dialog-wide" onClick={(e) => e.stopPropagation()}>
+        <button className="about-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
+        
+        <div className="about-header" style={{ 
+          background: `linear-gradient(180deg, ${currentStation.color}20 0%, transparent 100%)` 
+        }}>
+          <div className="about-logo" style={{ borderColor: currentStation.color }}>
+            <img src={currentStation.logoUrl} alt={currentStation.name} />
+          </div>
+          <h1 className="about-title">SR Radio Player</h1>
+          <span className="about-version">Version {version}</span>
+        </div>
+
+        <div className="about-content">
+          {/* Stations List */}
+          <section className="about-section">
+            <h2>Available Stations ({stations.length})</h2>
+            <div className="stations-list">
+              {stations.map((station) => (
+                <div 
+                  key={station.id} 
+                  className={`station-card ${station.id === currentStation.id ? 'active' : ''}`}
+                  style={{ '--station-color': station.color } as React.CSSProperties}
+                >
+                  <span className="station-dot" style={{ background: station.color }}></span>
+                  <div className="station-card-info">
+                    <strong>{station.name}</strong>
+                    <span>{station.description}</span>
+                  </div>
+                  {station.id === currentStation.id && (
+                    <span className="station-active-badge">Active</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Current Station Info */}
+          <section className="about-section">
+            <h2 style={{ color: currentStation.color }}>Current Station</h2>
+            <div className="about-info-row">
+              <span className="about-label">Name</span>
+              <span className="about-value">{currentStation.name}</span>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">Quality</span>
+              <span className="about-value">256 kbps MP3</span>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">Website</span>
+              <a 
+                href={currentStation.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="about-link"
+                style={{ color: currentStation.color }}
+              >
+                Visit →
+              </a>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">Stream URL</span>
+              <button 
+                className="about-copyable"
+                onClick={() => handleCopy(currentStation.streamUrl)}
+                title="Click to copy URL"
+              >
+                Copy URL
+                {copiedUrl === currentStation.streamUrl && (
+                  <span className="copied-tooltip">Copied!</span>
+                )}
+              </button>
+            </div>
+          </section>
+
+          {/* About SR */}
+          <section className="about-section">
+            <h2>About Saarländischer Rundfunk</h2>
+            <p>
+              The Saarländischer Rundfunk (SR) is the public broadcaster for Saarland, Germany. 
+              SR provides three radio stations offering news, culture, and entertainment 
+              programming since 1957.
+            </p>
+          </section>
+
+          {/* App Info */}
+          <section className="about-section">
+            <h2>App Information</h2>
+            <div className="about-info-row">
+              <span className="about-label">Built with</span>
+              <span className="about-value">Tauri + React + TypeScript</span>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">Platforms</span>
+              <span className="about-value">macOS, iOS</span>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">License</span>
+              <span className="about-value">MIT</span>
+            </div>
+          </section>
+
+          <section className="about-section about-credits">
+            <p className="about-disclaimer">
+              This is an unofficial third-party app. SR1, SR2, SR3 and Saarländischer Rundfunk 
+              are trademarks of Saarländischer Rundfunk. All rights reserved.
+            </p>
+          </section>
+        </div>
+
+        <div className="about-footer">
+          <span>Made with ♥ for radio lovers</span>
+        </div>
+      </div>
+    </div>
+  );
+};
