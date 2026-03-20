@@ -91,6 +91,10 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
               <span className="about-value">{currentStation.name}</span>
             </div>
             <div className="about-info-row">
+              <span className="about-label">Tagline</span>
+              <span className="about-value">{currentStation.description}</span>
+            </div>
+            <div className="about-info-row">
               <span className="about-label">Quality</span>
               <span className="about-value">256 kbps MP3</span>
             </div>
