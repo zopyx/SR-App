@@ -16,6 +16,8 @@ jobs:
         include:
           - target: aarch64-apple-darwin
             arch: aarch64
+          - target: x86_64-apple-darwin
+            arch: x86_64
 
     steps:
       - name: Checkout
@@ -49,8 +51,47 @@ jobs:
             src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app
           if-no-files-found: warn
 
+  release-linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        run: npm run tauri build
+        env:
+          CI: true
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+
   create-release:
-    needs: release-macos
+    needs: [release-macos, release-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -76,5 +117,7 @@ jobs:
           files: |
             artifacts/**/*.dmg
             artifacts/**/*.app
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
