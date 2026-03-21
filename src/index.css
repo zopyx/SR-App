@@ -67,14 +67,14 @@ body {
   flex-direction: column;
 }
 
-/* App Container - Compact with space for traffic lights */
+/* App Container - Compact with minimal top padding */
 .app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
-  padding: 36px var(--space-sm) var(--space-xs);
+  padding: 4px var(--space-sm) var(--space-xs);
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,
@@ -115,19 +115,19 @@ body {
   display: none;
 }
 
-/* Station Selector Toggle - Compact, no extra margins */
+/* Station Selector Toggle - Aligned with top, larger */
 .station-selector-toggle {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  gap: 6px;
+  padding: 6px 14px;
   background: var(--vibrancy-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--vibrancy-border);
-  border-radius: 14px;
+  border-radius: 18px;
   color: var(--text-primary);
-  font-size: 0.6875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
@@ -142,15 +142,15 @@ body {
 }
 
 .current-station-indicator {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent-color);
-  box-shadow: 0 0 6px var(--station-color, var(--accent-color));
+  box-shadow: 0 0 8px var(--station-color, var(--accent-color));
 }
 
 .dropdown-arrow {
-  font-size: 0.5rem;
+  font-size: 0.625rem;
   opacity: 0.6;
   transition: transform var(--transition-fast);
 }
