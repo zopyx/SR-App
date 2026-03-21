@@ -29,13 +29,9 @@ struct PlayerView: View {
             VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
                 .ignoresSafeArea()
             
-            LinearGradient(
-                colors: [Color.black.opacity(0.1), Color.black.opacity(0.3)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
+            Color.black
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
             
             VStack(spacing: 12) {
                 HStack {
