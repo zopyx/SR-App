@@ -57,11 +57,11 @@ struct PlayerView: View {
                     }) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 16))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(selectedStation.color)
                             .frame(width: 28, height: 28)
                             .background(
                                 Circle()
-                                    .fill(Color.white.opacity(0.05))
+                                    .fill(selectedStation.color.opacity(0.1))
                             )
                     }
                     .buttonStyle(PlainButtonStyle())
@@ -76,13 +76,7 @@ struct PlayerView: View {
                 
                 Text(selectedStation.name)
                     .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color.white.opacity(0.98), Color.white.opacity(0.8)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
+                    .foregroundColor(selectedStation.color)
                 
                 NowPlayingView(
                     data: nowPlayingService.currentData,
