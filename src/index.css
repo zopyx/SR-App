@@ -53,8 +53,7 @@ html, body {
 }
 
 body {
-  /* Transparent background for macOS vibrancy */
-  background: transparent !important;
+  background: #000;
   color: var(--text-primary);
   user-select: none;
   -webkit-user-select: none;
@@ -599,15 +598,16 @@ body {
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: 4px 10px;
+  padding: 4px 12px;
   background: var(--vibrancy-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
   border: 1px solid var(--vibrancy-border);
   width: 100%;
-  max-width: 200px;
+  max-width: 260px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Mute Button - Compact */
@@ -623,6 +623,7 @@ body {
   cursor: pointer;
   transition: all var(--transition-fast);
   padding: 0;
+  flex: 0 0 24px;
 }
 
 .mute-button:hover {
