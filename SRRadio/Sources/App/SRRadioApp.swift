@@ -34,9 +34,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func configureWindow(_ window: NSWindow) {
-        window.setContentSize(NSSize(width: 320, height: 400))
-        window.minSize = NSSize(width: 320, height: 400)
-        window.maxSize = NSSize(width: 320, height: 400)
+        window.setContentSize(NSSize(width: 320, height: 480))
+        window.minSize = NSSize(width: 320, height: 480)
+        window.maxSize = NSSize(width: 320, height: 480)
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.backgroundColor = .clear

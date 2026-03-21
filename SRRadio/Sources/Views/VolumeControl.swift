@@ -6,43 +6,42 @@ struct VolumeControl: View {
     let stationColor: Color
     let onMuteToggle: () -> Void
     
+    @State private var isHovering = false
+    
     var body: some View {
-        HStack(spacing: 8) {
-            // Mute button
+        HStack(spacing: 12) {
             Button(action: onMuteToggle) {
-                VolumeIcon(volume: volume, isMuted: isMuted)
-                    .frame(width: 24, height: 24)
-                    .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.05))
-                    )
+                Image(systemName: isMuted || volume == 0 ? "speaker.slash.fill" : "speaker.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.7))
+                    .frame(width: 16)
             }
             .buttonStyle(PlainButtonStyle())
             
-            // Native Slider - works better on macOS
             Slider(value: $volume, in: 0...1) { editing in
                 if !editing && volume > 0 {
                     isMuted = false
                 }
             }
-            .tint(stationColor)
-            .frame(height: 16)
+            .tint(Color.white)
+            .controlSize(.small)
             
-            // Volume percentage
-            Text(isMuted ? "Muted" : "\(Int((isMuted ? 0 : volume) * 100))%")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(.secondary)
-                .frame(width: 46, alignment: .trailing)
+            Image(systemName: "speaker.wave.3.fill")
+                .font(.system(size: 11))
+                .foregroundColor(Color.white.opacity(0.7))
+                .frame(width: 18)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
+            Capsule()
+                .fill(Color.white.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    Capsule().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                 )
         )
+        .scaleEffect(isHovering ? 1.02 : 1.0)
+        .onHover { isHovering = $0 }
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovering)
     }
 }

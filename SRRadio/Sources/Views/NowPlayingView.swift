@@ -6,41 +6,49 @@ struct NowPlayingView: View {
     let stationColor: Color
     
     var body: some View {
-        VStack(spacing: 4) {
-            Text("Now Playing")
-                .font(.system(size: 10, weight: .bold))
-                .foregroundColor(.secondary.opacity(0.7))
-                .tracking(1)
-                .textCase(.uppercase)
-            
+        VStack(spacing: 2) {
             Group {
                 if isLoading {
-                    Text("Loading...")
-                        .foregroundColor(.secondary)
-                } else if let displayText = data?.displayText {
-                    Text(displayText)
-                        .foregroundColor(stationColor)
+                    Text("Connecting...")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.7))
+                } else if let data = data {
+                    if let displayText = data.displayText {
+                        let parts = buildParts(from: data)
+                        Text(parts.main)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                        
+                        if !parts.sub.isEmpty {
+                            Text(parts.sub)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.7))
+                        }
+                    } else {
+                        Text("Live on Air")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(Color.white.opacity(0.7))
+                    }
                 } else {
-                    Text("No track information")
-                        .foregroundColor(.secondary)
+                    Text("Live on Air")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.7))
                 }
             }
-            .font(.system(size: 14, weight: .semibold))
             .multilineTextAlignment(.center)
-            .lineLimit(2)
-            .minimumScaleFactor(0.8)
+            .lineLimit(1)
+            .truncationMode(.tail)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .frame(maxWidth: 260)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                )
-        )
+        .frame(maxWidth: 280)
+    }
+    
+    private func buildParts(from data: NowPlayingData) -> (main: String, sub: String) {
+        if !data.title.isEmpty {
+            return (data.title, data.artist)
+        } else if !data.show.isEmpty {
+            return (data.show, data.moderator)
+        }
+        return (data.displayText ?? "", "")
     }
 }
 
@@ -49,40 +57,19 @@ struct StatusIndicator: View {
     let isLoading: Bool
     let stationColor: Color
     
-    private var statusText: String {
-        if isLoading {
-            return "Buffering..."
-        } else if isPlaying {
-            return "On Air"
-        } else {
-            return "Tap to Play"
-        }
-    }
-    
     var body: some View {
         HStack(spacing: 6) {
             Circle()
-                .fill(isPlaying ? stationColor : Color.white.opacity(0.3))
+                .fill(isPlaying && !isLoading ? stationColor : Color.white.opacity(0.4))
                 .frame(width: 6, height: 6)
-                .shadow(color: isPlaying ? stationColor.opacity(0.5) : Color.clear, radius: 4)
-                .opacity(isLoading ? 0.5 : 1.0)
+                .shadow(color: isPlaying && !isLoading ? stationColor.opacity(0.6) : .clear, radius: 4)
+                .opacity(isLoading ? 0.4 : 1.0)
                 .animation(isLoading ? .easeInOut(duration: 0.5).repeatForever(autoreverses: true) : .default, value: isLoading)
             
-            Text(statusText)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(isPlaying ? stationColor : .secondary)
-                .tracking(0.5)
-                .textCase(.uppercase)
+            Text(isLoading ? "BUFFERING" : (isPlaying ? "ON AIR" : "PAUSED"))
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(isPlaying && !isLoading ? .white : Color.white.opacity(0.6))
+                .tracking(1.5)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                )
-        )
     }
 }

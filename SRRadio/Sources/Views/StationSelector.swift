@@ -6,10 +6,12 @@ struct StationSelector: View {
     let stations: [Station]
     let onStationChange: (Station) -> Void
     
+    @State private var isHovering = false
+    
     var body: some View {
         VStack(spacing: 0) {
             Button(action: {
-                withAnimation(.easeOut(duration: 0.2)) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                     isExpanded.toggle()
                 }
             }) {
@@ -17,63 +19,67 @@ struct StationSelector: View {
                     Circle()
                         .fill(selectedStation.color)
                         .frame(width: 8, height: 8)
-                        .shadow(color: selectedStation.color.opacity(0.5), radius: 4)
+                        .shadow(color: selectedStation.color.opacity(0.8), radius: 4)
                     
                     Text(selectedStation.shortName)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 14, weight: .bold))
                     
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 10))
-                        .opacity(0.6)
+                        .font(.system(size: 10, weight: .bold))
+                        .opacity(0.9)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
-                .foregroundColor(.primary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 5)
+                .foregroundColor(.white)
+                .padding(.horizontal, 14) // Increased padding slightly for a better pill shape
+                .padding(.vertical, 8)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.ultraThinMaterial)
+                    Capsule()
+                        .fill(Color.black.opacity(isHovering ? 0.45 : 0.35))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                            Capsule().stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                         )
+                        .shadow(color: Color.black.opacity(0.2), radius: 3)
                 )
             }
             .buttonStyle(PlainButtonStyle())
+            .onHover { isHovering = $0 }
             
             if isExpanded {
                 dropdown
                     .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .offset(y: -10)),
-                        removal: .opacity
+                        insertion: .scale(scale: 0.95).combined(with: .opacity).combined(with: .offset(y: -5)),
+                        removal: .scale(scale: 0.95).combined(with: .opacity)
                     ))
+                    .padding(.top, 8)
             }
         }
     }
     
     private var dropdown: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 2) {
             ForEach(stations) { station in
                 Button(action: {
                     if station.id != selectedStation.id {
                         onStationChange(station)
                     }
-                    withAnimation {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         isExpanded = false
                     }
                 }) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 12) {
                         Circle()
                             .fill(station.color)
                             .frame(width: 10, height: 10)
+                            .shadow(color: station.color.opacity(0.6), radius: 3)
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(station.shortName)
+                            Text(station.name)
                                 .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(.white)
                             
                             Text(station.description)
                                 .font(.system(size: 11))
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.white.opacity(0.6))
                                 .lineLimit(1)
                         }
                         
@@ -81,34 +87,33 @@ struct StationSelector: View {
                         
                         if station.id == selectedStation.id {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundColor(.secondary)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white.opacity(0.8))
                         }
                     }
-                    .foregroundColor(.primary)
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 8)
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(station.id == selectedStation.id ? 
-                                  Color.white.opacity(0.1) : Color.clear)
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(station.id == selectedStation.id ? Color.white.opacity(0.15) : Color.clear)
                     )
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(4)
+        .padding(6)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(white: 0.1, opacity: 0.6))
+                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                 )
-                .shadow(color: Color.black.opacity(0.4), radius: 16, x: 0, y: 8)
+                .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
         )
-        .frame(width: 220)
+        .frame(width: 240)
         .zIndex(100)
     }
 }

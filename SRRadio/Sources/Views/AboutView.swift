@@ -21,14 +21,15 @@ struct AboutView: View {
     
     var body: some View {
         ZStack {
-            Color.black.opacity(0.6)
+            Color.black.opacity(0.4)
+                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active))
                 .ignoresSafeArea()
                 .onTapGesture {
                     close()
                 }
             
             dialog
-                .frame(maxWidth: 400, maxHeight: 500)
+                .frame(maxWidth: 400, maxHeight: 540) // Given macOS has some paddings, slightly larger max height
                 .padding(20)
         }
         .transition(.opacity)
@@ -39,70 +40,66 @@ struct AboutView: View {
             header
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 18) {
                     stationsSection
-                    Divider()
+                    Divider().background(Color.white.opacity(0.1))
                     currentStationSection
-                    Divider()
+                    Divider().background(Color.white.opacity(0.1))
                     aboutSRSection
-                    Divider()
+                    Divider().background(Color.white.opacity(0.1))
                     appInfoSection
                     disclaimerSection
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
             }
             
             footer
         }
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.ultraThinMaterial)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color(white: 0.1, opacity: 0.8))
+                .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
-                .shadow(color: Color.black.opacity(0.5), radius: 25, x: 0, y: 12)
+                .shadow(color: Color.black.opacity(0.5), radius: 30, x: 0, y: 15)
         )
     }
     
     private var header: some View {
         VStack(spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black.opacity(0.3))
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(Color.white.opacity(0.05))
                     .frame(width: 80, height: 80)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(currentStation.color, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 20, style: .continuous)
+                            .stroke(currentStation.color.opacity(0.5), lineWidth: 1)
                     )
                 
                 Image(currentStation.logoName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 56, height: 56)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .frame(width: 60, height: 60)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
+            .padding(.bottom, 4)
             
-            Text("SR Radio Player")
+            Text("SR Radio")
                 .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.white.opacity(0.98), Color.white.opacity(0.7)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
+                .foregroundColor(.white)
             
             Text("Version \(appVersion)")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Color.white.opacity(0.6))
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
+        .padding(.vertical, 24)
         .background(
             LinearGradient(
-                colors: [currentStation.color.opacity(0.1), Color.clear],
+                colors: [currentStation.color.opacity(0.15), Color.clear],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -110,24 +107,22 @@ struct AboutView: View {
         .overlay(alignment: .topTrailing) {
             Button(action: close) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(Color.white.opacity(0.7))
                     .frame(width: 28, height: 28)
-                    .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.1))
-                    )
+                    .background(Color.white.opacity(0.1))
+                    .clipShape(Circle())
             }
             .buttonStyle(PlainButtonStyle())
-            .padding(12)
+            .padding(16)
         }
     }
     
     private var stationsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Available Stations (\(Station.all.count))")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(.secondary)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(Color.white.opacity(0.5))
                 .tracking(0.5)
                 .textCase(.uppercase)
             
@@ -147,9 +142,9 @@ struct AboutView: View {
     }
     
     private var currentStationSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Current Station")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 12, weight: .bold))
                 .foregroundColor(currentStation.color)
                 .tracking(0.5)
                 .textCase(.uppercase)
@@ -163,55 +158,56 @@ struct AboutView: View {
             
             InfoRow(label: "Quality", value: "256 kbps MP3")
             
-            HStack {
+            HStack(alignment: .top) {
                 Text("Website")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .frame(width: 80, alignment: .leading)
-                
-                Link("Visit →", destination: currentStation.website)
                     .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color.white.opacity(0.6))
+                    .frame(width: 100, alignment: .leading)
+                
+                Link("Visit website \u{2192}", destination: currentStation.website)
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(currentStation.color)
             }
             
-            HStack {
+            HStack(alignment: .top) {
                 Text("Stream URL")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .frame(width: 80, alignment: .leading)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color.white.opacity(0.6))
+                    .frame(width: 100, alignment: .leading)
                 
                 Button(action: {
                     copyToClipboard(currentStation.streamUrl.absoluteString)
                 }) {
                     Text(copiedUrl == currentStation.streamUrl.absoluteString ? "Copied!" : "Copy URL")
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: 13, weight: .semibold))
                 }
                 .buttonStyle(PlainButtonStyle())
-                .foregroundColor(.primary)
+                .foregroundColor(.white)
             }
         }
     }
     
     private var aboutSRSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("About Saarländischer Rundfunk")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(.secondary)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(Color.white.opacity(0.5))
                 .tracking(0.5)
                 .textCase(.uppercase)
             
             Text("The Saarländischer Rundfunk (SR) is the public broadcaster for Saarland, Germany. SR provides three radio stations offering news, culture, and entertainment programming since 1957.")
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .lineSpacing(2)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Color.white.opacity(0.8))
+                .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
     
     private var appInfoSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("App Information")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundColor(.secondary)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(Color.white.opacity(0.5))
                 .tracking(0.5)
                 .textCase(.uppercase)
             
@@ -221,14 +217,14 @@ struct AboutView: View {
             InfoRow(label: "Platforms", value: "macOS")
             InfoRow(label: "Author", value: "Andreas Jung")
             
-            HStack {
+            HStack(alignment: .top) {
                 Text("Website")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .frame(width: 80, alignment: .leading)
-                
-                Link("www.zopyx.com →", destination: URL(string: "https://www.zopyx.com")!)
                     .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color.white.opacity(0.6))
+                    .frame(width: 100, alignment: .leading)
+                
+                Link("zopyx.com \u{2192}", destination: URL(string: "https://www.zopyx.com")!)
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(currentStation.color)
             }
             
@@ -237,24 +233,22 @@ struct AboutView: View {
     }
     
     private var disclaimerSection: some View {
-        Text("This is an unofficial third-party app. SR1, SR2, SR3 and Saarländischer Rundfunk are trademarks of Saarländischer Rundfunk. All rights reserved.")
-            .font(.system(size: 10))
-            .foregroundColor(.secondary.opacity(0.7))
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.top, 8)
+        Text("This is an unofficial third-party app. SR1, SR2, SR3 and Saarländischer Rundfunk are trademarks of Saarländischer Rundfunk.")
+            .font(.system(size: 11, weight: .medium))
+            .foregroundColor(Color.white.opacity(0.4))
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 10)
+            .fixedSize(horizontal: false, vertical: true)
     }
     
     private var footer: some View {
         Text("Made with ♥ for radio lovers")
-            .font(.system(size: 11, weight: .medium))
-            .foregroundColor(.secondary)
+            .font(.system(size: 12, weight: .semibold))
+            .foregroundColor(Color.white.opacity(0.5))
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(
-                Rectangle()
-                    .fill(Color.white.opacity(0.03))
-            )
+            .padding(.vertical, 16)
+            .background(Color.white.opacity(0.05))
     }
     
     private func close() {
@@ -264,14 +258,17 @@ struct AboutView: View {
     }
     
     private func copyToClipboard(_ string: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(string, forType: .string)
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(string, forType: .string)
         withAnimation {
             copiedUrl = string
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation {
-                copiedUrl = nil
+                if copiedUrl == string {
+                    copiedUrl = nil
+                }
             }
         }
     }
@@ -284,18 +281,20 @@ struct StationCard: View {
     
     var body: some View {
         Button(action: onSelect) {
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 Circle()
                     .fill(station.color)
                     .frame(width: 10, height: 10)
+                    .shadow(color: station.color.opacity(0.6), radius: 3)
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(station.name)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
                     
                     Text(station.description)
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.6))
                         .lineLimit(1)
                 }
                 
@@ -303,22 +302,25 @@ struct StationCard: View {
                 
                 if isActive {
                     Text("Active")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(Color.white.opacity(0.9))
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
+                        .padding(.vertical, 4)
                         .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.white.opacity(0.1))
+                            Capsule()
+                                .fill(Color.white.opacity(0.15))
                         )
                 }
             }
-            .foregroundColor(.primary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
             .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(isActive ? Color.white.opacity(0.1) : Color.clear)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(isActive ? Color.white.opacity(0.1) : Color.white.opacity(0.03))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.white.opacity(isActive ? 0.15 : 0.05), lineWidth: 1)
             )
             .contentShape(Rectangle())
         }
@@ -333,16 +335,17 @@ struct InfoRow: View {
     var valueColor: Color? = nil
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             Text(label)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
-                .frame(width: 80, alignment: .leading)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(Color.white.opacity(0.6))
+                .frame(width: 100, alignment: .leading)
             
             Text(value)
-                .font(.system(size: 13))
-                .foregroundColor(valueColor ?? .primary)
-                .lineLimit(1)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(valueColor ?? .white)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
