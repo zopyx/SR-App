@@ -182,6 +182,20 @@ const tasks = [
 - Use descriptive task descriptions (3-5 words)
 - Limit parallel tasks to avoid context overflow
 
+### Testing Requirements
+
+**Write a test for every bug fix or regression:**
+- When fixing a bug, add a test that reproduces the issue
+- When modifying behavior, update or add tests
+- Tests prevent regressions and document expected behavior
+- Run `npm test` before committing changes
+
+**Example workflow:**
+```
+1. Identify bug → Write failing test → Fix bug → Test passes
+2. Add feature → Write test for feature → Implement → Test passes
+```
+
 ## Resources
 
 - [Tauri Docs](https://tauri.app/v2/api/)

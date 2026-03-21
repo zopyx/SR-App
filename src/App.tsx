@@ -8,6 +8,7 @@ import './App.css'
 function App() {
   const [currentStation, setCurrentStation] = useState<Station>(defaultStation)
   const [isAboutOpen, setIsAboutOpen] = useState(false)
+  const [isCompactMode, setIsCompactMode] = useState(false)
 
   // Listen for menu About click events
   useEffect(() => {
@@ -30,30 +31,37 @@ function App() {
 
   return (
     <div className="app-container">
-      <button 
-        className="info-button" 
-        onClick={() => setIsAboutOpen(true)}
-        aria-label="About SR Radio"
-        title="About"
-      >
-        ℹ
-      </button>
+      {!isCompactMode && (
+        <button 
+          className="info-button" 
+          onClick={() => setIsAboutOpen(true)}
+          aria-label="About SR Radio"
+          title="About"
+        >
+          ℹ
+        </button>
+      )}
       
       <RadioPlayer
         station={currentStation}
         onStationChange={setCurrentStation}
         allStations={stations}
+        isCompactMode={isCompactMode}
+        onCompactModeChange={setIsCompactMode}
       />
       
-      <footer className="app-footer">
-        <p>SR Radio Player • {stations.length} Stations</p>
-      </footer>
+      {!isCompactMode && (
+        <footer className="app-footer">
+          <p>SR Radio Player • {stations.length} Stations</p>
+        </footer>
+      )}
       
       <AboutDialog 
         isOpen={isAboutOpen} 
         onClose={() => setIsAboutOpen(false)}
         stations={stations}
         currentStation={currentStation}
+        onStationChange={setCurrentStation}
       />
     </div>
   )

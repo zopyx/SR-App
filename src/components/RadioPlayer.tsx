@@ -6,6 +6,8 @@ interface RadioPlayerProps {
   station: Station;
   onStationChange?: (station: Station) => void;
   allStations?: Station[];
+  isCompactMode?: boolean;
+  onCompactModeChange?: (compact: boolean) => void;
 }
 
 
@@ -16,7 +18,9 @@ const RETRY_DELAY = 2000;
 export const RadioPlayer: React.FC<RadioPlayerProps> = ({ 
   station, 
   onStationChange,
-  allStations = []
+  allStations = [],
+  isCompactMode = false,
+  onCompactModeChange
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -320,28 +324,42 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
         </div>
       </div>
       
-      <h1 className="station-name">{station.name}</h1>
-      
-      {/* Now Playing Info */}
-      <div className="now-playing-container">
-        <div className="now-playing-label">Now Playing</div>
-        <div className="now-playing-text" style={{ color: station.color }}>
-          {nowPlayingLoading 
-            ? 'Loading...' 
-            : nowPlayingText 
-              ? nowPlayingText 
-              : 'No track information'}
-        </div>
-      </div>
-      
-      {error && (
-        <div className="error-message" onClick={() => setError(null)} role="button" tabIndex={0}>
-          ⚠️ {error}
-        </div>
+      {/* Compact Mode Toggle */}
+      <button 
+        className="compact-toggle"
+        onClick={() => onCompactModeChange?.(!isCompactMode)}
+        aria-label={isCompactMode ? 'Expand UI' : 'Minimize UI'}
+        title={isCompactMode ? 'Expand' : 'Minimize'}
+      >
+        {isCompactMode ? '□' : '—'}
+      </button>
+
+      {!isCompactMode && (
+        <>
+          <h1 className="station-name">{station.name}</h1>
+          
+          {/* Now Playing Info */}
+          <div className="now-playing-container">
+            <div className="now-playing-label">Now Playing</div>
+            <div className="now-playing-text" style={{ color: station.color }}>
+              {nowPlayingLoading 
+                ? 'Loading...' 
+                : nowPlayingText 
+                  ? nowPlayingText 
+                  : 'No track information'}
+            </div>
+          </div>
+          
+          {error && (
+            <div className="error-message" onClick={() => setError(null)} role="button" tabIndex={0}>
+              ⚠️ {error}
+            </div>
+          )}
+        </>
       )}
       
       {/* Volume Control */}
-      <div className="volume-control">
+      <div className={`volume-control ${isCompactMode ? 'compact' : ''}`}>
         <button 
           className="mute-button"
           onClick={toggleMute}
@@ -365,12 +383,14 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
         <span className="volume-value">{isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}</span>
       </div>
 
-      <div className={`status-container ${isPlaying ? 'playing' : ''} ${isLoading ? 'loading' : ''}`}>
-        <span className="status-dot" style={{ background: isPlaying ? station.color : undefined }}></span>
-        <span className="status-indicator">
-          {isLoading ? 'Buffering...' : isPlaying ? 'On Air' : 'Tap to Play'}
-        </span>
-      </div>
+      {!isCompactMode && (
+        <div className={`status-container ${isPlaying ? 'playing' : ''} ${isLoading ? 'loading' : ''}`}>
+          <span className="status-dot" style={{ background: isPlaying ? station.color : undefined }}></span>
+          <span className="status-indicator">
+            {isLoading ? 'Buffering...' : isPlaying ? 'On Air' : 'Tap to Play'}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

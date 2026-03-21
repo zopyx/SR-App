@@ -3,18 +3,23 @@ import { getVersion } from '@tauri-apps/api/app';
 import type { Station } from '../data/stations';
 import { fetchCurrentSong, type NowPlayingData } from '../services/nowPlaying';
 
+// Build timestamp - injected at build time
+const BUILD_DATE = import.meta.env.VITE_BUILD_DATE || new Date().toISOString();
+
 interface AboutDialogProps {
   isOpen: boolean;
   onClose: () => void;
   stations: Station[];
   currentStation: Station;
+  onStationChange?: (station: Station) => void;
 }
 
 export const AboutDialog: React.FC<AboutDialogProps> = ({ 
   isOpen, 
   onClose, 
   stations,
-  currentStation 
+  currentStation,
+  onStationChange
 }) => {
   const [version, setVersion] = useState<string>('0.0.0');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
@@ -69,10 +74,18 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
             <h2>Available Stations ({stations.length})</h2>
             <div className="stations-list">
               {stations.map((station) => (
-                <div 
+                <button 
                   key={station.id} 
                   className={`station-card ${station.id === currentStation.id ? 'active' : ''}`}
                   style={{ '--station-color': station.color } as React.CSSProperties}
+                  onClick={() => {
+                    if (onStationChange && station.id !== currentStation.id) {
+                      onStationChange(station);
+                      onClose();
+                    }
+                  }}
+                  disabled={station.id === currentStation.id}
+                  aria-label={`Select ${station.name}`}
                 >
                   <span className="station-dot" style={{ background: station.color }}></span>
                   <div className="station-card-info">
@@ -82,7 +95,7 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
                   {station.id === currentStation.id && (
                     <span className="station-active-badge">Active</span>
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </section>
