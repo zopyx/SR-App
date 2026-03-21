@@ -40,7 +40,7 @@ final class AudioPlayer: ObservableObject {
         cleanup()
         retryCount = 0
         
-        let asset = AVAsset(url: station.streamUrl)
+        let asset = AVURLAsset(url: station.streamUrl, options: nil)
         playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
         

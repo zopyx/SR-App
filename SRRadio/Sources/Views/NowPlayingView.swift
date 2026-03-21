@@ -24,21 +24,14 @@ struct NowPlayingView: View {
                     Text("Connecting...")
                         .font(.system(size: statusFontSize, weight: .medium))
                         .foregroundColor(Color.white.opacity(0.7))
-                } else if let data = data {
-                    if let displayText = data.displayText {
-                        let parts = buildParts(from: data)
-                        Text(parts.main)
-                            .font(.system(size: mainFontSize, weight: .semibold))
-                            .foregroundColor(.white)
-                        
-                        if !parts.sub.isEmpty {
-                            Text(parts.sub)
-                                .font(.system(size: subFontSize, weight: .medium))
-                                .foregroundColor(Color.white.opacity(0.7))
-                        }
-                    } else {
-                        Text("Live on Air")
-                            .font(.system(size: statusFontSize, weight: .medium))
+                } else if let data = data, let parts = buildParts(from: data) {
+                    Text(parts.main)
+                        .font(.system(size: mainFontSize, weight: .semibold))
+                        .foregroundColor(.white)
+                    
+                    if !parts.sub.isEmpty {
+                        Text(parts.sub)
+                            .font(.system(size: subFontSize, weight: .medium))
                             .foregroundColor(Color.white.opacity(0.7))
                     }
                 } else {
@@ -54,13 +47,15 @@ struct NowPlayingView: View {
         .frame(maxWidth: maxWidth)
     }
     
-    private func buildParts(from data: NowPlayingData) -> (main: String, sub: String) {
+    private func buildParts(from data: NowPlayingData) -> (main: String, sub: String)? {
         if !data.title.isEmpty {
             return (data.title, data.artist)
         } else if !data.show.isEmpty {
             return (data.show, data.moderator)
+        } else if data.displayText != nil {
+            return (data.displayText!, "")
         }
-        return (data.displayText ?? "", "")
+        return nil
     }
 }
 
