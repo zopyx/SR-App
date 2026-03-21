@@ -214,6 +214,9 @@ const tasks = [
 - All tests must pass before commit and push
 - Fix failing tests first, then commit
 
+**Optional CI/CD local check:**
+- You can run `act` to test CI/CD workflows locally before committing and pushing
+
 ### UI Constraints
 
 **No scrolling in default window:**

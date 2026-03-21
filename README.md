@@ -1,72 +1,96 @@
-# SR2 Radio - Tauri App
+# SR Radio Player
 
-A native macOS & iOS radio player for SR2 Kultur built with React, TypeScript, Vite, and Tauri.
+[![Visual Tests](https://github.com/zopyx/SR-App/actions/workflows/visual-tests.yml/badge.svg)](https://github.com/zopyx/SR-App/actions/workflows/visual-tests.yml)
+[![Release](https://github.com/zopyx/SR-App/actions/workflows/release.yml/badge.svg)](https://github.com/zopyx/SR-App/actions/workflows/release.yml)
+
+A native macOS and iOS radio player for Saarländischer Rundfunk (SR) stations, built with React, TypeScript, Vite, and Tauri.
+
+## Stations
+
+- SR1 Europawelle
+- SR2 KulturRadio
+- SR3 Saarlandwelle
 
 ## Features
 
-- Clean, native macOS interface with vibrancy effects
-- iOS app support (iPhone/iPad)
-- Lightweight and fast (Rust backend)
-- Single-station focus: SR2 Kultur radio stream
-- Compact player window (400x600)
-- Hidden title bar with overlay style
-- Keyboard shortcuts (Space to play/pause, Cmd+Q to quit)
+- Station switching with auto-play
+- Compact, fixed-size player window (320x480)
+- Native macOS vibrancy and glass morphism effects
+- Play/pause on station logo click
+- Volume control (app-level)
+- About dialog with station details
+- Keyboard shortcuts for quick control
+
+## Keyboard Shortcuts
+
+- Space: Play/Pause
+- Cmd+Q: Quit
+- Cmd+M: Minimize
 
 ## Development
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or later)
-- [Rust](https://rustup.rs/) (latest stable)
-- macOS 10.15 or later
+- Node.js 18+
+- Rust (latest stable)
+- macOS 10.15+ for desktop builds
 
 ### Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Run development server
 npm run tauri:dev
 ```
 
-### Building
+Makefile shortcuts:
 
 ```bash
-# Build for macOS (ARM64 - Apple Silicon)
-npm run tauri:build
+make dev
+make build
+make build-universal
+make test
+make test-visual
+make test-visual-update
+```
 
-# Build Universal macOS binary (Intel + Apple Silicon)
+### Build
+
+```bash
+npm run tauri:build
 npm run tauri:build:universal
 ```
 
-### iOS Build
+### iOS
 
 ```bash
-# Initialize iOS project (one-time setup)
 npm run tauri ios init
-
-# Build and run on iOS Simulator
 npm run tauri ios dev
-
-# Build for device
 npm run tauri ios build
 ```
 
-To open in Xcode:
+Open in Xcode:
+
 ```bash
 open src-tauri/gen/apple/sr2.xcodeproj
 ```
 
-### Output
+## Testing
 
-**macOS:**
-- App Bundle: `src-tauri/target/release/bundle/macos/SR2 Radio.app`
-- DMG Installer: `src-tauri/target/release/bundle/dmg/SR2 Radio_*.dmg`
+```bash
+npm test
+npm run test:visual
+```
 
-**iOS:**
-- Xcode Project: `src-tauri/gen/apple/sr2.xcodeproj`
-- Build Archive: Use Xcode to export IPA
+Update visual snapshots:
+
+```bash
+npm run test:visual:update
+```
+
+## CI/CD
+
+- GitHub Actions runs visual regression tests and release packaging.
+- You can run CI workflows locally with `act` before committing and pushing.
 
 ## Project Structure
 
@@ -89,11 +113,9 @@ sr2/
 
 ## Technologies
 
-- **Frontend**: React 19 + TypeScript + Vite
-- **Backend**: Tauri v2 (Rust)
-- **Desktop**: macOS app with native vibrancy
-- **Mobile**: iOS app (iPhone/iPad support)
-- **Build**: Xcode + CocoaPods
+- React 19 + TypeScript + Vite
+- Tauri v2 (Rust backend)
+- macOS and iOS builds via Xcode
 
 ## License
 
