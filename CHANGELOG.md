@@ -2,6 +2,19 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.3.2] - 2026-03-21
+
+### Build & Release
+- **Release workflow aligned with semver tags**: Tagged releases now trigger on `*.*.*` and `*.*.*-*`
+- **macOS builds**: Apple Silicon only (Intel build removed)
+- **Linux artifacts**: Included in tagged releases
+
+### Documentation
+- **Release guidance**: Documentation now reflects Apple Silicon–only macOS builds
+- **Versioning**: Require semantic versioning for releases/tags
+
+---
+
 ## [0.2.4] - 2026-03-21
 
 ### Bug Fixes
