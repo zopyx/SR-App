@@ -67,14 +67,14 @@ body {
   flex-direction: column;
 }
 
-/* App Container - Tight fit */
+/* App Container - Balanced padding */
 .app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 4px var(--space-sm) 2px;
+  padding: 8px var(--space-sm) 4px;
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,
@@ -724,19 +724,19 @@ body {
   padding-right: 6px;
 }
 
-/* App Footer - Minimal */
+/* App Footer */
 .app-footer {
-  margin-top: 2px;
-  padding: 2px 0;
+  margin-top: 6px;
+  padding: 4px 0;
   text-align: center;
   flex-shrink: 0;
 }
 
 .app-footer p {
   color: var(--text-tertiary);
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
