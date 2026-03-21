@@ -95,7 +95,11 @@ struct PlayerView: View {
                     }
                 }
                 .padding(.horizontal, 22)
+#if os(macOS)
                 .padding(.top, 36) // extra padding to clear macOS traffic lights
+#else
+                .padding(.top, 16)
+#endif
                 .zIndex(2)
                 
                 Spacer()
@@ -151,7 +155,11 @@ struct PlayerView: View {
                 .padding(.bottom, 24)
                 .zIndex(1)
             }
+#if os(macOS)
             .frame(width: 320, height: 480)
+#else
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+#endif
             
             if showAbout {
                 AboutView(
@@ -166,7 +174,11 @@ struct PlayerView: View {
                 .zIndex(3)
             }
         }
+#if os(macOS)
         .frame(width: 320, height: 480)
+#else
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+#endif
         .onAppear {
             audioPlayer.loadStation(selectedStation, autoPlay: true)
             nowPlayingService.startMonitoring(station: selectedStation)

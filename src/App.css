@@ -1,7 +1,0 @@
-/* App-specific styles - most styles are in index.css */
-
-/* Ensure the app fills the window */
-#root {
-  width: 100%;
-  height: 100%;
-}

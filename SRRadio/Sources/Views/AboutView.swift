@@ -33,8 +33,14 @@ struct AboutView: View {
                 }
             
             dialog
+#if os(macOS)
                 .frame(maxWidth: 400, maxHeight: 540) // Given macOS has some paddings, slightly larger max height
                 .padding(20)
+#else
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+#endif
         }
         .transition(.opacity)
     }
