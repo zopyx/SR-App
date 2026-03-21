@@ -22,7 +22,11 @@ struct AboutView: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
+#if os(macOS)
                 .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active))
+#else
+                .background(VisualEffectView())
+#endif
                 .ignoresSafeArea()
                 .onTapGesture {
                     close()
@@ -59,7 +63,11 @@ struct AboutView: View {
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color(white: 0.1, opacity: 0.8))
+#if os(macOS)
                 .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)))
+#else
+                .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)))
+#endif
                 .overlay(
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .stroke(Color.white.opacity(0.15), lineWidth: 1)
@@ -258,9 +266,13 @@ struct AboutView: View {
     }
     
     private func copyToClipboard(_ string: String) {
+#if os(macOS)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(string, forType: .string)
+#else
+        UIPasteboard.general.string = string
+#endif
         withAnimation {
             copiedUrl = string
         }

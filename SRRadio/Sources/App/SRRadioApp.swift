@@ -2,13 +2,20 @@ import SwiftUI
 
 @main
 struct SRRadioApp: App {
+#if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+#endif
     
     var body: some Scene {
         WindowGroup {
+#if os(macOS)
             PlayerView()
                 .background(VisualEffectView(material: .sidebar, blendingMode: .behindWindow))
+#else
+            PlayerView()
+#endif
         }
+#if os(macOS)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .commands {
@@ -18,9 +25,11 @@ struct SRRadioApp: App {
                 }
             }
         }
+#endif
     }
 }
 
+#if os(macOS)
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         if let window = NSApplication.shared.windows.first {
@@ -93,3 +102,4 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.post(name: NSNotification.Name("ShowAbout"), object: nil)
     }
 }
+#endif

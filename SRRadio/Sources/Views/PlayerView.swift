@@ -5,7 +5,11 @@ struct DynamicBackground: View {
     
     var body: some View {
         ZStack {
+#if os(macOS)
             VisualEffectView(material: .popover, blendingMode: .behindWindow, state: .active)
+#else
+            VisualEffectView()
+#endif
             
             Color.black.opacity(0.55) // Ensures a consistently dark backdrop even in macOS Light Mode
             
@@ -176,7 +180,11 @@ struct PlayerView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.white.opacity(0.05))
+#if os(macOS)
                 .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous)))
+#else
+                .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous)))
+#endif
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
