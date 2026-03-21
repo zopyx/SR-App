@@ -154,6 +154,10 @@ src-tauri/target/release/bundle/
 
 This project uses **Yolo Mode** - agents should be decisive and make minimal changes to achieve goals efficiently.
 
+### Versioning
+
+- Always use semantic versioning for releases and tags (e.g., `1.2.3`).
+
 ### Using Subagents
 
 For parallel task execution, use the `Task` tool to spawn subagents:
