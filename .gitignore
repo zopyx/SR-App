@@ -29,3 +29,9 @@ src-tauri/gen/schemas
 
 # Electron (legacy - removed)
 dist-electron
+
+# Playwright
+test-results/
+playwright-report/
+test-visual/__snapshots__/*-actual.png
+test-visual/__snapshots__/*-diff.png

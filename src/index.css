@@ -224,7 +224,9 @@ body {
 .station-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
 }
 
 .station-name-short {
@@ -233,8 +235,13 @@ body {
 }
 
 .station-desc {
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 }
 
 /* Logo Wrapper - Compact */
