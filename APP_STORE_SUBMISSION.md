@@ -32,8 +32,8 @@ Edit `src-tauri/tauri.conf.json`:
 ### 2. Build for App Store
 
 ```bash
-# Build universal binary (Intel + Apple Silicon)
-npm run tauri:build:universal
+# Build Apple Silicon binary
+npm run tauri:build -- --target aarch64-apple-darwin
 
 # Or build for specific architecture
 npm run tauri:build -- --target aarch64-apple-darwin
@@ -43,7 +43,7 @@ npm run tauri:build -- --target aarch64-apple-darwin
 
 ```bash
 # The .app bundle will be at:
-src-tauri/target/universal-apple-darwin/release/bundle/macos/SR2 Radio.app
+src-tauri/target/aarch64-apple-darwin/release/bundle/macos/SR2 Radio.app
 ```
 
 ## App Store Connect

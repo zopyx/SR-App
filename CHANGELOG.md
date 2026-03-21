@@ -177,7 +177,6 @@ Before:                    After:
 {
   "tauri:dev": "tauri dev",
   "tauri:build": "tauri build",
-  "tauri:build:universal": "tauri build --target universal-apple-darwin"
 }
 ```
 
@@ -261,11 +260,9 @@ src-tauri/target/release/bundle/
 - [ ] Now playing metadata display
 - [ ] Menu bar icon (tray)
 - [ ] Auto-updater integration
-- [ ] Universal binary (Intel + Apple Silicon)
 - [ ] Code signing for distribution
 
 ### Platform Support
 - [x] macOS (Apple Silicon)
-- [ ] macOS (Intel) - via universal build
 - [ ] Windows
 - [ ] Linux

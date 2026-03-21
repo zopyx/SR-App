@@ -119,6 +119,7 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+    continue-on-error: true
 
     steps:
       - name: Checkout
@@ -154,6 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    continue-on-error: true
 
     steps:
       - name: Checkout
@@ -217,7 +219,7 @@ jobs:
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
 
   release:
-    needs: [build-macos, build-linux, build-windows, build-android]
+    needs: [build-macos, build-linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write

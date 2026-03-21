@@ -47,7 +47,6 @@ Makefile shortcuts:
 ```bash
 make dev
 make build
-make build-universal
 make test
 make test-visual
 make test-visual-update
@@ -57,7 +56,6 @@ make test-visual-update
 
 ```bash
 npm run tauri:build
-npm run tauri:build:universal
 ```
 
 ### iOS

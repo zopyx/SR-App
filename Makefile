@@ -1,4 +1,4 @@
-.PHONY: dev build build-universal test test-visual test-visual-update
+.PHONY: dev build test test-visual test-visual-update
 
 dev:
 	npm run tauri:dev
@@ -6,8 +6,6 @@ dev:
 build:
 	npm run tauri:build
 
-build-universal:
-	npm run tauri:build:universal
 
 test:
 	npm test

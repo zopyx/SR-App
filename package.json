@@ -16,7 +16,6 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "tauri:build:universal": "tauri build --target universal-apple-darwin",
     "tauri:build:mas": "tauri build --target aarch64-apple-darwin --bundles app",
     "notarize": "./scripts/notarize.sh",
     "notarize:check": "xcrun notarytool history --keychain-profile AC_PASSWORD"
