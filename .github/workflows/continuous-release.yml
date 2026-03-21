@@ -44,10 +44,8 @@ jobs:
         include:
           - target: aarch64-apple-darwin
             arch: aarch64
-            name: apple-silicon
           - target: x86_64-apple-darwin
             arch: x86_64
-            name: intel
 
     steps:
       - name: Checkout
@@ -75,11 +73,86 @@ jobs:
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dmg-${{ matrix.arch }}
+          name: macos-${{ matrix.arch }}
           path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
 
+  build-linux:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Build Tauri app
+        run: npm run tauri build
+        env:
+          CI: true
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+
+  build-windows:
+    needs: test
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        run: npm run tauri build
+        env:
+          CI: true
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/nsis/*.exe
+
   release:
-    needs: build-macos
+    needs: [build-macos, build-linux, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -88,10 +161,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-          pattern: dmg-*
 
       - name: List artifacts
-        run: find artifacts -type f -name "*.dmg"
+        run: find artifacts -type f \( -name "*.dmg" -o -name "*.deb" -o -name "*.rpm" -o -name "*.msi" -o -name "*.exe" \)
 
       - name: Get short SHA
         id: sha
@@ -116,11 +188,23 @@ jobs:
 
             **Commit:** ${{ github.sha }}
             **Branch:** ${{ github.ref_name }}
-            **Date:** ${{ github.event.head_commit.timestamp }}
+
+            ### Downloads
+            - **macOS** (Apple Silicon): `SR2 Radio_*_aarch64.dmg`
+            - **macOS** (Intel): `SR2 Radio_*_x86_64.dmg`
+            - **Linux** (Debian/Ubuntu): `sr2_*_amd64.deb`
+            - **Linux** (Fedora/RHEL): `sr2-*.x86_64.rpm`
+            - **Windows** (Installer): `SR2 Radio_*_x64-setup.exe`
+            - **Windows** (MSI): `SR2 Radio_*_x64_en-US.msi`
 
             These builds are updated automatically with each push to main.
           draft: false
           prerelease: true
-          files: artifacts/**/*.dmg
+          files: |
+            artifacts/**/*.dmg
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            artifacts/**/*.msi
+            artifacts/**/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
