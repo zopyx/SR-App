@@ -35,58 +35,112 @@ final class NowPlayingService: ObservableObject {
     private func fetchNowPlaying(for station: Station) {
         guard currentStationId == station.id else { return }
         
+        // Use the music research page for song info
+        let songUrl = URL(string: "https://musikrecherche.sr.de/\(station.id)/musicresearch.php")!
+        // Use the EPG API for show info
         let showUrl = URL(string: "https://www.sr.de/sr/epg/nowPlaying.jsp?welle=\(station.id)")!
+        
+        var title = ""
+        var artist = ""
+        var show = ""
+        var moderator = ""
+        let group = DispatchGroup()
         
         print("[NowPlaying] Fetching for station: \(station.id)")
         
-        URLSession.shared.dataTask(with: showUrl) { [weak self] data, response, error in
-            guard let self = self else { return }
+        // Fetch song info from music research page
+        group.enter()
+        URLSession.shared.dataTask(with: songUrl) { [weak self] data, response, error in
+            defer { group.leave() }
             
             if let error = error {
-                print("[NowPlaying] Error: \(error)")
-            }
-            
-            guard let data = data else {
-                print("[NowPlaying] No data received")
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                }
+                print("[NowPlaying] Song fetch error: \(error)")
                 return
             }
             
-            do {
-                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-                print("[NowPlaying] JSON: \(json ?? [:])")
-                
-                if let nowPlaying = json?["now playing"] as? [String: [String: Any]],
-                   let stationData = nowPlaying[station.id] {
-                    
-                    let show = stationData["titel"] as? String ?? ""
-                    let moderator = stationData["moderator"] as? String ?? ""
-                    
-                    print("[NowPlaying] Show: \(show), Moderator: \(moderator)")
-                    
-                    DispatchQueue.main.async {
-                        guard self.currentStationId == station.id else { return }
-                        self.currentData = NowPlayingData(
-                            title: "",
-                            artist: "",
-                            show: show,
-                            moderator: moderator
-                        )
-                        self.isLoading = false
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                    }
-                }
-            } catch {
-                print("[NowPlaying] Parse error: \(error)")
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                }
+            guard let data = data, let html = String(data: data, encoding: .utf8) else {
+                print("[NowPlaying] No song data received")
+                return
+            }
+            
+            // Parse HTML to extract first song (current)
+            if let parsedTitle = self?.extractFirstTitle(from: html),
+               let parsedArtist = self?.extractFirstArtist(from: html) {
+                title = parsedTitle
+                artist = parsedArtist
+                print("[NowPlaying] Parsed song: \(artist) - \(title)")
             }
         }.resume()
+        
+        // Fetch show info from EPG API
+        group.enter()
+        URLSession.shared.dataTask(with: showUrl) { data, response, error in
+            defer { group.leave() }
+            
+            guard let data = data else { return }
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                if let nowPlaying = json?["now playing"] as? [String: [String: Any]],
+                   let stationData = nowPlaying[station.id] {
+                    show = stationData["titel"] as? String ?? ""
+                    moderator = stationData["moderator"] as? String ?? ""
+                }
+            } catch {
+                print("[NowPlaying] Show parse error: \(error)")
+            }
+        }.resume()
+        
+        group.notify(queue: .main) { [weak self] in
+            guard let self = self, self.currentStationId == station.id else { return }
+            
+            self.currentData = NowPlayingData(
+                title: title,
+                artist: artist,
+                show: show,
+                moderator: moderator
+            )
+            self.isLoading = false
+            
+            print("[NowPlaying] Updated: \(artist) - \(title) | Show: \(show)")
+        }
+    }
+    
+    // MARK: - HTML Parsing
+    
+    private func extractFirstTitle(from html: String) -> String? {
+        // Find the first occurrence of musicResearch__Item__Content__Title
+        let pattern = "musicResearch__Item__Content__Title[^>]*>([^<]+)</div>"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)) else {
+            return nil
+        }
+        
+        if let range = Range(match.range(at: 1), in: html) {
+            let title = String(html[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+            // Clean up HTML entities
+            return title.replacingOccurrences(of: "&amp;", with: "&")
+                       .replacingOccurrences(of: "&#039;", with: "'")
+                       .replacingOccurrences(of: "&quot;", with: "\"")
+        }
+        return nil
+    }
+    
+    private func extractFirstArtist(from html: String) -> String? {
+        // Find the first occurrence of musicResearch__Item__Content__Artist
+        let pattern = "musicResearch__Item__Content__Artist[^>]*>([^<]+)</div>"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+              let match = regex.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)) else {
+            return nil
+        }
+        
+        if let range = Range(match.range(at: 1), in: html) {
+            let artist = String(html[range]).trimmingCharacters(in: .whitespacesAndNewlines)
+            // Clean up HTML entities
+            return artist.replacingOccurrences(of: "&amp;", with: "&")
+                         .replacingOccurrences(of: "&#039;", with: "'")
+                         .replacingOccurrences(of: "&quot;", with: "\"")
+        }
+        return nil
     }
 }
