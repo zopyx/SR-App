@@ -29,8 +29,22 @@ final class AudioPlayer: ObservableObject {
     private var preMuteVolume: Double = 0.8
     
     init() {
-        // Volume updates are handled in didSet via updateVolume()
+        #if os(iOS)
+        setupAudioSession()
+        #endif
     }
+    
+    #if os(iOS)
+    private func setupAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            print("Failed to set up audio session: \(error.localizedDescription)")
+        }
+    }
+    #endif
     
     deinit {
         cleanup()
