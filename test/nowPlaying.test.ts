@@ -47,6 +47,7 @@ describe('NowPlaying Service', () => {
     expect(data?.artist).toBe('Test Artist');
     expect(data?.show).toBe('Test Show');
     expect(data?.moderator).toBe('Test Moderator');
+    expect(vi.getTimerCount()).toBe(0);
   });
 
   it('should handle errors gracefully', async () => {

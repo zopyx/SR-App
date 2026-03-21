@@ -43,6 +43,8 @@ export function subscribeToNowPlaying(
       clearTimeout(pollTimeout);
       pollTimeout = null;
       currentStationId = null;
+      // Invalidate any in-flight polling to prevent rescheduling
+      pollGeneration++;
     }
   };
 }
@@ -66,12 +68,14 @@ async function fetchNowPlaying(stationId: string, expectedGeneration: number): P
     // Notify all listeners
     listeners.forEach(listener => listener(data));
 
-    // Schedule next poll only if generation hasn't changed
-    pollTimeout = setTimeout(() => {
-      if (expectedGeneration === pollGeneration) {
-        fetchNowPlaying(stationId, expectedGeneration);
-      }
-    }, POLL_INTERVAL);
+    // Schedule next poll only if generation hasn't changed and there are listeners
+    if (listeners.length > 0) {
+      pollTimeout = setTimeout(() => {
+        if (expectedGeneration === pollGeneration && listeners.length > 0) {
+          fetchNowPlaying(stationId, expectedGeneration);
+        }
+      }, POLL_INTERVAL);
+    }
 
     return data;
   } catch (error) {
@@ -85,12 +89,14 @@ async function fetchNowPlaying(stationId: string, expectedGeneration: number): P
     };
     listeners.forEach(listener => listener(emptyData));
 
-    // Schedule next poll only if generation hasn't changed
-    pollTimeout = setTimeout(() => {
-      if (expectedGeneration === pollGeneration) {
-        fetchNowPlaying(stationId, expectedGeneration);
-      }
-    }, POLL_INTERVAL);
+    // Schedule next poll only if generation hasn't changed and there are listeners
+    if (listeners.length > 0) {
+      pollTimeout = setTimeout(() => {
+        if (expectedGeneration === pollGeneration && listeners.length > 0) {
+          fetchNowPlaying(stationId, expectedGeneration);
+        }
+      }, POLL_INTERVAL);
+    }
 
     return emptyData;
   }

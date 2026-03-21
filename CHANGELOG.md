@@ -2,6 +2,21 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.2.3] - 2026-03-21
+
+### Security Improvements
+- **Tightened CSP further**: `connect-src` now restricted to `'self'` only
+
+### Code Quality
+- **Safer polling lifecycle**: Prevent rescheduling when there are no listeners
+- **Test coverage**: Added test asserting no timers on one-shot now-playing fetch
+- **Test stability**: About dialog alignment test now asserts CSS rule
+
+### Testing
+- **All tests pass**: 39 unit tests passing (`npm test`)
+
+---
+
 ## [0.2.2] - 2026-03-21
 
 ### Bug Fixes

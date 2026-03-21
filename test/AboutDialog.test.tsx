@@ -2,6 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AboutDialog } from '../src/components/AboutDialog';
 import type { Station } from '../src/data/stations';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+vi.mock('@tauri-apps/api/app', () => ({
+  getVersion: vi.fn(() => Promise.resolve('0.0.0')),
+}));
 
 vi.mock('../src/services/nowPlaying', () => ({
   fetchCurrentSong: vi.fn(() => Promise.resolve({
@@ -197,7 +203,7 @@ describe('AboutDialog Component', () => {
     expect(visitLink).toHaveAttribute('href', 'https://www.sr.de/sr2');
   });
 
-  it('should have right-aligned values in info rows', () => {
+  it('should have right-aligned values in info rows', async () => {
     render(
       <AboutDialog
         isOpen={true}
@@ -206,6 +212,9 @@ describe('AboutDialog Component', () => {
         currentStation={mockCurrentStation}
       />
     );
+
+    // Wait for async updates to settle
+    await screen.findByText(/Test Song/);
     
     // Check that about-value elements exist and have right alignment class
     const taglineLabel = screen.getByText('Tagline');
@@ -223,6 +232,10 @@ describe('AboutDialog Component', () => {
     const qualityValue = qualityRow?.querySelector('.about-value');
     expect(qualityValue).toBeInTheDocument();
     expect(qualityValue).toHaveTextContent('256 kbps MP3');
+
+    // Assert alignment is defined in CSS
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
+    expect(css).toMatch(/\.about-value\s*\{[\s\S]*?text-align:\s*right;/);
   });
 
   it('calls onStationChange and onClose when clicking a different station', () => {
