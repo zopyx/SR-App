@@ -2,6 +2,13 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.3.3] - 2026-03-21
+
+### Release
+- **Version bump**: 0.3.3
+
+---
+
 ## [0.3.2] - 2026-03-21
 
 ### Build & Release
