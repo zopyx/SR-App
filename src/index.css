@@ -67,14 +67,14 @@ body {
   flex-direction: column;
 }
 
-/* App Container - Balanced padding */
+/* App Container - Centered content */
 .app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 100vh;
-  padding: 8px var(--space-sm) 4px;
+  padding: 28px var(--space-sm) 16px;
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,
@@ -115,17 +115,17 @@ body {
   display: none;
 }
 
-/* Station Selector Toggle - Aligned with top, larger */
+/* Station Selector Toggle - Positioned nicely */
 .station-selector-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 5px 12px;
   background: var(--vibrancy-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--vibrancy-border);
-  border-radius: 18px;
+  border-radius: 16px;
   color: var(--text-primary);
   font-size: 0.8125rem;
   font-weight: 600;
@@ -724,9 +724,10 @@ body {
   padding-right: 6px;
 }
 
-/* App Footer */
+/* App Footer - With bottom margin */
 .app-footer {
-  margin-top: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
   padding: 4px 0;
   text-align: center;
   flex-shrink: 0;
