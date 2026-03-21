@@ -40,6 +40,12 @@ struct NowPlayingData {
 async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String> {
     println!("[Rust] Fetching now playing for station: {}", station_id);
     
+    // Validate station ID against allowlist
+    const VALID_STATIONS: [&str; 3] = ["sr1", "sr2", "sr3"];
+    if !VALID_STATIONS.contains(&station_id.as_str()) {
+        return Err("Invalid station ID".to_string());
+    }
+    
     // Create HTTP client with timeout
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(10))

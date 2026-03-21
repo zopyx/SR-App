@@ -2,6 +2,17 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.2.2] - 2026-03-21
+
+### Bug Fixes
+- **Volume change no longer reloads stream**: Separated audio initialization, station changes, and volume updates into distinct effects
+- **Right-aligned values in About dialog**: Tagline and other values now properly right-aligned
+
+### Code Quality
+- **Added regression test**: Test for right-aligned values in About dialog
+
+---
+
 ## [0.2.1] - 2026-03-21
 
 ### Security Improvements

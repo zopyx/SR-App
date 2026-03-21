@@ -139,6 +139,7 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     attemptPlayRef.current = attemptPlay;
   }, [attemptPlay]);
 
+  // Initialize audio element (runs once on mount)
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(station.streamUrl);
@@ -173,9 +174,6 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       autoPlayTimeoutRef.current = setTimeout(() => {
         attemptPlayRef.current?.();
       }, 500);
-    } else {
-      // Update source when station changes
-      audioRef.current.src = station.streamUrl;
     }
 
     return () => {
@@ -186,7 +184,21 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
         clearTimeout(autoPlayTimeoutRef.current);
       }
     };
-  }, [station, volume]);
+  }, []); // Empty deps - only run once on mount
+
+  // Update audio source when station changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.src = station.streamUrl;
+    }
+  }, [station]);
+
+  // Update volume without reloading stream
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const togglePlay = async () => {
     if (!audioRef.current) return;

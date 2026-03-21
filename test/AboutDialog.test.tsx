@@ -197,6 +197,34 @@ describe('AboutDialog Component', () => {
     expect(visitLink).toHaveAttribute('href', 'https://www.sr.de/sr2');
   });
 
+  it('should have right-aligned values in info rows', () => {
+    render(
+      <AboutDialog
+        isOpen={true}
+        onClose={() => {}}
+        stations={mockStations}
+        currentStation={mockCurrentStation}
+      />
+    );
+    
+    // Check that about-value elements exist and have right alignment class
+    const taglineLabel = screen.getByText('Tagline');
+    const taglineRow = taglineLabel.closest('.about-info-row');
+    expect(taglineRow).toBeInTheDocument();
+    
+    // The value should be in the same row
+    const taglineValue = taglineRow?.querySelector('.about-value');
+    expect(taglineValue).toBeInTheDocument();
+    expect(taglineValue).toHaveTextContent('Kultur, Wort und klassische Musik');
+    
+    // Check quality value
+    const qualityLabel = screen.getByText('Quality');
+    const qualityRow = qualityLabel.closest('.about-info-row');
+    const qualityValue = qualityRow?.querySelector('.about-value');
+    expect(qualityValue).toBeInTheDocument();
+    expect(qualityValue).toHaveTextContent('256 kbps MP3');
+  });
+
   it('calls onStationChange and onClose when clicking a different station', () => {
     const onStationChange = vi.fn();
     const onClose = vi.fn();
