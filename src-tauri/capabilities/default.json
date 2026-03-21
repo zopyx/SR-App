@@ -1,17 +1,32 @@
-{
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "Default capabilities for SR2 Radio",
-  "local": true,
-  "windows": ["main"],
-  "permissions": [
-    "core:default",
-    "core:window:allow-minimize",
-    "core:window:allow-close",
-    "core:event:allow-emit",
-    "global-shortcut:allow-is-registered",
-    "global-shortcut:allow-register",
-    "global-shortcut:allow-unregister",
-    "global-shortcut:allow-unregister-all"
-  ]
-}
+[
+  {
+    "$schema": "../gen/schemas/desktop-schema.json",
+    "identifier": "default-desktop",
+    "description": "Default capabilities for SR2 Radio (desktop)",
+    "local": true,
+    "windows": ["main"],
+    "platforms": ["macOS", "windows", "linux"],
+    "permissions": [
+      "core:default",
+      "core:window:allow-minimize",
+      "core:window:allow-close",
+      "core:event:allow-emit",
+      "global-shortcut:allow-is-registered",
+      "global-shortcut:allow-register",
+      "global-shortcut:allow-unregister",
+      "global-shortcut:allow-unregister-all"
+    ]
+  },
+  {
+    "$schema": "../gen/schemas/mobile-schema.json",
+    "identifier": "default-mobile",
+    "description": "Default capabilities for SR2 Radio (mobile)",
+    "local": true,
+    "windows": ["main"],
+    "platforms": ["iOS", "android"],
+    "permissions": [
+      "core:default",
+      "core:event:allow-emit"
+    ]
+  }
+]

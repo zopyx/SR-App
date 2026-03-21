@@ -99,17 +99,27 @@ async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String>
     })
 }
 
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+    let mut builder = tauri::Builder::default();
+
+    #[cfg(not(any(target_os = "ios", target_os = "android")))]
+    {
+        builder = builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
+    }
+
+    builder
         .invoke_handler(tauri::generate_handler![fetch_now_playing])
         .setup(|app| {
-            let window = app.get_webview_window("main").unwrap();
+            // On mobile, a "main" webview window may not be available.
+            let window = app.get_webview_window("main");
             
             // Apply platform-specific window styling
             #[cfg(target_os = "macos")]
             {
-                window.set_background_color(Some(tauri::window::Color(18, 18, 18, 255))).ok();
+                if let Some(window) = window {
+                    window.set_background_color(Some(tauri::window::Color(18, 18, 18, 255))).ok();
+                }
                 
                 // Create native menu
                 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};

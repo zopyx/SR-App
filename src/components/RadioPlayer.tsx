@@ -33,6 +33,10 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const [nowPlayingLoading, setNowPlayingLoading] = useState(true);
   const preMuteVolumeRef = useRef(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const mediaSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const useGainRef = useRef(false);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoPlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stationChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -97,6 +101,34 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     retryCountRef.current = retryCount;
   }, [retryCount]);
 
+  const ensureAudioGraph = useCallback(() => {
+    if (!audioRef.current) return;
+    const AudioContextCtor =
+      window.AudioContext ||
+      (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!audioContextRef.current && AudioContextCtor) {
+      audioContextRef.current = new AudioContextCtor();
+    }
+    const audioContext = audioContextRef.current;
+    if (!audioContext) return;
+    if (!gainNodeRef.current) {
+      gainNodeRef.current = audioContext.createGain();
+      gainNodeRef.current.gain.value = volume;
+    }
+    if (!mediaSourceRef.current) {
+      try {
+        mediaSourceRef.current = audioContext.createMediaElementSource(audioRef.current);
+        mediaSourceRef.current.connect(gainNodeRef.current);
+        gainNodeRef.current.connect(audioContext.destination);
+        useGainRef.current = true;
+        audioRef.current.volume = 1;
+      } catch {
+        // Some WebViews restrict MediaElementSource; fall back to element volume.
+        useGainRef.current = false;
+      }
+    }
+  }, [volume]);
+
   const attemptPlay = useCallback(async (isRetry = false) => {
     if (!audioRef.current) return;
 
@@ -108,6 +140,10 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     setIsLoading(true);
 
     try {
+      ensureAudioGraph();
+      if (audioContextRef.current?.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
       await audioRef.current.play();
       setIsPlaying(true);
       setIsLoading(false);
@@ -195,7 +231,14 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
 
   // Update volume without reloading stream
   useEffect(() => {
-    if (audioRef.current) {
+    if (useGainRef.current) {
+      if (gainNodeRef.current) {
+        gainNodeRef.current.gain.value = volume;
+      }
+      if (audioRef.current) {
+        audioRef.current.volume = 1;
+      }
+    } else if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
@@ -213,6 +256,10 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       setRetryCount(0);
     } else {
       setRetryCount(0);
+      ensureAudioGraph();
+      if (audioContextRef.current?.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
       await attemptPlay();
     }
   };
@@ -227,7 +274,16 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     if (isMuted && newVolume > 0) {
       setIsMuted(false);
     }
-    if (audioRef.current) {
+    ensureAudioGraph();
+    if (useGainRef.current) {
+      if (gainNodeRef.current) {
+        gainNodeRef.current.gain.value = newVolume;
+      }
+      if (audioRef.current) {
+        audioRef.current.volume = 1;
+        audioRef.current.muted = newVolume === 0;
+      }
+    } else if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }
     // Update CSS variable for track fill
@@ -237,19 +293,38 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   // Toggle mute
   const toggleMute = () => {
     if (!audioRef.current) return;
+    ensureAudioGraph();
     
     if (isMuted) {
       // Unmute - restore previous volume
       const restoredVolume = preMuteVolumeRef.current || 0.8;
       setIsMuted(false);
       setVolume(restoredVolume);
-      audioRef.current.volume = restoredVolume;
+      if (useGainRef.current) {
+        if (gainNodeRef.current) {
+          gainNodeRef.current.gain.value = restoredVolume;
+        }
+        audioRef.current.volume = 1;
+        audioRef.current.muted = false;
+      } else {
+        audioRef.current.volume = restoredVolume;
+        audioRef.current.muted = false;
+      }
     } else {
       // Mute - save current volume first
       preMuteVolumeRef.current = volume;
       setIsMuted(true);
       setVolume(0);
-      audioRef.current.volume = 0;
+      if (useGainRef.current) {
+        if (gainNodeRef.current) {
+          gainNodeRef.current.gain.value = 0;
+        }
+        audioRef.current.volume = 1;
+        audioRef.current.muted = true;
+      } else {
+        audioRef.current.volume = 0;
+        audioRef.current.muted = true;
+      }
     }
   };
 
@@ -298,6 +373,42 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   };
 
   const nowPlayingText = getNowPlayingText();
+  const volumeLevel = isMuted ? 'mute' : volume < 0.3 ? 'low' : volume < 0.7 ? 'medium' : 'high';
+  const renderVolumeIcon = () => {
+    if (volumeLevel === 'mute') {
+      return (
+        <svg className="mute-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path className="speaker" d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+          <path className="mute-x" d="M16 9l5 6M21 9l-5 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      );
+    }
+    if (volumeLevel === 'low') {
+      return (
+        <svg className="mute-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path className="speaker" d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+          <path className="wave" d="M16 10.5c1 .9 1 2.1 0 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+        </svg>
+      );
+    }
+    if (volumeLevel === 'medium') {
+      return (
+        <svg className="mute-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path className="speaker" d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+          <path className="wave" d="M15.5 9c1.6 1.5 1.6 4.5 0 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+          <path className="wave" d="M18.5 7c2.4 2.3 2.4 7.7 0 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
+        </svg>
+      );
+    }
+    return (
+      <svg className="mute-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path className="speaker" d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor" />
+        <path className="wave" d="M15.5 8c2.1 2 2.1 6 0 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path className="wave" d="M19 5.5c3.2 3 3.2 10 0 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
+        <path className="wave" d="M12.8 10.2c.8.7.8 2.9 0 3.6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
+      </svg>
+    );
+  };
 
   return (
     <div className="player-container">
@@ -407,7 +518,7 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
           title={isMuted ? 'Unmute' : 'Mute'}
         >
           <span className="mute-icon">
-            {isMuted ? '🔇' : volume < 0.3 ? '🔈' : volume < 0.7 ? '🔉' : '🔊'}
+            {renderVolumeIcon()}
           </span>
         </button>
         <input
@@ -418,7 +529,7 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
           step="0.01"
           value={volume}
           onChange={handleVolumeChange}
-          style={{ '--station-color': station.color } as React.CSSProperties}
+          style={{ '--station-color': station.color, '--volume-percent': `${volume * 100}%` } as React.CSSProperties}
         />
         <span className="volume-value">{isMuted ? 'Muted' : `${Math.round(volume * 100)}%`}</span>
       </div>

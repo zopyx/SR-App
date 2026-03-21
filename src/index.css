@@ -81,6 +81,42 @@ body {
     rgba(0, 0, 0, 0.3) 100%
   );
   overflow: hidden;
+  position: relative;
+}
+
+.platform-ios .app-container {
+  justify-content: space-between;
+  padding: 18px 18px 14px;
+  background:
+    radial-gradient(120% 80% at 20% 10%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0) 60%),
+    radial-gradient(140% 90% at 80% 30%, rgba(255, 183, 0, 0.12) 0%, rgba(0, 0, 0, 0) 65%),
+    radial-gradient(120% 120% at 50% 90%, rgba(0, 130, 201, 0.18) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, rgba(5, 5, 8, 0.9) 0%, rgba(5, 5, 12, 0.98) 100%);
+}
+
+.platform-ios .app-container::before,
+.platform-ios .app-container::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 60% at 30% 20%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
+    radial-gradient(50% 50% at 70% 40%, rgba(255, 183, 0, 0.12) 0%, rgba(255, 183, 0, 0) 65%);
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.platform-ios .app-container::after {
+  background:
+    repeating-linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  opacity: 0.35;
 }
 
 /* Player Container - Compact, tight layout */
@@ -96,6 +132,14 @@ body {
   position: relative;
   margin: 0;
   padding: 0;
+}
+
+.platform-ios .player-container {
+  max-width: 320px;
+  gap: 10px;
+  padding: 8px 0 4px;
+  flex: 1;
+  justify-content: space-between;
 }
 
 @keyframes fadeIn {
@@ -267,6 +311,16 @@ body {
     box-shadow var(--transition-base),
     border-color var(--transition-fast);
   will-change: transform;
+}
+
+.platform-ios .logo-wrapper {
+  width: 140px;
+  height: 140px;
+  background: rgba(20, 20, 24, 0.55);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .logo-wrapper::before {
@@ -472,6 +526,11 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+.platform-ios .station-name {
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
 /* Now Playing - Compact */
 .now-playing-container {
   display: flex;
@@ -488,6 +547,13 @@ body {
   width: 100%;
   animation: fadeIn 0.3s ease-out;
   margin: var(--space-xs) 0;
+}
+
+.platform-ios .now-playing-container {
+  max-width: 300px;
+  padding: 8px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .now-playing-label {
@@ -523,6 +589,11 @@ body {
   border-radius: 16px;
   border: 1px solid var(--vibrancy-border);
   transition: all var(--transition-base);
+}
+
+.platform-ios .status-container {
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .status-indicator {
@@ -610,6 +681,14 @@ body {
   box-sizing: border-box;
 }
 
+.platform-ios .volume-control {
+  max-width: 300px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 /* Mute Button - Compact */
 .mute-button {
   display: flex;
@@ -636,9 +715,12 @@ body {
 }
 
 .mute-icon {
-  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
-  filter: grayscale(0.2);
+  color: var(--text-primary);
+  filter: grayscale(0.05);
   transition: filter var(--transition-fast);
 }
 
@@ -651,6 +733,20 @@ body {
   opacity: 0.8;
 }
 
+.mute-svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.mute-svg .wave {
+  opacity: 0.9;
+}
+
+.mute-svg .mute-x {
+  stroke-linecap: round;
+}
+
 .volume-slider {
   flex: 1;
   height: 4px;
@@ -661,6 +757,10 @@ body {
   cursor: pointer;
   outline: none;
   margin: 8px 0;
+}
+
+.platform-ios .volume-slider {
+  height: 6px;
 }
 
 .volume-slider::-webkit-slider-thumb {
@@ -676,6 +776,12 @@ body {
   margin-top: -6px;
   position: relative;
   top: 0;
+}
+
+.platform-ios .volume-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
 }
 
 .volume-slider::-webkit-slider-thumb:hover {
@@ -1094,6 +1200,23 @@ body {
   z-index: 10;
   border: 1px solid var(--vibrancy-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.platform-ios .info-button {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
 }
 
 .info-button:hover {

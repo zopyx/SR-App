@@ -10,6 +10,12 @@ function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false)
   const [isCompactMode, setIsCompactMode] = useState(false)
 
+  useEffect(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    document.body.classList.toggle('platform-ios', isIOS)
+    document.documentElement.classList.toggle('platform-ios', isIOS)
+  }, [])
+
   // Listen for menu About click events
   useEffect(() => {
     let unlisten: (() => void) | undefined
