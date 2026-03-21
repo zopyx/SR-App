@@ -4,34 +4,46 @@ struct NowPlayingView: View {
     let data: NowPlayingData?
     let isLoading: Bool
     let stationColor: Color
+
+#if os(macOS)
+    private let mainFontSize: CGFloat = 16
+    private let subFontSize: CGFloat = 14
+    private let statusFontSize: CGFloat = 15
+    private let maxWidth: CGFloat = 280
+#else
+    private let mainFontSize: CGFloat = 18
+    private let subFontSize: CGFloat = 15
+    private let statusFontSize: CGFloat = 16
+    private let maxWidth: CGFloat = 320
+#endif
     
     var body: some View {
         VStack(spacing: 2) {
             Group {
                 if isLoading {
                     Text("Connecting...")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.system(size: statusFontSize, weight: .medium))
                         .foregroundColor(Color.white.opacity(0.7))
                 } else if let data = data {
                     if let displayText = data.displayText {
                         let parts = buildParts(from: data)
                         Text(parts.main)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: mainFontSize, weight: .semibold))
                             .foregroundColor(.white)
                         
                         if !parts.sub.isEmpty {
                             Text(parts.sub)
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.system(size: subFontSize, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.7))
                         }
                     } else {
                         Text("Live on Air")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: statusFontSize, weight: .medium))
                             .foregroundColor(Color.white.opacity(0.7))
                     }
                 } else {
                     Text("Live on Air")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.system(size: statusFontSize, weight: .medium))
                         .foregroundColor(Color.white.opacity(0.7))
                 }
             }
@@ -39,7 +51,7 @@ struct NowPlayingView: View {
             .lineLimit(1)
             .truncationMode(.tail)
         }
-        .frame(maxWidth: 280)
+        .frame(maxWidth: maxWidth)
     }
     
     private func buildParts(from data: NowPlayingData) -> (main: String, sub: String) {

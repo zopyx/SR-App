@@ -44,6 +44,18 @@ struct PlayerView: View {
     @State private var showStationSelector = false
     @State private var showAbout = false
     @State private var isHoveringLogo = false
+
+#if os(macOS)
+    private let logoContainerSize: CGFloat = 200
+    private let logoImageSize: CGFloat = 140
+    private let stationNameSize: CGFloat = 22
+    private let trackInfoHeight: CGFloat = 70
+#else
+    private let logoContainerSize: CGFloat = 240
+    private let logoImageSize: CGFloat = 170
+    private let stationNameSize: CGFloat = 26
+    private let trackInfoHeight: CGFloat = 90
+#endif
     
     private var isPlaying: Bool {
         if case .playing = audioPlayer.state { return true }
@@ -112,7 +124,7 @@ struct PlayerView: View {
                 // Track Info
                 VStack(spacing: 8) {
                     Text(selectedStation.name)
-                        .font(.system(size: 22, weight: .bold))
+                        .font(.system(size: stationNameSize, weight: .bold))
                         .foregroundColor(.white)
                         .shadow(color: Color.black.opacity(0.3), radius: 2, y: 1)
                     
@@ -123,7 +135,7 @@ struct PlayerView: View {
                     )
                 }
                 .padding(.horizontal, 20)
-                .frame(height: 70)
+                .frame(height: trackInfoHeight)
                 .zIndex(1)
                 
                 if let error = errorMessage {
@@ -207,7 +219,7 @@ struct PlayerView: View {
             Image(selectedStation.logoName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 140, height: 140)
+                .frame(width: logoImageSize, height: logoImageSize)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .opacity(isLoading ? 0.3 : 1.0)
                 .shadow(color: Color.white.opacity(0.1), radius: 10)
@@ -231,7 +243,7 @@ struct PlayerView: View {
                 }
             }
         }
-        .frame(width: 200, height: 200)
+        .frame(width: logoContainerSize, height: logoContainerSize)
         .onHover { hovering in
             isHoveringLogo = hovering
         }

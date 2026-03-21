@@ -15,23 +15,23 @@ struct StationSelector: View {
                     isExpanded.toggle()
                 }
             }) {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Circle()
                         .fill(selectedStation.color)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 10, height: 10)
                         .shadow(color: selectedStation.color.opacity(0.8), radius: 4)
                     
                     Text(selectedStation.shortName)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                     
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 12, weight: .bold))
                         .opacity(0.9)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 14) // Increased padding slightly for a better pill shape
-                .padding(.vertical, 8)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
                 .background(
                     Capsule()
                         .fill(Color.black.opacity(isHovering ? 0.45 : 0.35))
@@ -69,16 +69,16 @@ struct StationSelector: View {
                     HStack(spacing: 12) {
                         Circle()
                             .fill(station.color)
-                            .frame(width: 10, height: 10)
+                            .frame(width: 12, height: 12)
                             .shadow(color: station.color.opacity(0.6), radius: 3)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text(station.name)
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.white)
                             
                             Text(station.description)
-                                .font(.system(size: 11))
+                                .font(.system(size: 12))
                                 .foregroundColor(.white.opacity(0.6))
                                 .lineLimit(1)
                         }
@@ -87,12 +87,12 @@ struct StationSelector: View {
                         
                         if station.id == selectedStation.id {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.white.opacity(0.8))
                         }
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
                     .background(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .fill(station.id == selectedStation.id ? Color.white.opacity(0.15) : Color.clear)
@@ -102,22 +102,22 @@ struct StationSelector: View {
                 .buttonStyle(PlainButtonStyle())
             }
         }
-        .padding(6)
+        .padding(8)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(white: 0.1, opacity: 0.6))
 #if os(macOS)
-                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)))
+                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)))
 #else
-                .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous)))
+                .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)))
 #endif
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                 )
                 .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
         )
-        .frame(width: 240)
+        .frame(width: 280)
         .zIndex(100)
     }
 }
