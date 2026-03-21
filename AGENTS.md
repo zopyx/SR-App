@@ -158,6 +158,17 @@ This project uses **Yolo Mode** - agents should be decisive and make minimal cha
 
 - Always use semantic versioning for releases and tags (e.g., `1.2.3`).
 
+### Release Process
+
+1. Bump versions to `X.Y.Z` in:
+   - `package.json`
+   - `package-lock.json` (including `packages[""].version`)
+   - `src-tauri/Cargo.toml`
+   - `src-tauri/tauri.conf.json`
+2. Commit: `chore: release X.Y.Z`
+3. Tag: `git tag -a vX.Y.Z -m "Release X.Y.Z"`
+4. Push commit and tags: `git push` then `git push --tags`
+
 ### Using Subagents
 
 For parallel task execution, use the `Task` tool to spawn subagents:
