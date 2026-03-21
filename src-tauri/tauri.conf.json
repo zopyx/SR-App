@@ -14,7 +14,7 @@
       {
         "title": "SR2 Radio",
         "width": 320,
-        "height": 480,
+        "height": 400,
         "resizable": false,
         "fullscreen": false,
         "transparent": true,

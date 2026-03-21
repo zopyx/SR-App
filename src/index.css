@@ -67,14 +67,14 @@ body {
   flex-direction: column;
 }
 
-/* App Container - Compact with minimal top padding */
+/* App Container - Tight fit */
 .app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   min-height: 100vh;
-  padding: 4px var(--space-sm) var(--space-xs);
+  padding: 4px var(--space-sm) 2px;
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,
@@ -724,19 +724,19 @@ body {
   padding-right: 6px;
 }
 
-/* App Footer - Compact */
+/* App Footer - Minimal */
 .app-footer {
-  margin-top: var(--space-sm);
-  padding: var(--space-xs) 0;
+  margin-top: 2px;
+  padding: 2px 0;
   text-align: center;
   flex-shrink: 0;
 }
 
 .app-footer p {
   color: var(--text-tertiary);
-  font-size: 0.625rem;
+  font-size: 0.5625rem;
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
