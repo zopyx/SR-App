@@ -169,6 +169,18 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
               <span className="about-value">Andreas Jung</span>
             </div>
             <div className="about-info-row">
+              <span className="about-label">Website</span>
+              <a 
+                href="https://www.zopyx.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="about-link"
+                style={{ color: currentStation.color }}
+              >
+                www.zopyx.com →
+              </a>
+            </div>
+            <div className="about-info-row">
               <span className="about-label">Contact</span>
               <a 
                 href="mailto:info@zopyx.com"

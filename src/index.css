@@ -72,15 +72,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
-  padding: env(titlebar-area-height, 28px) var(--space-lg) var(--space-xl);
+  padding: calc(env(titlebar-area-height, 28px) + var(--space-md)) var(--space-lg) var(--space-xl);
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.1) 0%,
     rgba(0, 0, 0, 0.3) 100%
   );
+  overflow-y: auto;
 }
 
 /* Player Container */
@@ -94,7 +95,8 @@ body {
   max-width: 320px;
   animation: fadeIn 0.6s ease-out;
   position: relative;
-  margin: 0 auto;
+  margin: auto 0;
+  padding-top: var(--space-md);
 }
 
 @keyframes fadeIn {
@@ -124,7 +126,9 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
+  margin-top: var(--space-sm);
   margin-bottom: var(--space-md);
+  flex-shrink: 0;
 }
 
 .station-selector-toggle:hover {
@@ -717,9 +721,10 @@ body {
 
 /* App Footer */
 .app-footer {
-  margin-top: auto;
+  margin-top: var(--space-lg);
   padding: var(--space-md) 0;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .app-footer p {

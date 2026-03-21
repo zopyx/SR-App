@@ -150,6 +150,38 @@ src-tauri/target/release/bundle/
 - Stream requires internet connection (no offline mode)
 - Volume is app-level, not system-level
 
+## Agent Workflow (Yolo Mode)
+
+This project uses **Yolo Mode** - agents should be decisive and make minimal changes to achieve goals efficiently.
+
+### Using Subagents
+
+For parallel task execution, use the `Task` tool to spawn subagents:
+
+**When to use subagents:**
+- Multiple independent file modifications
+- Parallel research or fact-checking
+- Testing different approaches simultaneously
+- Large refactoring tasks that can be split
+
+**Example - Parallel file updates:**
+```typescript
+// Update multiple components in parallel
+const tasks = [
+  { path: 'src/components/Button.tsx', description: 'Update Button styles' },
+  { path: 'src/components/Input.tsx', description: 'Update Input styles' },
+  { path: 'src/components/Modal.tsx', description: 'Update Modal styles' }
+];
+
+// Spawn subagents for each task
+```
+
+**Best practices:**
+- Spawn subagents for independent tasks only
+- Provide complete context in the prompt (subagents don't see your history)
+- Use descriptive task descriptions (3-5 words)
+- Limit parallel tasks to avoid context overflow
+
 ## Resources
 
 - [Tauri Docs](https://tauri.app/v2/api/)
