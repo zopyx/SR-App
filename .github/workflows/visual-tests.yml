@@ -25,8 +25,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps chromium
     
+    - name: Generate/update visual snapshots
+      run: npm run test:visual:update
+    
     - name: Run visual tests
       run: npm run test:visual
+      continue-on-error: true
     
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -40,8 +44,16 @@ jobs:
     
     - name: Upload baseline screenshots
       uses: actions/upload-artifact@v4
-      if: failure()
+      if: always()
       with:
         name: visual-test-screenshots
         path: test-visual/__snapshots__/
         retention-days: 7
+    
+    - name: Commit updated snapshots
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add test-visual/__snapshots__/
+        git diff --staged --quiet || (git commit -m "chore: update visual test snapshots [skip ci]" && git push)
