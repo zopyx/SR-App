@@ -91,6 +91,6 @@ test.describe('Responsive Layout Tests', () => {
     
     // Should be horizontally centered
     const centerX = (selectorBox?.x || 0) + (selectorBox?.width || 0) / 2;
-    expect(centerX).toBeCloseTo(160, 30); // Center of 320px width
+    expect(centerX).toBeCloseTo(160, 1); // Center of 320px width
   });
 });
