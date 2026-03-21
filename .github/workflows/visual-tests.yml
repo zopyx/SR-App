@@ -49,11 +49,3 @@ jobs:
         name: visual-test-screenshots
         path: test-visual/*-snapshots/
         retention-days: 7
-    
-    - name: Commit updated snapshots
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add test-visual/*-snapshots/
-        git diff --staged --quiet || (git commit -m "chore: update visual test snapshots [skip ci]" && git push)
