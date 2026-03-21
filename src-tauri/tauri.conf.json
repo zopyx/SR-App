@@ -13,8 +13,8 @@
     "windows": [
       {
         "title": "SR2 Radio",
-        "width": 400,
-        "height": 600,
+        "width": 320,
+        "height": 480,
         "resizable": false,
         "fullscreen": false,
         "transparent": true,

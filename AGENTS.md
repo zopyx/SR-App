@@ -196,6 +196,15 @@ const tasks = [
 2. Add feature → Write test for feature → Implement → Test passes
 ```
 
+### UI Constraints
+
+**No scrolling in default window:**
+- All UI elements must fit within the fixed window size (320x480)
+- No overflow-y or scrollbars in the main player view
+- Content must be responsive and scale appropriately
+- Use compact mode or truncation for long text
+- Test layout at minimum window size
+
 ## Resources
 
 - [Tauri Docs](https://tauri.app/v2/api/)
