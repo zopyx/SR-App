@@ -1064,17 +1064,17 @@ body {
 /* Info Button */
 .info-button {
   position: fixed;
-  bottom: 16px;
-  left: 16px;
-  width: 32px;
-  height: 32px;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: none;
   background: var(--vibrancy-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
