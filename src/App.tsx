@@ -30,7 +30,7 @@ function App() {
   }, [])
 
   return (
-    <div className="app-container">
+    <div className="app-container" data-tauri-drag-region>
       {!isCompactMode && (
         <button 
           className="info-button" 

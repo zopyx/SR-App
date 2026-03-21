@@ -38,12 +38,14 @@ test.describe('Compact Mode Visual Tests', () => {
 });
 
 test.describe('Responsive Layout Tests', () => {
-  test('layout at minimum size', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 400 });
-    
+  test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.player-container');
     await page.waitForTimeout(500);
+  });
+
+  test('layout at minimum size', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 400 });
     
     // Take baseline screenshot
     await expect(page).toHaveScreenshot('responsive-320x400.png', {
@@ -68,6 +70,7 @@ test.describe('Responsive Layout Tests', () => {
     await page.setViewportSize({ width: 320, height: 400 });
     
     const infoButton = page.locator('.info-button');
+    await infoButton.waitFor({ state: 'visible' });
     const buttonBox = await infoButton.boundingBox();
     
     // Should be in top-right corner
@@ -79,6 +82,7 @@ test.describe('Responsive Layout Tests', () => {
     await page.setViewportSize({ width: 320, height: 400 });
     
     const selector = page.locator('.station-selector-toggle');
+    await selector.waitFor({ state: 'visible' });
     const selectorBox = await selector.boundingBox();
     
     // Should be near top but below traffic lights

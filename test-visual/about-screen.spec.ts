@@ -41,10 +41,8 @@ test.describe('About Screen Visual Tests', () => {
     await page.setViewportSize({ width: 320, height: 400 });
     
     // Scroll to App Information section
-    await page.evaluate(() => {
-      const appInfo = document.querySelector('.about-section:has-text("App Information")');
-      appInfo?.scrollIntoView({ behavior: 'instant', block: 'start' });
-    });
+    const appInfoSection = page.locator('.about-section', { hasText: 'App Information' });
+    await appInfoSection.scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
     
     await expect(page).toHaveScreenshot('about-screen-app-info.png', {

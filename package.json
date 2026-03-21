@@ -1,7 +1,7 @@
 {
   "name": "sr2",
   "private": true,
-  "version": "0.2.3",
+  "version": "0.2.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -17,7 +17,9 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "tauri:build:universal": "tauri build --target universal-apple-darwin",
-    "tauri:build:mas": "tauri build --target aarch64-apple-darwin --bundles app"
+    "tauri:build:mas": "tauri build --target aarch64-apple-darwin --bundles app",
+    "notarize": "./scripts/notarize.sh",
+    "notarize:check": "xcrun notarytool history --keychain-profile AC_PASSWORD"
   },
   "dependencies": {
     "react": "^19.2.0",

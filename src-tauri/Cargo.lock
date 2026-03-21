@@ -3422,7 +3422,7 @@ dependencies = [
 
 [[package]]
 name = "sr2"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "chrono",
  "reqwest 0.12.28",

@@ -2,6 +2,14 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.2.4] - 2026-03-21
+
+### Bug Fixes
+- **Fixed streaming**: Added CDN domains (*.rndfnk.com) to CSP allowlist
+- **Fixed window dragging**: Window can now be moved by dragging
+
+---
+
 ## [0.2.3] - 2026-03-21
 
 ### Security Improvements
