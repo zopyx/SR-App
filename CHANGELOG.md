@@ -2,6 +2,61 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.2.0] - 2026-03-21
+
+### Features
+
+#### Compact Slick UI
+- **Smaller window**: 400x600 → 320x400 (sleeker, more compact)
+- **Redesigned layout**: Vertically centered, better spacing
+- **Smaller play button**: 180px → 100px (more proportional)
+- **Aligned elements**: Station selector at top, info button top-right
+- **No scrolling**: All elements fit in fixed window size
+
+#### Compact/Minimize Mode
+- Toggle button (—/□) to minimize UI
+- Minimized view shows only: station selector, play button, volume
+- Expand back to full view with one click
+
+#### About Dialog Improvements
+- **Station selector in About**: Click any station card to switch
+- **www.zopyx.com link**: Added to App Information section
+- **Build date display**: Shows build timestamp
+- **Better disclaimer**: Clearer unofficial app notice
+
+#### Native macOS Integration
+- Traffic light buttons (close/minimize/maximize) visible
+- Overlay title bar style with native macOS behavior
+- Proper window styling for macOS vibrancy
+
+### Testing
+
+#### Comprehensive Test Suite
+- **38 tests** across 5 test files
+- Tests for: stations, now playing, RadioPlayer, AboutDialog, App
+- Vitest + React Testing Library + jsdom
+- Run with `npm test`
+
+### Developer Experience
+
+#### AGENTS.md Updates
+- Yolo mode workflow documentation
+- Subagent usage guidelines
+- Testing requirements: "Write a test for every bug fix"
+- UI constraints: "No scrolling in default window"
+
+### Technical Changes
+
+#### Dependencies
+- Added: `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
+
+#### Configuration
+- Window size: 320x400 (was 400x600)
+- Title bar: Overlay style with hidden title
+- Top padding: 28px for traffic light clearance
+
+---
+
 ## [0.0.0] - 2026-03-20
 
 ### Major Changes

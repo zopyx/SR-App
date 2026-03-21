@@ -170,6 +170,22 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
           <section className="about-section">
             <h2>App Information</h2>
             <div className="about-info-row">
+              <span className="about-label">Version</span>
+              <span className="about-value">{version}</span>
+            </div>
+            <div className="about-info-row">
+              <span className="about-label">Build Date</span>
+              <span className="about-value">
+                {new Date(BUILD_DATE).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+            </div>
+            <div className="about-info-row">
               <span className="about-label">Built with</span>
               <span className="about-value">Tauri + React + TypeScript</span>
             </div>
