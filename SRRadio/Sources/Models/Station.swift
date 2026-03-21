@@ -18,7 +18,7 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Saarlands beste Musik und Nachrichten",
         streamUrl: URL(string: "https://liveradio.sr.de/sr/sr1/mp3/256/stream.mp3?aggregator=custom1")!,
         logoName: "sr1_logo",
-        color: Color(hex: "#e60005"),
+        color: Color(hex: "#ff4444"),
         website: URL(string: "https://www.sr.de/sr1")!
     )
     
@@ -29,7 +29,7 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Kultur, Wort und klassische Musik",
         streamUrl: URL(string: "https://liveradio.sr.de/sr/sr2/mp3/256/stream.mp3?aggregator=custom1")!,
         logoName: "sr2_logo",
-        color: Color(hex: "#ffb700"),
+        color: Color(hex: "#ffcc00"),
         website: URL(string: "https://www.sr.de/sr2")!
     )
     

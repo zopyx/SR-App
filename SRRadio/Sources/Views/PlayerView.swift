@@ -29,7 +29,7 @@ struct PlayerView: View {
             VisualEffectView(material: .sidebar, blendingMode: .behindWindow)
                 .ignoresSafeArea()
             
-            Color.black
+            Color(white: 0.08)
                 .ignoresSafeArea()
                 .allowsHitTesting(false)
             
