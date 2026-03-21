@@ -81,7 +81,9 @@ describe('AboutDialog Component', () => {
         currentStation={mockCurrentStation}
       />
     );
-    expect(await screen.findByText(/Version/)).toBeInTheDocument();
+    // Use getAllByText since "Version" appears in both header and App Info section
+    const versionElements = await screen.findAllByText(/Version/);
+    expect(versionElements.length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays build date or shows app info section', async () => {

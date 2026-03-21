@@ -1,5 +1,6 @@
 // Library entry point for mobile platforms
 
+use std::time::Duration;
 use tauri::{Manager, Emitter};
 use serde::Deserialize;
 
@@ -39,11 +40,17 @@ struct NowPlayingData {
 async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String> {
     println!("[Rust] Fetching now playing for station: {}", station_id);
     
+    // Create HTTP client with timeout
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+    
     let song_url = "https://musikrecherche.sr-online.de/sophora/titelinterpret.php";
     let show_url = format!("https://www.sr.de/sr/epg/nowPlaying.jsp?welle={}", station_id);
     
     // Fetch song info
-    let song_result = reqwest::get(song_url).await;
+    let song_result = client.get(song_url).send().await;
     let mut title = String::new();
     let mut artist = String::new();
     
@@ -61,7 +68,7 @@ async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String>
     }
     
     // Fetch show info
-    let show_result = reqwest::get(&show_url).await;
+    let show_result = client.get(&show_url).send().await;
     let mut show = String::new();
     let mut moderator = String::new();
     
@@ -88,7 +95,6 @@ async fn fetch_now_playing(station_id: String) -> Result<NowPlayingData, String>
 
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .invoke_handler(tauri::generate_handler![fetch_now_playing])
         .setup(|app| {

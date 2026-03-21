@@ -2,6 +2,28 @@
 
 All notable changes to the SR2 Radio project.
 
+## [0.2.1] - 2026-03-21
+
+### Security Improvements
+- **Tightened CSP**: Restricted to only required SR domains
+- **Station ID validation**: Added allowlist check in Rust backend
+- **HTTP timeouts**: Added 10-second timeout to all requests
+- **Removed unused plugin**: Removed tauri_plugin_opener to reduce attack surface
+
+### Code Quality
+- **Fixed hook dependencies**: Resolved stale closure issues in RadioPlayer
+- **Fixed polling race**: Added generation counter to prevent stale updates
+- **Proper timeout cleanup**: All timeouts now cleaned up on unmount
+- **Guarded console logs**: Production builds no longer log debug info
+- **Fixed clipboard handling**: Added proper error handling for copy operations
+- **Fixed React imports**: Added proper React imports for TypeScript
+
+### Testing
+- **All tests pass**: 38 unit tests passing
+- **Test configuration**: Fixed Vitest to exclude Playwright tests
+
+---
+
 ## [0.2.0] - 2026-03-21
 
 ### Features

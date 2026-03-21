@@ -7,9 +7,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./test/setup.ts'],
+    exclude: ['node_modules/', 'test-visual/', '*.config.*'],
     coverage: {
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'test/', '*.config.*'],
+      exclude: ['node_modules/', 'test/', 'test-visual/', '*.config.*'],
     },
   },
   resolve: {

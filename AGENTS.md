@@ -190,11 +190,29 @@ const tasks = [
 - Tests prevent regressions and document expected behavior
 - Run `npm test` before committing changes
 
+**Use red/green TDD:**
+- Write failing test first (red)
+- Implement minimal code to make it pass (green)
+- Refactor while keeping tests passing
+- This ensures tests actually verify the behavior
+
 **Example workflow:**
 ```
-1. Identify bug → Write failing test → Fix bug → Test passes
-2. Add feature → Write test for feature → Implement → Test passes
+1. Identify bug → Write failing test (red) → Fix bug (green) → Refactor
+2. Add feature → Write failing test (red) → Implement (green) → Refactor
 ```
+
+### Git Workflow
+
+**Do not commit and push at your own will:**
+- Only commit and push when explicitly requested by the user
+- Wait for user confirmation before making git mutations
+- This applies even if changes are complete and tests pass
+
+**No commit, no push if tests are failing:**
+- Always run tests before committing
+- All tests must pass before commit and push
+- Fix failing tests first, then commit
 
 ### UI Constraints
 

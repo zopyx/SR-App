@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { Station } from '../data/stations';
 import { subscribeToNowPlaying, type NowPlayingData } from '../services/nowPlaying';
 
@@ -34,6 +34,9 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   const preMuteVolumeRef = useRef(0.8);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoPlayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stationChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const attemptPlayRef = useRef<((isRetry?: boolean) => Promise<void>) | null>(null);
 
   // Subscribe to now playing updates
   useEffect(() => {
@@ -41,7 +44,9 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
     setNowPlaying(null);
     
     const unsubscribe = subscribeToNowPlaying(station, (data) => {
-      console.log('[RadioPlayer] Received now playing data:', data);
+      if (import.meta.env.DEV) {
+        console.log('[RadioPlayer] Received now playing data:', data);
+      }
       setNowPlaying(data);
       setNowPlayingLoading(false);
     });
@@ -80,15 +85,23 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
   };
 
   const logEvent = (eventName: string, data?: unknown) => {
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] 🎵 ${station.shortName} - ${eventName}`, data || '');
+    if (import.meta.env.DEV) {
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] 🎵 ${station.shortName} - ${eventName}`, data || '');
+    }
   };
+
+  // Store retryCount in a ref to avoid dependency issues
+  const retryCountRef = useRef(retryCount);
+  useEffect(() => {
+    retryCountRef.current = retryCount;
+  }, [retryCount]);
 
   const attemptPlay = useCallback(async (isRetry = false) => {
     if (!audioRef.current) return;
 
     if (isRetry) {
-      logEvent('Retry attempt', { attempt: retryCount + 1 });
+      logEvent('Retry attempt', { attempt: retryCountRef.current + 1 });
     }
 
     setError(null);
@@ -107,18 +120,24 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       setIsPlaying(false);
       setIsLoading(false);
 
-      if (retryCount < MAX_RETRIES) {
-        setRetryCount(prev => prev + 1);
-        setError(`Retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+      const currentRetryCount = retryCountRef.current;
+      if (currentRetryCount < MAX_RETRIES) {
+        setRetryCount(currentRetryCount + 1);
+        setError(`Retrying... (${currentRetryCount + 1}/${MAX_RETRIES})`);
         
         retryTimeoutRef.current = setTimeout(() => {
-          attemptPlay(true);
+          attemptPlayRef.current?.(true);
         }, RETRY_DELAY);
       } else {
         setError(`Failed: ${errorMsg}`);
       }
     }
-  }, [retryCount, station]);
+  }, [station]);
+
+  // Store attemptPlay in ref to avoid circular dependency
+  useEffect(() => {
+    attemptPlayRef.current = attemptPlay;
+  }, [attemptPlay]);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -151,8 +170,8 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
 
       // Auto-play on app start
       logEvent('Auto-starting on app launch');
-      setTimeout(() => {
-        attemptPlay();
+      autoPlayTimeoutRef.current = setTimeout(() => {
+        attemptPlayRef.current?.();
       }, 500);
     } else {
       // Update source when station changes
@@ -163,8 +182,11 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+      if (autoPlayTimeoutRef.current) {
+        clearTimeout(autoPlayTimeoutRef.current);
+      }
     };
-  }, [station]);
+  }, [station, volume]);
 
   const togglePlay = async () => {
     if (!audioRef.current) return;
@@ -235,11 +257,17 @@ export const RadioPlayer: React.FC<RadioPlayerProps> = ({
       shouldAutoPlayRef.current = false;
       logEvent('Auto-starting playback after station change');
       // Small delay to let the audio element initialize with new source
-      setTimeout(() => {
-        attemptPlay();
+      stationChangeTimeoutRef.current = setTimeout(() => {
+        attemptPlayRef.current?.();
       }, 100);
     }
-  }, [station, attemptPlay]);
+
+    return () => {
+      if (stationChangeTimeoutRef.current) {
+        clearTimeout(stationChangeTimeoutRef.current);
+      }
+    };
+  }, [station]);
 
   // Format now playing text
   const getNowPlayingText = (): string | null => {
