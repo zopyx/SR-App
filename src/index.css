@@ -67,14 +67,14 @@ body {
   flex-direction: column;
 }
 
-/* App Container - Compact, minimal top padding */
+/* App Container - Compact with space for traffic lights */
 .app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: env(titlebar-area-height, 28px) var(--space-sm) var(--space-xs);
+  padding: 36px var(--space-sm) var(--space-xs);
   /* Subtle gradient overlay for depth */
   background: linear-gradient(
     180deg,

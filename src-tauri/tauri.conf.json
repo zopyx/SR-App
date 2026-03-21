@@ -18,8 +18,8 @@
         "resizable": false,
         "fullscreen": false,
         "transparent": true,
-        "titleBarStyle": "Transparent",
-        "hiddenTitle": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "acceptFirstMouse": true
       }
     ],
