@@ -5,17 +5,10 @@ struct NowPlayingView: View {
     let isLoading: Bool
     let stationColor: Color
 
-#if os(macOS)
-    private let mainFontSize: CGFloat = 16
-    private let subFontSize: CGFloat = 14
-    private let statusFontSize: CGFloat = 15
-    private let maxWidth: CGFloat = 280
-#else
     private let mainFontSize: CGFloat = 18
     private let subFontSize: CGFloat = 15
     private let statusFontSize: CGFloat = 16
     private let maxWidth: CGFloat = 320
-#endif
     
     var body: some View {
         VStack(spacing: 2) {

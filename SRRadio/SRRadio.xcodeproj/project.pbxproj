@@ -7,20 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000000000000000000001 /* Station.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* Station.swift */; };
-		A10000000000000000000002 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* AudioPlayer.swift */; };
-		A10000000000000000000003 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* NowPlayingService.swift */; };
-		A10000000000000000000004 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* VisualEffectView.swift */; };
-		A10000000000000000000005 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* AboutView.swift */; };
-		A10000000000000000000006 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* EqualizerView.swift */; };
-		A10000000000000000000007 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* NowPlayingView.swift */; };
-		A10000000000000000000008 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* PlayerView.swift */; };
-		A10000000000000000000009 /* StationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000019 /* StationSelector.swift */; };
-		A1000000000000000000000A /* VolumeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001A /* VolumeControl.swift */; };
-		A1000000000000000000000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* Assets.xcassets */; };
-		A1000000000000000000000D /* SRRadioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* SRRadioApp.swift */; };
-		A1000000000000000000000E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* Theme.swift */; };
-		A2000000000000000000000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* Assets.xcassets */; };
 		A20000000000000000000101 /* Station.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* Station.swift */; };
 		A20000000000000000000102 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* AudioPlayer.swift */; };
 		A20000000000000000000103 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* NowPlayingService.swift */; };
@@ -31,13 +17,13 @@
 		A20000000000000000000108 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* PlayerView.swift */; };
 		A20000000000000000000109 /* StationSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000019 /* StationSelector.swift */; };
 		A2000000000000000000010A /* VolumeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001A /* VolumeControl.swift */; };
+		A2000000000000000000000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* Assets.xcassets */; };
 		A2000000000000000000010D /* SRRadioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* SRRadioApp.swift */; };
 		A2000000000000000000010E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* Theme.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000010 /* SR Radio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SR Radio.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A20000000000000000000010 /* SR Radio iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SR Radio iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000010 /* SR Radio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SR Radio.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000011 /* Station.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
@@ -49,19 +35,11 @@
 		A10000000000000000000019 /* StationSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationSelector.swift; sourceTree = "<group>"; };
 		A1000000000000000000001A /* VolumeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeControl.swift; sourceTree = "<group>"; };
 		A1000000000000000000001B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A1000000000000000000001C /* SRRadio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SRRadio.entitlements; sourceTree = "<group>"; };
 		A1000000000000000000001D /* SRRadioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioApp.swift; sourceTree = "<group>"; };
 		A1000000000000000000001E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A10000000000000000000020 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A20000000000000000000020 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -77,7 +55,6 @@
 			children = (
 				A10000000000000000000031 /* Sources */,
 				A10000000000000000000032 /* Resources */,
-				A1000000000000000000001C /* SRRadio.entitlements */,
 				A10000000000000000000033 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -106,8 +83,7 @@
 		A10000000000000000000033 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000010 /* SR Radio.app */,
-				A20000000000000000000010 /* SR Radio iOS.app */,
+				A20000000000000000000010 /* SR Radio.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,26 +145,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000000000000000000050 /* SRRadio */ = {
+		A20000000000000000000050 /* SRRadio */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio" */;
-			buildPhases = (
-				A10000000000000000000052 /* Sources */,
-				A10000000000000000000020 /* Frameworks */,
-				A10000000000000000000053 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SRRadio;
-			productName = "SR Radio";
-			productReference = A10000000000000000000010 /* SR Radio.app */;
-			productType = "com.apple.product-type.application";
-		};
-		A20000000000000000000050 /* SRRadio iOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A20000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio iOS" */;
+			buildConfigurationList = A20000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio" */;
 			buildPhases = (
 				A20000000000000000000052 /* Sources */,
 				A20000000000000000000020 /* Frameworks */,
@@ -198,9 +157,9 @@
 			);
 			dependencies = (
 			);
-			name = "SRRadio iOS";
-			productName = "SR Radio iOS";
-			productReference = A20000000000000000000010 /* SR Radio iOS.app */;
+			name = SRRadio;
+			productName = "SR Radio";
+			productReference = A20000000000000000000010 /* SR Radio.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -213,9 +172,6 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
-					A10000000000000000000050 = {
-						CreatedOnToolsVersion = 15.0;
-					};
 					A20000000000000000000050 = {
 						CreatedOnToolsVersion = 15.0;
 					};
@@ -234,21 +190,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000000000000000000050 /* SRRadio */,
-				A20000000000000000000050 /* SRRadio iOS */,
+				A20000000000000000000050 /* SRRadio */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A10000000000000000000053 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A1000000000000000000000B /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A20000000000000000000053 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -260,25 +207,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A10000000000000000000052 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A10000000000000000000001 /* Station.swift in Sources */,
-				A10000000000000000000002 /* AudioPlayer.swift in Sources */,
-				A10000000000000000000003 /* NowPlayingService.swift in Sources */,
-				A10000000000000000000004 /* VisualEffectView.swift in Sources */,
-				A10000000000000000000005 /* AboutView.swift in Sources */,
-				A10000000000000000000006 /* EqualizerView.swift in Sources */,
-				A10000000000000000000007 /* NowPlayingView.swift in Sources */,
-				A10000000000000000000008 /* PlayerView.swift in Sources */,
-				A10000000000000000000009 /* StationSelector.swift in Sources */,
-				A1000000000000000000000A /* VolumeControl.swift in Sources */,
-				A1000000000000000000000D /* SRRadioApp.swift in Sources */,
-				A1000000000000000000000E /* Theme.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		A20000000000000000000052 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -353,13 +281,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -412,73 +340,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_COMPILATION_MODE = wholemodule;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		A10000000000000000000072 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CODE_SIGN_ENTITLEMENTS = SRRadio.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4PC9Z56E47;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sr2radio;
-				PRODUCT_NAME = "SR Radio";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.9;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		A10000000000000000000073 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CODE_SIGN_ENTITLEMENTS = SRRadio.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4PC9Z56E47;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Resources/Info.plist;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.sr2radio;
-				PRODUCT_NAME = "SR Radio";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -491,16 +359,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4PC9Z56E47;
-				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Resources/Info-iOS.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sr2radio;
-				PRODUCT_NAME = "SR Radio iOS";
+				PRODUCT_NAME = "SR Radio";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -514,16 +383,17 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4PC9Z56E47;
-				ENABLE_BITCODE = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Resources/Info-iOS.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sr2radio;
-				PRODUCT_NAME = "SR Radio iOS";
+				PRODUCT_NAME = "SR Radio";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -532,16 +402,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A10000000000000000000072 /* Debug */,
-				A10000000000000000000073 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A20000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio iOS" */ = {
+		A20000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadio" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A20000000000000000000072 /* Debug */,

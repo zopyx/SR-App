@@ -106,11 +106,7 @@ struct StationSelector: View {
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(white: 0.1, opacity: 0.6))
-#if os(macOS)
-                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)))
-#else
                 .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)))
-#endif
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(Color.white.opacity(0.15), lineWidth: 0.5)

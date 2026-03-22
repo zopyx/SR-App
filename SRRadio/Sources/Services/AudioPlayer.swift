@@ -29,12 +29,9 @@ final class AudioPlayer: ObservableObject {
     private var preMuteVolume: Double = 0.8
     
     init() {
-        #if os(iOS)
         setupAudioSession()
-        #endif
     }
-    
-    #if os(iOS)
+
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
@@ -44,7 +41,6 @@ final class AudioPlayer: ObservableObject {
             print("Failed to set up audio session: \(error.localizedDescription)")
         }
     }
-    #endif
     
     deinit {
         cleanup()

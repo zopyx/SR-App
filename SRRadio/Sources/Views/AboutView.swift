@@ -22,25 +22,16 @@ struct AboutView: View {
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
-#if os(macOS)
-                .background(VisualEffectView(material: .popover, blendingMode: .withinWindow, state: .active))
-#else
                 .background(VisualEffectView())
-#endif
                 .ignoresSafeArea()
                 .onTapGesture {
                     close()
                 }
             
             dialog
-#if os(macOS)
-                .frame(maxWidth: 400, maxHeight: 540) // Given macOS has some paddings, slightly larger max height
-                .padding(20)
-#else
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
-#endif
         }
         .transition(.opacity)
     }
@@ -69,11 +60,7 @@ struct AboutView: View {
         .background(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color(white: 0.1, opacity: 0.8))
-#if os(macOS)
-                .background(VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)))
-#else
                 .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous)))
-#endif
                 .overlay(
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
                         .stroke(Color.white.opacity(0.15), lineWidth: 1)
@@ -227,8 +214,8 @@ struct AboutView: View {
             
             InfoRow(label: "Version", value: appVersion)
             InfoRow(label: "Build Date", value: buildDate)
-            InfoRow(label: "Built with", value: "SwiftUI + AppKit")
-            InfoRow(label: "Platforms", value: "macOS")
+            InfoRow(label: "Built with", value: "SwiftUI")
+            InfoRow(label: "Platforms", value: "iOS, iPadOS")
             InfoRow(label: "Author", value: "Andreas Jung")
             
             HStack(alignment: .top) {
@@ -272,13 +259,7 @@ struct AboutView: View {
     }
     
     private func copyToClipboard(_ string: String) {
-#if os(macOS)
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(string, forType: .string)
-#else
         UIPasteboard.general.string = string
-#endif
         withAnimation {
             copiedUrl = string
         }
