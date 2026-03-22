@@ -142,7 +142,7 @@ final class Container {
         guard let service = services[key] else {
             fatalError("LiveActivityManagerProtocol not registered in Container")
         }
-        let (lifetime, factory) = service as! (Lifetime, () -> (any LiveActivityManagerProtocol)?)
+        let (lifetime, factory) = service as! (Lifetime, () -> Any)
 
         switch lifetime {
         case .singleton:
@@ -150,10 +150,10 @@ final class Container {
                 return instance as? (any LiveActivityManagerProtocol)
             }
             let instance = factory()
-            singletons[key] = instance as Any
-            return instance
+            singletons[key] = instance
+            return instance as? (any LiveActivityManagerProtocol)
         case .transient:
-            return factory()
+            return factory() as? (any LiveActivityManagerProtocol)
         }
     }
 }
