@@ -139,29 +139,17 @@ final class Container {
     @available(iOS 16.2, *)
     func resolveLiveActivityManager() -> (any LiveActivityManagerProtocol)? {
         let key = ObjectIdentifier(LiveActivityManagerProtocol.self)
-        guard let service = services[key] else {
-            fatalError("LiveActivityManagerProtocol not registered in Container")
-        }
-        let (lifetime, factory) = service as! (Lifetime, () -> Any)
-
-        switch lifetime {
-        case .singleton:
-            if let instance = singletons[key] {
-                return instance as? (any LiveActivityManagerProtocol)
-            }
-            let instance = factory()
-            singletons[key] = instance
-            return instance as? (any LiveActivityManagerProtocol)
-        case .transient:
-            return factory() as? (any LiveActivityManagerProtocol)
-        }
+        
+        // LiveActivityManager is directly stored as a singleton in registerDefaultServices()
+        // so we only need to retrieve it from the singletons dictionary.
+        return singletons[key] as? (any LiveActivityManagerProtocol)
     }
 }
 
 // MARK: - Default Registration
 
 extension Container {
-    
+
     /// Registers all default services for the app.
     ///
     /// Call this method to set up the standard production dependencies.
@@ -170,17 +158,17 @@ extension Container {
         registerSingleton(AudioPlayerProtocol.self) {
             AudioPlayer()
         }
-        
+
         // Register NowPlayingService as singleton (manages polling)
         registerSingleton(NowPlayingServiceProtocol.self) {
             NowPlayingService()
         }
-        
+
         // Register LiveActivityManager as singleton (iOS 16.2+)
+        // Store the value directly to avoid factory closure type casting issues
         if #available(iOS 16.2, *) {
-            registerSingleton(LiveActivityManagerProtocol.self) {
-                LiveActivityManager.shared
-            }
+            let key = ObjectIdentifier(LiveActivityManagerProtocol.self)
+            singletons[key] = LiveActivityManager.shared
         }
     }
 }

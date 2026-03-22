@@ -350,6 +350,48 @@ final class PlayerViewModelTests: XCTestCase {
             _ = container.resolve(AudioPlayerProtocol.self)
         }())
     }
+    
+    // MARK: - App Startup Tests
+    
+    /// Test that verifies the app can start up without crashing.
+    /// This is a regression test for the LiveActivityManager type cast crash.
+    func testAppStartup_DoesNotCrash() throws {
+        // Given
+        let container = Container()
+        
+        // When - Register all default services (this is what happens at app launch)
+        container.registerDefaultServices()
+        
+        // Then - Should be able to resolve all services without crashing
+        let audioPlayer = container.resolveAudioPlayer()
+        XCTAssertNotNil(audioPlayer, "AudioPlayer should resolve without crashing")
+        
+        let nowPlayingService = container.resolveNowPlayingService()
+        XCTAssertNotNil(nowPlayingService, "NowPlayingService should resolve without crashing")
+        
+        if #available(iOS 16.2, *) {
+            let liveActivityManager = container.resolveLiveActivityManager()
+            XCTAssertNotNil(liveActivityManager, "LiveActivityManager should resolve without crashing on iOS 16.2+")
+        }
+    }
+    
+    /// Test that PlayerViewModel can be initialized with default dependencies (simulating app launch).
+    func testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash() throws {
+        // Given
+        Container.shared.registerDefaultServices()
+        
+        // When - Create ViewModel as happens during app launch
+        let viewModel = PlayerViewModel()
+        
+        // Then - Should initialize without crashing
+        XCTAssertNotNil(viewModel, "PlayerViewModel should initialize without crashing")
+        XCTAssertNotNil(viewModel.audioPlayer, "AudioPlayer should be injected")
+        XCTAssertNotNil(viewModel.nowPlayingService, "NowPlayingService should be injected")
+        
+        if #available(iOS 16.2, *) {
+            XCTAssertNotNil(viewModel.liveActivityManager, "LiveActivityManager should be injected on iOS 16.2+")
+        }
+    }
 }
 
 // MARK: - Linux Support
@@ -363,6 +405,8 @@ extension PlayerViewModelTests {
             ("testVolume_GetterDelegatesToAudioPlayer", testVolume_GetterDelegatesToAudioPlayer),
             ("testContainer_RegistersAndResolvesServices", testContainer_RegistersAndResolvesServices),
             ("testContainer_SingletonLifetime", testContainer_SingletonLifetime),
+            ("testAppStartup_DoesNotCrash", testAppStartup_DoesNotCrash),
+            ("testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash", testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash),
         ]
     }
 }

@@ -96,6 +96,13 @@ Edit `SRRadio/SRRadioLiveActivity/SRRadioLiveActivity.swift`
 - Only commit and push when explicitly requested by the user
 - Wait for user confirmation before making git mutations
 
+### Test Requirement
+**IMPORTANT:** Before claiming a task is complete or terminated:
+1. Run the build: `xcodebuild -project SRRadio/SRRadio.xcodeproj -scheme SRRadio -destination "platform=iOS Simulator,name=iPhone 16,OS=18.5" -configuration Debug build`
+2. Verify **BUILD SUCCEEDED** with no errors
+3. Run tests if test files were modified
+4. Do NOT commit until all tests pass
+
 ### UI Language
 - All user-facing strings are in **German**
 - Keep labels concise for mobile display

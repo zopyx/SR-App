@@ -2,16 +2,11 @@ import SwiftUI
 
 @main
 struct SRRadioApp: App {
-    /// The dependency injection container.
-    /// Registered once at app launch and shared throughout the app lifecycle.
-    private let container: Container
-    
     init() {
-        // Set up dependency injection container
-        self.container = Container.shared
-        self.container.registerDefaultServices()
+        // Set up dependency injection container once at app launch
+        Container.shared.registerDefaultServices()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
