@@ -1,16 +1,40 @@
 import Foundation
 import SwiftUI
 
+/// Represents a radio station with its metadata and stream configuration.
+///
+/// `Station` is the core model for representing radio stations in the app.
+/// It includes all necessary information for streaming, display, and persistence.
 struct Station: Identifiable, Equatable, Hashable {
+    /// Unique identifier for the station (e.g., `"sr1"`, `"radio_salue"`)
     let id: String
+    
+    /// Full display name of the station (e.g., `"SR 1"`, `"Radio Salü"`)
     let name: String
+    
+    /// Short name used in compact UI elements (e.g., `"SR1"`, `"Salü"`)
     let shortName: String
+    
+    /// Human-readable description of the station's format/content
     let description: String
+    
+    /// URL of the audio stream for playback
     let streamUrl: URL
+    
+    /// Asset name for the station logo image (empty string if using colored initials)
     let logoName: String
+    
+    /// Brand color associated with the station
     let color: Color
+    
+    /// Official website URL for the station
     let website: URL
-
+    
+    /// Hex color string representation for use in widgets and extensions.
+    ///
+    /// Returns a 6-digit hex color code (e.g., `"#2ab3a6"`) for the station.
+    /// This is used primarily for sharing color information with widget extensions
+    /// that cannot directly use SwiftUI `Color` objects.
     var colorHex: String {
         switch id {
         case "sr1": return "#2ab3a6"
@@ -34,174 +58,242 @@ struct Station: Identifiable, Equatable, Hashable {
 
     // MARK: - Saarländischer Rundfunk
 
-    static let sr1 = Station(
+    static let sr1 = srStation(
         id: "sr1",
         name: "SR 1",
         shortName: "SR1",
         description: "Saarlands beste Musik und Nachrichten",
-        streamUrl: URL(string: "https://liveradio.sr.de/sr/sr1/mp3/128/stream.mp3")!,
+        streamPath: "1009/mp3/128/sr1",
         logoName: "sr1_logo",
-        color: Color(hex: "#2ab3a6"),
-        website: URL(string: "https://www.sr.de/sr1")!
+        colorHex: "#2ab3a6"
     )
 
-    static let srKultur = Station(
+    static let srKultur = srStation(
         id: "sr_kultur",
         name: "SR kultur",
         shortName: "SR kultur",
         description: "Kultur, Wort und klassische Musik",
-        streamUrl: URL(string: "https://sr.audiostream.io/sr/1010/mp3/128/sr2")!,
+        streamPath: "1010/mp3/128/sr2",
         logoName: "sr2_logo",
-        color: Color(hex: "#8b7cff"),
-        website: URL(string: "https://www.sr.de/sr2")!
+        colorHex: "#8b7cff"
     )
 
-    static let sr3 = Station(
+    static let sr3 = srStation(
         id: "sr3",
         name: "SR 3 Saarlandwelle",
         shortName: "SR3",
         description: "Die beste Musik für das Saarland",
-        streamUrl: URL(string: "https://sr.audiostream.io/sr/1011/mp3/128/sr3")!,
+        streamPath: "1011/mp3/128/sr3",
         logoName: "sr3_logo",
-        color: Color(hex: "#44a1ff"),
-        website: URL(string: "https://www.sr.de/sr3")!
+        colorHex: "#44a1ff"
     )
 
-    static let unserding = Station(
+    static let unserding = srStation(
         id: "unserding",
         name: "SR UnserDing",
         shortName: "UnserDing",
         description: "Das junge Radio im Saarland",
-        streamUrl: URL(string: "https://sr.audiostream.io/sr/1012/mp3/128/ud")!,
+        streamPath: "1012/mp3/128/ud",
         logoName: "",
-        color: Color(hex: "#ff6b35"),
-        website: URL(string: "https://www.sr.de/unserding")!
+        colorHex: "#ff6b35"
     )
 
-    static let antenneSaar = Station(
+    static let antenneSaar = srStation(
         id: "antenne_saar",
         name: "Antenne Saar",
         shortName: "Antenne",
         description: "Hits und gute Laune",
-        streamUrl: URL(string: "https://sr.audiostream.io/sr/1013/mp3/128/as")!,
+        streamPath: "1013/mp3/128/as",
         logoName: "",
-        color: Color(hex: "#e4002b"),
-        website: URL(string: "https://www.antenne-saar.de")!
+        colorHex: "#e4002b"
     )
 
     // MARK: - Privatsender
 
-    static let radioSalue = Station(
+    static let radioSalue = privateStation(
         id: "radio_salue",
         name: "Radio Salü",
         shortName: "Salü",
         description: "Das Hitradio aus dem Saarland",
-        streamUrl: URL(string: "https://internetradio.salue.de:8443/salue5")!,
-        logoName: "",
-        color: Color(hex: "#ff9900"),
-        website: URL(string: "https://www.salue.de")!
+        streamUrlString: "https://internetradio.salue.de:8443/salue5",
+        websiteString: "https://www.salue.de",
+        colorHex: "#ff9900"
     )
 
-    static let bigfm = Station(
+    static let bigfm = privateStation(
         id: "bigfm",
         name: "bigFM Saarland",
         shortName: "bigFM",
         description: "Deutschlands biggste Beats",
-        streamUrl: URL(string: "https://stream.bigfm.de/saarland/mp3-128/private")!,
-        logoName: "",
-        color: Color(hex: "#00c853"),
-        website: URL(string: "https://www.bigfm.de")!
+        streamUrlString: "https://stream.bigfm.de/saarland/mp3-128/private",
+        websiteString: "https://www.bigfm.de",
+        colorHex: "#00c853"
     )
 
-    static let cityradioSB = Station(
+    static let cityradioSB = privateStation(
         id: "cityradio_sb",
         name: "CityRadio Saarbrücken",
         shortName: "CR SB",
         description: "Dein Stadtradio für Saarbrücken",
-        streamUrl: URL(string: "https://radiogroup-stream32.radiohost.de/cityradio-saarbruecken_mp3-192")!,
-        logoName: "",
-        color: Color(hex: "#1976d2"),
-        website: URL(string: "https://www.cityradio-saarbruecken.de")!
+        streamUrlString: "https://radiogroup-stream32.radiohost.de/cityradio-saarbruecken_mp3-192",
+        websiteString: "https://www.cityradio-saarbruecken.de",
+        colorHex: "#1976d2"
     )
 
-    static let cityradioNK = Station(
+    static let cityradioNK = privateStation(
         id: "cityradio_nk",
         name: "CityRadio Neunkirchen",
         shortName: "CR NK",
         description: "Dein Stadtradio für Neunkirchen",
-        streamUrl: URL(string: "https://radiogroup-stream31.radiohost.de/cityradio-neunkirchen_mp3-192")!,
-        logoName: "",
-        color: Color(hex: "#7b1fa2"),
-        website: URL(string: "https://www.cityradio-neunkirchen.de")!
+        streamUrlString: "https://radiogroup-stream31.radiohost.de/cityradio-neunkirchen_mp3-192",
+        websiteString: "https://www.cityradio-neunkirchen.de",
+        colorHex: "#7b1fa2"
     )
 
-    static let cityradioHOM = Station(
+    static let cityradioHOM = privateStation(
         id: "cityradio_hom",
         name: "CityRadio Homburg",
         shortName: "CR HOM",
         description: "Dein Stadtradio für Homburg",
-        streamUrl: URL(string: "https://stream.radiogroup.de/cityradio-homburg/mp3-192")!,
-        logoName: "",
-        color: Color(hex: "#00838f"),
-        website: URL(string: "https://www.cityradio-homburg.de")!
+        streamUrlString: "https://stream.radiogroup.de/cityradio-homburg/mp3-192",
+        websiteString: "https://www.cityradio-homburg.de",
+        colorHex: "#00838f"
     )
 
-    static let cityradioSLS = Station(
+    static let cityradioSLS = privateStation(
         id: "cityradio_sls",
         name: "CityRadio Saarlouis",
         shortName: "CR SLS",
         description: "Dein Stadtradio für Saarlouis",
-        streamUrl: URL(string: "https://stream.radiogroup.de/cityradio-saarlouis_mp3-192")!,
-        logoName: "",
-        color: Color(hex: "#c62828"),
-        website: URL(string: "https://www.cityradio-saarlouis.de")!
+        streamUrlString: "https://stream.radiogroup.de/cityradio-saarlouis_mp3-192",
+        websiteString: "https://www.cityradio-saarlouis.de",
+        colorHex: "#c62828"
     )
 
-    static let cityradioWND = Station(
+    static let cityradioWND = privateStation(
         id: "cityradio_wnd",
         name: "CityRadio St. Wendel",
         shortName: "CR WND",
         description: "Dein Stadtradio für St. Wendel",
-        streamUrl: URL(string: "https://radiogroup-stream32.radiohost.de/cityradio-stwendel_mp3-192")!,
-        logoName: "",
-        color: Color(hex: "#558b2f"),
-        website: URL(string: "https://www.cityradio-stwendel.de")!
+        streamUrlString: "https://radiogroup-stream32.radiohost.de/cityradio-stwendel_mp3-192",
+        websiteString: "https://www.cityradio-stwendel.de",
+        colorHex: "#558b2f"
     )
 
-    static let radioRSL = Station(
+    static let radioRSL = privateStation(
         id: "radio_rsl",
         name: "Radio Saarschleifenland",
         shortName: "RSL",
         description: "Radio aus dem Saarschleifenland",
-        streamUrl: URL(string: "http://stream.radiorsl.de:8000/radiorsl")!,
-        logoName: "",
-        color: Color(hex: "#4e342e"),
-        website: URL(string: "https://www.radiorsl.de")!
+        streamUrlString: "http://stream.radiorsl.de:8000/radiorsl",
+        websiteString: "https://www.radiorsl.de",
+        colorHex: "#4e342e"
     )
 
-    static let classicRock = Station(
+    static let classicRock = privateStation(
         id: "classic_rock",
         name: "Classic Rock Radio",
         shortName: "CRR",
         description: "Die besten Classic Rock Hits",
-        streamUrl: URL(string: "https://internetradio.salue.de:8443/classicrock.mp3")!,
-        logoName: "",
-        color: Color(hex: "#b71c1c"),
-        website: URL(string: "https://www.classicrockradio.de")!
+        streamUrlString: "https://internetradio.salue.de:8443/classicrock.mp3",
+        websiteString: "https://www.classicrockradio.de",
+        colorHex: "#b71c1c"
     )
 
-    static let schlagerparadies = Station(
+    static let schlagerparadies = privateStation(
         id: "schlagerparadies",
         name: "Radio Schlagerparadies",
         shortName: "Schlager",
         description: "Die schönsten Schlager",
-        streamUrl: URL(string: "https://stream.schlagerparadies.de/schlagerparadies")!,
-        logoName: "",
-        color: Color(hex: "#e91e63"),
-        website: URL(string: "https://www.schlagerparadies.de")!
+        streamUrlString: "https://stream.schlagerparadies.de/schlagerparadies",
+        websiteString: "https://www.schlagerparadies.de",
+        colorHex: "#e91e63"
     )
 
     var hasLogo: Bool { !logoName.isEmpty }
+
+    // MARK: - Factory Methods
+
+    /// Creates a Saarländischer Rundfunk (SR) station with standardized configuration.
+    ///
+    /// - Parameters:
+    ///   - id: Station identifier (e.g., `"sr1"`, `"sr_kultur"`)
+    ///   - name: Full display name
+    ///   - shortName: Abbreviated name for compact UI
+    ///   - description: Station description/tagline
+    ///   - streamPath: Stream path segment for SR CDN URL
+    ///   - logoName: Asset name for station logo
+    ///   - colorHex: Hex color code for branding
+    /// - Returns: A configured `Station` instance for SR stations
+    private static func srStation(
+        id: String,
+        name: String,
+        shortName: String,
+        description: String,
+        streamPath: String,
+        logoName: String,
+        colorHex: String
+    ) -> Station {
+        Station(
+            id: id,
+            name: name,
+            shortName: shortName,
+            description: description,
+            streamUrl: url("https://sr.audiostream.io/sr/\(streamPath)"),
+            logoName: logoName,
+            color: Color(hex: colorHex),
+            website: url("https://www.sr.de/\(id)")
+        )
+    }
+
+    /// Creates a private/commercial radio station.
+    ///
+    /// - Parameters:
+    ///   - id: Station identifier
+    ///   - name: Full display name
+    ///   - shortName: Abbreviated name for compact UI
+    ///   - description: Station description/tagline
+    ///   - streamUrlString: Full stream URL
+    ///   - websiteString: Full website URL
+    ///   - colorHex: Hex color code for branding
+    /// - Returns: A configured `Station` instance for private stations
+    private static func privateStation(
+        id: String,
+        name: String,
+        shortName: String,
+        description: String,
+        streamUrlString: String,
+        websiteString: String,
+        colorHex: String
+    ) -> Station {
+        Station(
+            id: id,
+            name: name,
+            shortName: shortName,
+            description: description,
+            streamUrl: url(streamUrlString),
+            logoName: "",
+            color: Color(hex: colorHex),
+            website: url(websiteString)
+        )
+    }
+
+    /// Safely creates a URL from a string, fatalizing on invalid URLs.
+    ///
+    /// This helper prevents force-unwrap crashes by providing clear error messages
+    /// during development if a malformed URL is encountered.
+    ///
+    /// - Parameter string: The URL string
+    /// - Returns: A valid `URL` instance
+    /// - FatalError: If the URL string is malformed
+    private static func url(_ string: String) -> URL {
+        guard let url = URL(string: string) else {
+            fatalError("Invalid URL: \(string)")
+        }
+        return url
+    }
+
+    // MARK: - Station Instances
 
     static let all: [Station] = [
         .sr1, .srKultur, .sr3, .unserding, .antenneSaar,
@@ -215,6 +307,9 @@ struct Station: Identifiable, Equatable, Hashable {
 
     private static let defaultStationKey = "defaultStationId"
 
+    /// The currently configured default station ID.
+    ///
+    /// - Returns: The stored station ID from `UserDefaults`, or the fallback default station ID.
     static var defaultStationId: String {
         get {
             UserDefaults.standard.string(forKey: defaultStationKey) ?? Station.default.id
@@ -224,10 +319,15 @@ struct Station: Identifiable, Equatable, Hashable {
         }
     }
 
+    /// The default station to use when the app launches.
+    ///
+    /// - Returns: The station matching `defaultStationId`, or the built-in default if not found.
     static var defaultStation: Station {
         all.first(where: { $0.id == defaultStationId }) ?? .default
     }
 
+    /// Persists the given station ID as the default station.
+    /// - Parameter id: The station ID to save as default.
     static func saveDefaultStation(id: String) {
         UserDefaults.standard.set(id, forKey: defaultStationKey)
     }
@@ -236,6 +336,9 @@ struct Station: Identifiable, Equatable, Hashable {
 
     private static let lastPlayedKey = "lastPlayedStationId"
 
+    /// The last played station.
+    ///
+    /// - Returns: The most recently played station from `UserDefaults`, or the default station if none was played.
     static var lastPlayed: Station {
         guard let id = UserDefaults.standard.string(forKey: lastPlayedKey),
               let station = all.first(where: { $0.id == id }) else {
@@ -244,17 +347,34 @@ struct Station: Identifiable, Equatable, Hashable {
         return station
     }
 
+    /// Persists the given station as the last played station.
+    /// - Parameter station: The station to save as last played.
     static func saveLastPlayed(_ station: Station) {
         UserDefaults.standard.set(station.id, forKey: lastPlayedKey)
     }
 }
 
+/// Represents now-playing metadata for a radio station.
+///
+/// `NowPlayingData` contains information about the currently playing track or show,
+/// including title, artist, show name, and moderator.
 struct NowPlayingData: Codable, Equatable {
+    /// The title of the currently playing track.
     let title: String
-    let artist: String
-    let show: String
-    let moderator: String
     
+    /// The artist of the currently playing track.
+    let artist: String
+    
+    /// The name of the current show or program.
+    let show: String
+    
+    /// The name of the current show moderator/host.
+    let moderator: String
+
+    /// Formatted display text for the now-playing information.
+    ///
+    /// Returns a human-readable string combining artist and title, or fallback to title/show.
+    /// - Returns: `"Artist — Title"` if both available, otherwise `title` or `show`.
     var displayText: String? {
         if !artist.isEmpty && !title.isEmpty {
             return "\(artist) — \(title)"

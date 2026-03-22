@@ -71,6 +71,7 @@ struct PlayerView: View {
                         withAnimation {
                             showSettings = true
                         }
+                        Analytics.track(.settingsOpen)
                     }) {
                         Image(systemName: "gear")
                             .font(.system(size: 16))
@@ -98,6 +99,7 @@ struct PlayerView: View {
                         withAnimation {
                             showAbout = true
                         }
+                        Analytics.track(.aboutViewOpen)
                     }) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 16))
@@ -260,6 +262,9 @@ struct PlayerView: View {
         nowPlayingService.startMonitoring(station: station)
         Station.saveLastPlayed(station)
         Haptics.stationChange()
+        
+        // Track analytics
+        Analytics.track(.stationChange(stationId: station.id, stationName: station.name))
 
         if #available(iOS 16.2, *) {
             restartLiveActivity(for: station)
@@ -276,6 +281,7 @@ struct PlayerView: View {
             show: ""
         )
         LiveActivityManager.shared.startActivity(station: station, state: contentState)
+        Analytics.track(.liveActivityStart(stationId: station.id))
     }
 
     @available(iOS 16.2, *)
@@ -342,23 +348,47 @@ struct ErrorMessageView: View {
     let message: String
     let onDismiss: () -> Void
     @State private var shakeOffset: CGFloat = 0
-    
+
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 12))
-            
+        VStack(spacing: 8) {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 12))
+
+                Text("Stream nicht verfügbar")
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundColor(Color(red: 1, green: 0.42, blue: 0.42))
+
             Text(message)
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11))
+                .foregroundColor(Color.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+
+            Button(action: onDismiss) {
+                HStack(spacing: 4) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text("Erneut versuchen")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(Color(red: 1, green: 0.27, blue: 0.27))
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .foregroundColor(Color(red: 1, green: 0.42, blue: 0.42))
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color(red: 1, green: 0.27, blue: 0.27).opacity(0.15))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 12)
                         .stroke(Color(red: 1, green: 0.27, blue: 0.27).opacity(0.3), lineWidth: 1)
                 )
         )
@@ -370,9 +400,6 @@ struct ErrorMessageView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 shakeOffset = 0
             }
-        }
-        .onTapGesture {
-            onDismiss()
         }
     }
 }

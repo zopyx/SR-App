@@ -1,7 +1,21 @@
 import SwiftUI
 
 extension Color {
-    /// Initialize a Color from a hex string (e.g. "#2ab3a6", "2ab3a6", "#FFF", "FFF")
+    /// Initialize a `Color` from a hex string representation.
+    ///
+    /// This initializer supports multiple hex string formats including optional `#` prefix,
+    /// 3-digit (RGB), 6-digit (RRGGBB), and 8-digit (RRGGBBAA) formats.
+    ///
+    /// - Parameter hex: The hex color string. Examples: `"#2ab3a6"`, `"2ab3a6"`, `"#FFF"`, `"FFF"`
+    ///
+    /// - Note: Invalid hex strings will result in a transparent black color.
+    ///
+    /// ## Examples
+    /// ```swift
+    /// Color(hex: "#2ab3a6")  // Teal color
+    /// Color(hex: "FFF")      // White
+    /// Color(hex: "#00000080") // Semi-transparent black
+    /// ```
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0

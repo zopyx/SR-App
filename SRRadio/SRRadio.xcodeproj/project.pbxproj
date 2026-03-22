@@ -13,6 +13,7 @@
 		A20000000000000000000104 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* VisualEffectView.swift */; };
 		A20000000000000000000105 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* AboutView.swift */; };
 		A20000000000000000000116 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000026 /* Color+Hex.swift */; };
+		A20000000000000000000117 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* Analytics.swift */; };
 		A20000000000000000000115 /* ScreenshotGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000025 /* ScreenshotGenerator.swift */; };
 		A20000000000000000000106 /* EqualizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* EqualizerView.swift */; };
 		A20000000000000000000107 /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* NowPlayingView.swift */; };
@@ -66,6 +67,7 @@
 		A10000000000000000000013 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		A10000000000000000000026 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		A10000000000000000000027 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		A10000000000000000000025 /* ScreenshotGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGenerator.swift; sourceTree = "<group>"; };
 		A10000000000000000000015 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		A10000000000000000000016 /* EqualizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerView.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				A10000000000000000000012 /* AudioPlayer.swift */,
 				A10000000000000000000013 /* NowPlayingService.swift */,
 				A10000000000000000000020 /* LiveActivityManager.swift */,
+				A10000000000000000000027 /* Analytics.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 				A20000000000000000000104 /* VisualEffectView.swift in Sources */,
 				A20000000000000000000105 /* AboutView.swift in Sources */,
 				A20000000000000000000116 /* Color+Hex.swift in Sources */,
+				A20000000000000000000117 /* Analytics.swift in Sources */,
 				A20000000000000000000115 /* ScreenshotGenerator.swift in Sources */,
 				A20000000000000000000106 /* EqualizerView.swift in Sources */,
 				A20000000000000000000107 /* NowPlayingView.swift in Sources */,

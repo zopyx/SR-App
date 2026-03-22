@@ -2,6 +2,7 @@ import AVFoundation
 import Combine
 import MediaPlayer
 
+/// Represents the current playback state of the audio player.
 enum PlaybackState: Equatable {
     case idle
     case loading
@@ -10,8 +11,19 @@ enum PlaybackState: Equatable {
     case error(String)
 }
 
+/// Manages audio playback for radio streams.
+///
+/// `AudioPlayer` is responsible for:
+/// - Loading and playing radio station streams
+/// - Managing playback state (idle, loading, playing, paused, error)
+/// - Volume control and mute functionality
+/// - Handling remote commands from Control Center and lock screen
+/// - Automatic retry on stream failures
 final class AudioPlayer: NSObject, ObservableObject {
+    /// The current playback state.
     @Published var state: PlaybackState = .idle
+    
+    /// The current volume level (0.0 to 1.0).
     @Published var volume: Double = 0.8 {
         didSet {
             guard !isMuted else { return }
@@ -19,6 +31,8 @@ final class AudioPlayer: NSObject, ObservableObject {
             player?.volume = Float(clampedVolume)
         }
     }
+    
+    /// Whether audio is currently muted.
     @Published var isMuted: Bool = false
 
     private var player: AVPlayer?
@@ -46,6 +60,7 @@ final class AudioPlayer: NSObject, ObservableObject {
         }
     }
 
+    /// Configures remote command handlers for Control Center and lock screen controls.
     private func setupRemoteCommands() {
         let center = MPRemoteCommandCenter.shared()
 
@@ -102,6 +117,11 @@ final class AudioPlayer: NSObject, ObservableObject {
         cleanup()
     }
 
+    /// Loads a radio station and optionally starts playback.
+    ///
+    /// - Parameters:
+    ///   - station: The station to load
+    ///   - autoPlay: Whether to automatically start playback after loading (default: `false`)
     func loadStation(_ station: Station, autoPlay: Bool = false) {
         cleanup()
         currentStation = station
@@ -162,6 +182,7 @@ final class AudioPlayer: NSObject, ObservableObject {
         }
     }
 
+    /// Starts or resumes audio playback.
     func play() {
         guard let player = player else { return }
         state = .loading
@@ -172,6 +193,10 @@ final class AudioPlayer: NSObject, ObservableObject {
             if self.player?.rate ?? 0 > 0 {
                 self.state = .playing
                 self.retryCount = 0
+                // Track successful playback start
+                if let station = self.currentStation {
+                    Analytics.track(.playbackStart(stationId: station.id))
+                }
             } else {
                 self.handleError(nil)
             }
@@ -179,6 +204,7 @@ final class AudioPlayer: NSObject, ObservableObject {
         }
     }
 
+    /// Pauses the current playback.
     func pause() {
         retryWorkItem?.cancel()
         player?.pause()
@@ -186,6 +212,7 @@ final class AudioPlayer: NSObject, ObservableObject {
         updateNowPlayingInfo()
     }
 
+    /// Toggles between play and pause states.
     func togglePlayPause() {
         switch state {
         case .playing:
@@ -213,10 +240,18 @@ final class AudioPlayer: NSObject, ObservableObject {
         if retryCount < maxRetries {
             retryPlayback()
         } else {
-            state = .error(error?.localizedDescription ?? "Playback error")
+            let errorMessage = error?.localizedDescription ?? "Playback error"
+            state = .error(errorMessage)
+            // Track playback error
+            if let station = currentStation {
+                Analytics.track(.playbackError(stationId: station.id, error: errorMessage))
+            }
         }
     }
 
+    /// Toggles the mute state.
+    ///
+    /// When muting, stores the current volume for restoration on unmute.
     func toggleMute() {
         isMuted.toggle()
         if isMuted {

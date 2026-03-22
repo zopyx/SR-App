@@ -79,7 +79,7 @@ struct StationPickerSheet: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
-                    Text("Sender wählen")
+                    Text(NSLocalizedString("Sender wählen", comment: "Station picker title"))
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(.white)
 
@@ -99,7 +99,7 @@ struct StationPickerSheet: View {
                 HStack(spacing: 10) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(Color.white.opacity(0.4))
-                    TextField("Sender suchen...", text: $searchText)
+                    TextField(NSLocalizedString("Sender suchen...", comment: "Station search placeholder"), text: $searchText)
                         .foregroundColor(.white)
                         .autocorrectionDisabled()
                 }

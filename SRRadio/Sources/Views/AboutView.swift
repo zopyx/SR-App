@@ -110,32 +110,32 @@ struct AboutView: View {
 
     private var currentStationSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Aktueller Sender")
+            Text(NSLocalizedString("AKTUELLER SENDER", comment: "Current station section header"))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(currentStation.color)
                 .tracking(0.5)
                 .textCase(.uppercase)
 
-            InfoRow(label: "Name", value: currentStation.name)
-            InfoRow(label: "Beschreibung", value: currentStation.description)
+            InfoRow(label: NSLocalizedString("Name", comment: "Station name label"), value: currentStation.name)
+            InfoRow(label: NSLocalizedString("Beschreibung", comment: "Station description label"), value: currentStation.description)
 
             if let displayText = nowPlayingData?.displayText {
-                InfoRow(label: "Läuft gerade", value: displayText, valueColor: currentStation.color)
+                InfoRow(label: NSLocalizedString("Läuft gerade", comment: "Now playing label"), value: displayText, valueColor: currentStation.color)
             }
 
             HStack(alignment: .top) {
-                Text("Website")
+                Text(NSLocalizedString("Website", comment: "Website label"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color.white.opacity(0.6))
                     .frame(width: 100, alignment: .leading)
 
-                Link("Webseite besuchen \u{2192}", destination: currentStation.website)
+                Link(NSLocalizedString("Webseite besuchen →", comment: "Visit website link"), destination: currentStation.website)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(currentStation.color)
             }
 
             HStack(alignment: .top) {
-                Text("Stream URL")
+                Text(NSLocalizedString("Stream URL", comment: "Stream URL label"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color.white.opacity(0.6))
                     .frame(width: 100, alignment: .leading)
@@ -143,7 +143,7 @@ struct AboutView: View {
                 Button(action: {
                     copyToClipboard(currentStation.streamUrl.absoluteString)
                 }) {
-                    Text(copiedUrl == currentStation.streamUrl.absoluteString ? "Kopiert!" : "URL kopieren")
+                    Text(copiedUrl == currentStation.streamUrl.absoluteString ? NSLocalizedString("Kopiert!", comment: "Copied confirmation") : NSLocalizedString("URL kopieren", comment: "Copy URL action"))
                         .font(.system(size: 13, weight: .semibold))
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -154,20 +154,20 @@ struct AboutView: View {
 
     private var appInfoSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("App-Informationen")
+            Text(NSLocalizedString("APP-INFORMATIONEN", comment: "App information section header"))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundColor(Color.white.opacity(0.5))
                 .tracking(0.5)
                 .textCase(.uppercase)
 
-            InfoRow(label: "Version", value: appVersion)
-            InfoRow(label: "Erstelldatum", value: buildDate)
-            InfoRow(label: "Erstellt mit", value: "SwiftUI")
-            InfoRow(label: "Plattformen", value: "iOS, iPadOS")
-            InfoRow(label: "Autor", value: "Andreas Jung")
+            InfoRow(label: NSLocalizedString("Version", comment: "Version label"), value: appVersion)
+            InfoRow(label: NSLocalizedString("Erstelldatum", comment: "Build date label"), value: buildDate)
+            InfoRow(label: NSLocalizedString("Erstellt mit", comment: "Built with label"), value: "SwiftUI")
+            InfoRow(label: NSLocalizedString("Plattformen", comment: "Platforms label"), value: "iOS, iPadOS")
+            InfoRow(label: NSLocalizedString("Autor", comment: "Author label"), value: "Andreas Jung")
 
             HStack(alignment: .top) {
-                Text("Website")
+                Text(NSLocalizedString("Website", comment: "Website label"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color.white.opacity(0.6))
                     .frame(width: 100, alignment: .leading)
@@ -177,12 +177,12 @@ struct AboutView: View {
                     .foregroundColor(currentStation.color)
             }
 
-            InfoRow(label: "Lizenz", value: "MIT")
+            InfoRow(label: NSLocalizedString("Lizenz", comment: "License label"), value: "MIT")
         }
     }
 
     private var disclaimerSection: some View {
-        Text("Dies ist eine inoffizielle Drittanbieter-App. Alle Sender und Marken gehören ihren jeweiligen Eigentümern.")
+        Text(NSLocalizedString("Dies ist eine inoffizielle Drittanbieter-App. Alle Sender und Marken gehören ihren jeweiligen Eigentümern.", comment: "Disclaimer text"))
             .font(.system(size: 11, weight: .medium))
             .foregroundColor(Color.white.opacity(0.4))
             .multilineTextAlignment(.leading)
@@ -192,7 +192,7 @@ struct AboutView: View {
     }
 
     private var footer: some View {
-        Text("Mit ♥ für Radioliebhaber gemacht")
+        Text(NSLocalizedString("Mit ♥ für Radioliebhaber gemacht", comment: "Footer tagline"))
             .font(.system(size: 12, weight: .semibold))
             .foregroundColor(Color.white.opacity(0.5))
             .frame(maxWidth: .infinity)

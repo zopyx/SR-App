@@ -1,0 +1,64 @@
+//
+//  Localizable.strings
+//  SRRadio
+//
+//  English localization strings for Saar Streams app
+//
+
+// MARK: - General
+"Saar Streams" = "Saar Streams";
+"Live auf Sendung" = "Live on Air";
+"Verbinde..." = "Connecting...";
+"PUFFERN" = "BUFFERING";
+"AUF SENDUNG" = "ON AIR";
+"PAUSIERT" = "PAUSED";
+
+// MARK: - Main Screen
+"Sender wählen" = "Select Station";
+"Sender suchen..." = "Search stations...";
+"Standard-Sender" = "Default Station";
+"Der Sender, der beim Start automatisch geladen wird" = "The station that loads automatically on startup";
+"Automatische Wiedergabe" = "Auto Playback";
+"Wiedergabe" = "Playback";
+"Über" = "About";
+"Version" = "Version";
+"Build" = "Build";
+
+// MARK: - Settings
+"Einstellungen" = "Settings";
+"Fertig" = "Done";
+"Startverhalten" = "Startup Behavior";
+
+// MARK: - About
+"AKTUELLER SENDER" = "CURRENT STATION";
+"Name" = "Name";
+"Beschreibung" = "Description";
+"Läuft gerade" = "Now Playing";
+"APP-INFORMATIONEN" = "APP INFORMATION";
+"Plattformen" = "Platforms";
+"Autor" = "Author";
+"Dies ist eine inoffizielle Drittanbieter-App." = "This is an unofficial third-party app.";
+"Mit ♥ für Radioliebhaber gemacht" = "Made with ♥ for radio lovers";
+
+// MARK: - Error Messages
+"Stream nicht verfügbar" = "Stream Unavailable";
+"Erneut versuchen" = "Try Again";
+"Stream ended unexpectedly" = "Stream ended unexpectedly";
+"Retrying..." = "Retrying...";
+
+// MARK: - Stations
+"Saarlands beste Musik und Nachrichten" = "Saarland's best music and news";
+"Kultur, Wort und klassische Musik" = "Culture, talk and classical music";
+"Die beste Musik für das Saarland" = "The best music for Saarland";
+"Das junge Radio im Saarland" = "The young radio station in Saarland";
+"Hits und gute Laune" = "Hits and good vibes";
+"Das Hitradio aus dem Saarland" = "The hit radio from Saarland";
+"Deutschlands biggste Beats" = "Germany's biggest beats";
+"Dein Stadtradio für Saarbrücken" = "Your city radio for Saarbrücken";
+"Dein Stadtradio für Neunkirchen" = "Your city radio for Neunkirchen";
+"Dein Stadtradio für Homburg" = "Your city radio for Homburg";
+"Dein Stadtradio für Saarlouis" = "Your city radio for Saarlouis";
+"Dein Stadtradio für St. Wendel" = "Your city radio for St. Wendel";
+"Radio aus dem Saarschleifenland" = "Radio from Saarschleifenland";
+"Die besten Classic Rock Hits" = "The best classic rock hits";
+"Die schönsten Schlager" = "The best German pop hits";

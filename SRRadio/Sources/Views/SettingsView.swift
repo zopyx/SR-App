@@ -3,12 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @Binding var isPresented: Bool
     @State private var defaultStationId: String = Station.defaultStationId
-    
+
     var body: some View {
         NavigationView {
             List {
-                Section(header: Text("Startverhalten")) {
-                    Picker("Standard-Sender", selection: $defaultStationId) {
+                Section(header: Text(NSLocalizedString("Startverhalten", comment: "Settings section for startup behavior"))) {
+                    Picker(NSLocalizedString("Standard-Sender", comment: "Default station picker label"), selection: $defaultStationId) {
                         ForEach(Station.all) { station in
                             Text(station.name)
                                 .tag(station.id)
@@ -21,11 +21,11 @@ struct SettingsView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Einstellungen")
+            .navigationTitle(NSLocalizedString("Einstellungen", comment: "Settings screen title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fertig") {
+                    Button(NSLocalizedString("Fertig", comment: "Done button")) {
                         isPresented = false
                     }
                 }
