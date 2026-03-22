@@ -28,27 +28,12 @@
 		A2000000000000000000000B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* Assets.xcassets */; };
 		A2000000000000000000010D /* SRRadioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001D /* SRRadioApp.swift */; };
 		A2000000000000000000010E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001E /* Theme.swift */; };
-		A2000000000000000000010F /* SRRadioAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* SRRadioAttributes.swift */; };
-		A20000000000000000000110 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* LiveActivityManager.swift */; };
 		A20000000000000000000111 /* StationLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* StationLogo.swift */; };
 		A20000000000000000000112 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* Haptics.swift */; };
 		A20000000000000000000113 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000023 /* SettingsView.swift */; };
-		A30000000000000000000001 /* SRRadioLiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000011 /* SRRadioLiveActivityBundle.swift */; };
-		A30000000000000000000002 /* SRRadioLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000012 /* SRRadioLiveActivity.swift */; };
-		A30000000000000000000003 /* SRRadioAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* SRRadioAttributes.swift */; };
 		A30000000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001B /* Assets.xcassets */; };
-		A30000000000000000000005 /* SRRadioLiveActivityExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A30000000000000000000010 /* SRRadioLiveActivityExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		A30000000000000000000020 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A10000000000000000000060 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A30000000000000000000050;
-			remoteInfo = SRRadioLiveActivity;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		A30000000000000000000060 /* Embed Foundation Extensions */ = {
@@ -57,7 +42,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				A30000000000000000000005 /* SRRadioLiveActivityExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -66,7 +50,6 @@
 
 /* Begin PBXFileReference section */
 		A20000000000000000000010 /* SR Radio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SR Radio.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A30000000000000000000010 /* SRRadioLiveActivityExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SRRadioLiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000010 /* RadioError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioError.swift; sourceTree = "<group>"; };
 		A10000000000000000000011 /* Station.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
@@ -88,13 +71,9 @@
 		A1000000000000000000001B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000000000000000000001D /* SRRadioApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioApp.swift; sourceTree = "<group>"; };
 		A1000000000000000000001E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		A1000000000000000000001F /* SRRadioAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioAttributes.swift; sourceTree = "<group>"; };
-		A10000000000000000000020 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		A10000000000000000000021 /* StationLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationLogo.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		A10000000000000000000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A30000000000000000000011 /* SRRadioLiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioLiveActivityBundle.swift; sourceTree = "<group>"; };
-		A30000000000000000000012 /* SRRadioLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioLiveActivity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,7 +99,6 @@
 			children = (
 				A10000000000000000000031 /* Sources */,
 				A10000000000000000000032 /* Resources */,
-				A30000000000000000000040 /* SRRadioLiveActivity */,
 				A10000000000000000000033 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -151,7 +129,6 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000010 /* SR Radio.app */,
-				A30000000000000000000010 /* SRRadioLiveActivityExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,7 +146,6 @@
 			children = (
 				A10000000000000000000010 /* RadioError.swift */,
 				A10000000000000000000011 /* Station.swift */,
-				A1000000000000000000001F /* SRRadioAttributes.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -179,7 +155,6 @@
 			children = (
 				A10000000000000000000012 /* AudioPlayer.swift */,
 				A10000000000000000000013 /* NowPlayingService.swift */,
-				A10000000000000000000020 /* LiveActivityManager.swift */,
 				A10000000000000000000027 /* Analytics.swift */,
 				4FE573ED90B3A183B852BD11 /* ServiceProtocols.swift */,
 				CA26448892A583867ABC2D37 /* Container.swift */,
@@ -224,8 +199,6 @@
 		A30000000000000000000040 /* SRRadioLiveActivity */ = {
 			isa = PBXGroup;
 			children = (
-				A30000000000000000000011 /* SRRadioLiveActivityBundle.swift */,
-				A30000000000000000000012 /* SRRadioLiveActivity.swift */,
 			);
 			path = SRRadioLiveActivity;
 			sourceTree = "<group>";
@@ -240,12 +213,10 @@
 				A20000000000000000000052 /* Sources */,
 				A20000000000000000000020 /* Frameworks */,
 				A20000000000000000000053 /* Resources */,
-				A30000000000000000000060 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A30000000000000000000021 /* PBXTargetDependency */,
 			);
 			name = SRRadio;
 			productName = "SR Radio";
@@ -266,7 +237,6 @@
 			);
 			name = SRRadioLiveActivity;
 			productName = SRRadioLiveActivity;
-			productReference = A30000000000000000000010 /* SRRadioLiveActivityExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -280,9 +250,6 @@
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					A20000000000000000000050 = {
-						CreatedOnToolsVersion = 15.0;
-					};
-					A30000000000000000000050 = {
 						CreatedOnToolsVersion = 15.0;
 					};
 				};
@@ -301,7 +268,6 @@
 			projectRoot = "";
 			targets = (
 				A20000000000000000000050 /* SRRadio */,
-				A30000000000000000000050 /* SRRadioLiveActivity */,
 			);
 		};
 /* End PBXProject section */
@@ -349,8 +315,6 @@
 				A2000000000000000000010A /* VolumeControl.swift in Sources */,
 				A2000000000000000000010D /* SRRadioApp.swift in Sources */,
 				A2000000000000000000010E /* Theme.swift in Sources */,
-				A2000000000000000000010F /* SRRadioAttributes.swift in Sources */,
-				A20000000000000000000110 /* LiveActivityManager.swift in Sources */,
 				A20000000000000000000111 /* StationLogo.swift in Sources */,
 				A20000000000000000000112 /* Haptics.swift in Sources */,
 				A20000000000000000000113 /* SettingsView.swift in Sources */,
@@ -361,9 +325,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A30000000000000000000001 /* SRRadioLiveActivityBundle.swift in Sources */,
-				A30000000000000000000002 /* SRRadioLiveActivity.swift in Sources */,
-				A30000000000000000000003 /* SRRadioAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,15 +571,6 @@
 			buildConfigurations = (
 				A20000000000000000000072 /* Debug */,
 				A20000000000000000000073 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		A30000000000000000000051 /* Build configuration list for PBXNativeTarget "SRRadioLiveActivity" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A30000000000000000000072 /* Debug */,
-				A30000000000000000000073 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

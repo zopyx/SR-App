@@ -36,19 +36,12 @@ final class PlayerViewModel: ObservableObject {
 
     private let _audioPlayer: any AudioPlayerProtocol
     private let _nowPlayingService: any NowPlayingServiceProtocol
-    private let _liveActivityManager: Any?
 
     /// The audio player service.
     var audioPlayer: any AudioPlayerProtocol { _audioPlayer }
 
     /// The now playing service.
     var nowPlayingService: any NowPlayingServiceProtocol { _nowPlayingService }
-    
-    /// The Live Activity manager (iOS 16.2+).
-    @available(iOS 16.2, *)
-    var liveActivityManager: (any LiveActivityManagerProtocol)? {
-        _liveActivityManager as? (any LiveActivityManagerProtocol)
-    }
 
     // MARK: - Private Properties
 
@@ -90,13 +83,6 @@ final class PlayerViewModel: ObservableObject {
         // Use injected dependencies or resolve from container
         self._audioPlayer = audioPlayer ?? Container.shared.resolveAudioPlayer()
         self._nowPlayingService = nowPlayingService ?? Container.shared.resolveNowPlayingService()
-        
-        // Handle Live Activity manager with proper iOS version check
-        if #available(iOS 16.2, *) {
-            self._liveActivityManager = Container.shared.resolveLiveActivityManager()
-        } else {
-            self._liveActivityManager = nil
-        }
 
         // Load last played station
         self.selectedStation = Station.lastPlayed
@@ -121,7 +107,7 @@ final class PlayerViewModel: ObservableObject {
     func changeStation(to station: Station) {
         // Clear any existing errors
         userErrorMessage = nil
-        
+
         selectedStation = station
         audioPlayer.loadStation(station, autoPlay: true)
         nowPlayingService.startMonitoring(station: station)
@@ -130,10 +116,6 @@ final class PlayerViewModel: ObservableObject {
 
         // Track analytics
         Analytics.track(.stationChange(stationId: station.id, stationName: station.name))
-
-        if #available(iOS 16.2, *) {
-            restartLiveActivity(for: station)
-        }
     }
 
     /// Opens the about dialog.
@@ -154,57 +136,6 @@ final class PlayerViewModel: ObservableObject {
         audioPlayer.retryAfterError()
     }
 
-    // MARK: - Live Activity
-
-    @available(iOS 16.2, *)
-    private func restartLiveActivity(for station: Station) {
-        guard let liveActivityManager = liveActivityManager else { return }
-
-        liveActivityManager.endActivity()
-        let contentState = SRRadioAttributes.ContentState(
-            isPlaying: true,
-            title: "",
-            artist: "",
-            show: ""
-        )
-        liveActivityManager.startActivity(station: station, state: contentState)
-        Analytics.track(.liveActivityStart(stationId: station.id))
-    }
-
-    @available(iOS 16.2, *)
-    func updateLiveActivity() {
-        guard let liveActivityManager = liveActivityManager else { return }
-
-        let data = nowPlayingService.currentData
-
-        switch audioPlayer.state {
-        case .playing:
-            let contentState = SRRadioAttributes.ContentState(
-                isPlaying: true,
-                title: data?.title ?? "",
-                artist: data?.artist ?? "",
-                show: data?.show ?? ""
-            )
-            if liveActivityManager.currentActivity == nil {
-                liveActivityManager.startActivity(station: selectedStation, state: contentState)
-            } else {
-                liveActivityManager.updateActivity(state: contentState)
-            }
-        case .paused:
-            let contentState = SRRadioAttributes.ContentState(
-                isPlaying: false,
-                title: data?.title ?? "",
-                artist: data?.artist ?? "",
-                show: data?.show ?? ""
-            )
-            liveActivityManager.updateActivity(state: contentState)
-        case .idle:
-            liveActivityManager.endActivity()
-        case .loading, .error:
-            break
-        }
-    }
-
     // MARK: - Lifecycle
 
     func onViewAppear() {
@@ -214,14 +145,8 @@ final class PlayerViewModel: ObservableObject {
     }
 
     func onPlaybackStateChange() {
-        if #available(iOS 16.2, *) {
-            updateLiveActivity()
-        }
     }
 
     func onNowPlayingChange() {
-        if #available(iOS 16.2, *) {
-            updateLiveActivity()
-        }
     }
 }

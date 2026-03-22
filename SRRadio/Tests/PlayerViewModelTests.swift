@@ -6,22 +6,16 @@ final class PlayerViewModelTests: XCTestCase {
 
     var mockAudioPlayer: MockAudioPlayer!
     var mockNowPlayingService: MockNowPlayingService!
-    var mockLiveActivityManager: MockLiveActivityManager!
 
     override func setUp() {
         super.setUp()
         mockAudioPlayer = MockAudioPlayer()
         mockNowPlayingService = MockNowPlayingService()
-        
-        if #available(iOS 16.2, *) {
-            mockLiveActivityManager = MockLiveActivityManager()
-        }
     }
 
     override func tearDown() {
         mockAudioPlayer = nil
         mockNowPlayingService = nil
-        mockLiveActivityManager = nil
         super.tearDown()
     }
 
@@ -31,8 +25,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // Then
@@ -50,9 +43,6 @@ final class PlayerViewModelTests: XCTestCase {
         // Then
         XCTAssertNotNil(viewModel.audioPlayer)
         XCTAssertNotNil(viewModel.nowPlayingService)
-        if #available(iOS 16.2, *) {
-            XCTAssertNotNil(viewModel.liveActivityManager)
-        }
     }
 
     // MARK: - Station Change Tests
@@ -61,8 +51,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
         let newStation = Station.sr3
 
@@ -79,8 +68,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -95,8 +83,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -112,8 +99,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -127,8 +113,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -142,8 +127,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
         mockAudioPlayer.volume = 0.5
 
@@ -158,8 +142,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -173,8 +156,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
         mockAudioPlayer.isMuted = true
 
@@ -189,8 +171,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
 
         // When
@@ -206,8 +187,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
         mockAudioPlayer.state = .error("Test error")
 
@@ -222,8 +202,7 @@ final class PlayerViewModelTests: XCTestCase {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
+            nowPlayingService: mockNowPlayingService
         )
         viewModel.userErrorMessage = "Test error"
 
@@ -233,65 +212,6 @@ final class PlayerViewModelTests: XCTestCase {
         // Then
         XCTAssertNil(viewModel.userErrorMessage)
         XCTAssertTrue(mockAudioPlayer.retryAfterErrorCalled)
-    }
-
-    // MARK: - Live Activity Tests
-
-    @available(iOS 16.2, *)
-    func testChangeStation_RestartsLiveActivity() {
-        // Given
-        let viewModel = PlayerViewModel(
-            audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
-        )
-
-        // When
-        viewModel.changeStation(to: .sr1)
-
-        // Then
-        XCTAssertTrue(mockLiveActivityManager.endActivityCalled)
-        XCTAssertTrue(mockLiveActivityManager.startActivityCalled)
-    }
-
-    @available(iOS 16.2, *)
-    func testUpdateLiveActivity_UpdatesWithPlayingState() {
-        // Given
-        let viewModel = PlayerViewModel(
-            audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
-        )
-        mockAudioPlayer.state = .playing
-        mockNowPlayingService.setData(NowPlayingData(
-            title: "Test Song",
-            artist: "Test Artist",
-            show: "Test Show",
-            moderator: "Test Moderator"
-        ))
-
-        // When
-        viewModel.updateLiveActivity()
-
-        // Then
-        XCTAssertTrue(mockLiveActivityManager.updateActivityCalled)
-    }
-
-    @available(iOS 16.2, *)
-    func testUpdateLiveActivity_EndsActivityOnIdle() {
-        // Given
-        let viewModel = PlayerViewModel(
-            audioPlayer: mockAudioPlayer,
-            nowPlayingService: mockNowPlayingService,
-            liveActivityManager: mockLiveActivityManager
-        )
-        mockAudioPlayer.state = .idle
-
-        // When
-        viewModel.updateLiveActivity()
-
-        // Then
-        XCTAssertTrue(mockLiveActivityManager.endActivityCalled)
     }
 
     // MARK: - Container Tests
@@ -354,43 +274,33 @@ final class PlayerViewModelTests: XCTestCase {
     // MARK: - App Startup Tests
     
     /// Test that verifies the app can start up without crashing.
-    /// This is a regression test for the LiveActivityManager type cast crash.
     func testAppStartup_DoesNotCrash() throws {
         // Given
         let container = Container()
-        
+
         // When - Register all default services (this is what happens at app launch)
         container.registerDefaultServices()
-        
+
         // Then - Should be able to resolve all services without crashing
         let audioPlayer = container.resolveAudioPlayer()
         XCTAssertNotNil(audioPlayer, "AudioPlayer should resolve without crashing")
-        
+
         let nowPlayingService = container.resolveNowPlayingService()
         XCTAssertNotNil(nowPlayingService, "NowPlayingService should resolve without crashing")
-        
-        if #available(iOS 16.2, *) {
-            let liveActivityManager = container.resolveLiveActivityManager()
-            XCTAssertNotNil(liveActivityManager, "LiveActivityManager should resolve without crashing on iOS 16.2+")
-        }
     }
     
     /// Test that PlayerViewModel can be initialized with default dependencies (simulating app launch).
     func testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash() throws {
         // Given
         Container.shared.registerDefaultServices()
-        
+
         // When - Create ViewModel as happens during app launch
         let viewModel = PlayerViewModel()
-        
+
         // Then - Should initialize without crashing
         XCTAssertNotNil(viewModel, "PlayerViewModel should initialize without crashing")
         XCTAssertNotNil(viewModel.audioPlayer, "AudioPlayer should be injected")
         XCTAssertNotNil(viewModel.nowPlayingService, "NowPlayingService should be injected")
-        
-        if #available(iOS 16.2, *) {
-            XCTAssertNotNil(viewModel.liveActivityManager, "LiveActivityManager should be injected on iOS 16.2+")
-        }
     }
 }
 

@@ -135,15 +135,6 @@ final class Container {
         }
     }
     
-    /// Resolves a service using ObjectIdentifier for type-erased protocols.
-    @available(iOS 16.2, *)
-    func resolveLiveActivityManager() -> (any LiveActivityManagerProtocol)? {
-        let key = ObjectIdentifier(LiveActivityManagerProtocol.self)
-        
-        // LiveActivityManager is directly stored as a singleton in registerDefaultServices()
-        // so we only need to retrieve it from the singletons dictionary.
-        return singletons[key] as? (any LiveActivityManagerProtocol)
-    }
 }
 
 // MARK: - Default Registration
@@ -162,13 +153,6 @@ extension Container {
         // Register NowPlayingService as singleton (manages polling)
         registerSingleton(NowPlayingServiceProtocol.self) {
             NowPlayingService()
-        }
-
-        // Register LiveActivityManager as singleton (iOS 16.2+)
-        // Store the value directly to avoid factory closure type casting issues
-        if #available(iOS 16.2, *) {
-            let key = ObjectIdentifier(LiveActivityManagerProtocol.self)
-            singletons[key] = LiveActivityManager.shared
         }
     }
 }

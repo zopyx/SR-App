@@ -1,6 +1,5 @@
 import Foundation
 import Combine
-import ActivityKit
 @testable import SRRadio
 
 // MARK: - Mock Audio Player
@@ -113,50 +112,5 @@ final class MockNowPlayingService: NowPlayingServiceProtocol {
     func setData(_ data: NowPlayingData?) {
         currentData = data
         isLoading = false
-    }
-}
-
-// MARK: - Mock Live Activity Manager
-
-/// Mock implementation of LiveActivityManagerProtocol for testing.
-@available(iOS 16.2, *)
-final class MockLiveActivityManager: LiveActivityManagerProtocol {
-    var currentActivity: Activity<SRRadioAttributes>?
-    @Published var currentError: RadioError?
-    
-    var startActivityCalled = false
-    var startActivityCalledWithStation: Station?
-    var startActivityCalledWithState: SRRadioAttributes.ContentState?
-    
-    var updateActivityCalled = false
-    var updateActivityCalledWithState: SRRadioAttributes.ContentState?
-    
-    var endActivityCalled = false
-    
-    func startActivity(station: Station, state: SRRadioAttributes.ContentState) {
-        startActivityCalled = true
-        startActivityCalledWithStation = station
-        startActivityCalledWithState = state
-    }
-    
-    func updateActivity(state: SRRadioAttributes.ContentState) {
-        updateActivityCalled = true
-        updateActivityCalledWithState = state
-    }
-    
-    func endActivity() {
-        endActivityCalled = true
-        currentActivity = nil
-    }
-    
-    func reset() {
-        currentActivity = nil
-        currentError = nil
-        startActivityCalled = false
-        startActivityCalledWithStation = nil
-        startActivityCalledWithState = nil
-        updateActivityCalled = false
-        updateActivityCalledWithState = nil
-        endActivityCalled = false
     }
 }
