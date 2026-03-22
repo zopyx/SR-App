@@ -59,7 +59,7 @@ struct SettingsView: View {
            let attributes = try? FileManager.default.attributesOfItem(atPath: executablePath),
            let modificationDate = attributes[.modificationDate] as? Date {
             let formatter = DateFormatter()
-            formatter.dateFormat = "dd-MM.yy HH:mm:ss"
+            formatter.dateFormat = "dd.MM.yy HH:mm:ss"
             return formatter.string(from: modificationDate) + " Uhr"
         }
         return "Unbekannt"
