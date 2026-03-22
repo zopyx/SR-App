@@ -1,5 +1,6 @@
 import AVFoundation
 import Combine
+import MediaPlayer
 
 enum PlaybackState: Equatable {
     case idle
@@ -19,7 +20,7 @@ final class AudioPlayer: ObservableObject {
         }
     }
     @Published var isMuted: Bool = false
-    
+
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
     private var cancellables = Set<AnyCancellable>()
@@ -27,47 +28,81 @@ final class AudioPlayer: ObservableObject {
     private let maxRetries = 3
     private var retryWorkItem: DispatchWorkItem?
     private var preMuteVolume: Double = 0.8
-    
+    private(set) var currentStation: Station?
+
     init() {
         setupAudioSession()
+        setupRemoteCommands()
     }
 
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setCategory(.playback, mode: .default)
             try session.setActive(true)
         } catch {
             print("Failed to set up audio session: \(error.localizedDescription)")
         }
     }
-    
+
+    private func setupRemoteCommands() {
+        let center = MPRemoteCommandCenter.shared()
+
+        center.playCommand.isEnabled = true
+        center.playCommand.addTarget { [weak self] _ in
+            self?.play()
+            return .success
+        }
+
+        center.pauseCommand.isEnabled = true
+        center.pauseCommand.addTarget { [weak self] _ in
+            self?.pause()
+            return .success
+        }
+
+        center.togglePlayPauseCommand.isEnabled = true
+        center.togglePlayPauseCommand.addTarget { [weak self] _ in
+            self?.togglePlayPause()
+            return .success
+        }
+    }
+
+    private func updateNowPlayingInfo() {
+        var info = [String: Any]()
+        info[MPMediaItemPropertyTitle] = currentStation?.name ?? "Stream Saar"
+        info[MPMediaItemPropertyArtist] = currentStation?.description ?? ""
+        info[MPNowPlayingInfoPropertyIsLiveStream] = true
+        info[MPNowPlayingInfoPropertyPlaybackRate] = state == .playing ? 1.0 : 0.0
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+
     deinit {
         cleanup()
     }
-    
+
     func loadStation(_ station: Station, autoPlay: Bool = false) {
         cleanup()
+        currentStation = station
         retryCount = 0
-        
+
         let asset = AVURLAsset(url: station.streamUrl, options: nil)
         playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
-        
+
         playerItem?.publisher(for: \.status)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 self?.handlePlayerItemStatus(status)
             }
             .store(in: &cancellables)
-        
+
         NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.handlePlaybackEnded()
             }
             .store(in: &cancellables)
-        
+
         playerItem?.publisher(for: \.error)
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
@@ -75,17 +110,19 @@ final class AudioPlayer: ObservableObject {
                 self?.handleError(error)
             }
             .store(in: &cancellables)
-        
+
         // Set initial volume
         player?.volume = isMuted ? 0 : Float(volume)
-        
+
+        updateNowPlayingInfo()
+
         if autoPlay {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.play()
             }
         }
     }
-    
+
     private func handlePlayerItemStatus(_ status: AVPlayerItem.Status) {
         switch status {
         case .failed:
@@ -94,7 +131,7 @@ final class AudioPlayer: ObservableObject {
             break
         }
     }
-    
+
     private func handlePlaybackEnded() {
         if retryCount < maxRetries {
             retryPlayback()
@@ -102,12 +139,12 @@ final class AudioPlayer: ObservableObject {
             state = .error("Stream ended unexpectedly")
         }
     }
-    
+
     func play() {
         guard let player = player else { return }
         state = .loading
         player.play()
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             if self.player?.rate ?? 0 > 0 {
@@ -116,15 +153,17 @@ final class AudioPlayer: ObservableObject {
             } else {
                 self.handleError(nil)
             }
+            self.updateNowPlayingInfo()
         }
     }
-    
+
     func pause() {
         retryWorkItem?.cancel()
         player?.pause()
         state = .paused
+        updateNowPlayingInfo()
     }
-    
+
     func togglePlayPause() {
         switch state {
         case .playing:
@@ -135,19 +174,19 @@ final class AudioPlayer: ObservableObject {
             pause()
         }
     }
-    
+
     private func retryPlayback() {
         retryWorkItem?.cancel()
         retryCount += 1
         state = .error("Retrying... (\(retryCount)/\(maxRetries))")
-        
+
         let workItem = DispatchWorkItem { [weak self] in
             self?.play()
         }
         retryWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: workItem)
     }
-    
+
     private func handleError(_ error: Error?) {
         if retryCount < maxRetries {
             retryPlayback()
@@ -155,7 +194,7 @@ final class AudioPlayer: ObservableObject {
             state = .error(error?.localizedDescription ?? "Playback error")
         }
     }
-    
+
     func toggleMute() {
         isMuted.toggle()
         if isMuted {
@@ -167,7 +206,7 @@ final class AudioPlayer: ObservableObject {
             player?.volume = Float(newVolume)
         }
     }
-    
+
     private func cleanup() {
         retryWorkItem?.cancel()
         cancellables.removeAll()
