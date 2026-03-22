@@ -158,6 +158,22 @@ final class AudioPlayer: NSObject, ObservableObject {
             }
             .store(in: &cancellables)
 
+        // Observe player rate to detect when playback actually starts
+        player?.publisher(for: \.rate)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] rate in
+                guard let self = self else { return }
+                if rate > 0 && self.state == .loading {
+                    self.state = .playing
+                    self.retryCount = 0
+                    if let station = self.currentStation {
+                        Analytics.track(.playbackStart(stationId: station.id))
+                    }
+                    self.updateNowPlayingInfo()
+                }
+            }
+            .store(in: &cancellables)
+
         NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
@@ -199,7 +215,10 @@ final class AudioPlayer: NSObject, ObservableObject {
             }
         case .failed:
             handleError(playerItem?.error)
-        default:
+        case .unknown:
+            // Wait for status to change to readyToPlay or failed
+            break
+        @unknown default:
             break
         }
     }
@@ -212,40 +231,16 @@ final class AudioPlayer: NSObject, ObservableObject {
         }
     }
 
-    private var rateObservation: AnyCancellable?
-
     /// Starts or resumes audio playback.
     func play() {
         guard let player = player else { return }
         state = .loading
         player.play()
-
-        // Cancel any previous rate observation
-        rateObservation?.cancel()
-
-        // Observe player rate changes to detect when playback actually starts
-        // For live streams, rate > 0 means the player is actively playing
-        rateObservation = player.publisher(for: \.rate)
-            .receive(on: DispatchQueue.main)
-            .dropFirst() // Skip initial value (0)
-            .sink { [weak self] rate in
-                guard let self = self else { return }
-                // Only transition to playing if we're still in loading state
-                if rate > 0 && self.state == .loading {
-                    self.state = .playing
-                    self.retryCount = 0
-                    if let station = self.currentStation {
-                        Analytics.track(.playbackStart(stationId: station.id))
-                    }
-                    self.updateNowPlayingInfo()
-                }
-            }
-
+        
         // Fallback: if still loading after 3 seconds, assume playing for live streams
+        // This handles cases where rate observation or readyToPlay don't fire reliably
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             guard let self = self else { return }
-            // If still in loading state after timeout, assume stream is playing
-            // (live streams may not report rate > 0 reliably)
             if self.state == .loading {
                 self.state = .playing
                 self.retryCount = 0
