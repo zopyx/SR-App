@@ -66,40 +66,23 @@ struct PlayerView: View {
             
             VStack(spacing: 0) {
                 // Top Bar
-                ZStack {
-                    HStack {
-                        Button(action: {
-                            withAnimation {
-                                showSettings = true
-                            }
-                        }) {
-                            Image(systemName: "gear")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.95))
-                                .frame(width: 28, height: 28)
-                                .background(Color.black.opacity(0.35))
-                                .clipShape(Circle())
-                                .shadow(color: Color.black.opacity(0.2), radius: 2)
+                HStack {
+                    Button(action: {
+                        withAnimation {
+                            showSettings = true
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            withAnimation {
-                                showAbout = true
-                            }
-                        }) {
-                            Image(systemName: "info.circle")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.95))
-                                .frame(width: 28, height: 28)
-                                .background(Color.black.opacity(0.35))
-                                .clipShape(Circle())
-                                .shadow(color: Color.black.opacity(0.2), radius: 2)
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                    }) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white.opacity(0.95))
+                            .frame(width: 28, height: 28)
+                            .background(Color.black.opacity(0.35))
+                            .clipShape(Circle())
+                            .shadow(color: Color.black.opacity(0.2), radius: 2)
                     }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
                     
                     StationSelector(
                         selectedStation: $selectedStation,
@@ -108,6 +91,23 @@ struct PlayerView: View {
                     ) { newStation in
                         changeStation(to: newStation)
                     }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation {
+                            showAbout = true
+                        }
+                    }) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 16))
+                            .foregroundColor(.white.opacity(0.95))
+                            .frame(width: 28, height: 28)
+                            .background(Color.black.opacity(0.35))
+                            .clipShape(Circle())
+                            .shadow(color: Color.black.opacity(0.2), radius: 2)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal, 22)
                 .padding(.top, 16)

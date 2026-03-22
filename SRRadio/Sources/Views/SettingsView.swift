@@ -31,7 +31,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Build")
                         Spacer()
-                        Text(buildNumber)
+                        Text(buildTime)
                             .foregroundColor(.secondary)
                     }
                 }
@@ -53,8 +53,18 @@ struct SettingsView: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     }
     
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+    private var buildTime: String {
+        // Get build time from the app's executable modification date
+        if let executablePath = Bundle.main.executablePath,
+           let attributes = try? FileManager.default.attributesOfItem(atPath: executablePath),
+           let modificationDate = attributes[.modificationDate] as? Date {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            formatter.locale = Locale(identifier: "de_DE")
+            return formatter.string(from: modificationDate)
+        }
+        return "Unbekannt"
     }
 }
 
