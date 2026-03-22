@@ -37,23 +37,17 @@ final class PlayerViewModel: ObservableObject {
     private let _audioPlayer: any AudioPlayerProtocol
     private let _nowPlayingService: any NowPlayingServiceProtocol
     private let _liveActivityManager: Any?
-    
+
     /// The audio player service.
     var audioPlayer: any AudioPlayerProtocol { _audioPlayer }
-    
+
     /// The now playing service.
     var nowPlayingService: any NowPlayingServiceProtocol { _nowPlayingService }
     
     /// The Live Activity manager (iOS 16.2+).
-    var liveActivityManager: Any? {
-        guard #available(iOS 16.2, *) else { return nil }
-        return _liveActivityManager
-    }
-    
-    /// Returns the Live Activity manager if available.
     @available(iOS 16.2, *)
-    func getLiveActivityManager() -> (any LiveActivityManagerProtocol)? {
-        return liveActivityManager as? (any LiveActivityManagerProtocol)
+    var liveActivityManager: (any LiveActivityManagerProtocol)? {
+        _liveActivityManager as? (any LiveActivityManagerProtocol)
     }
 
     // MARK: - Private Properties
@@ -89,21 +83,20 @@ final class PlayerViewModel: ObservableObject {
     /// - Parameters:
     ///   - audioPlayer: The audio player service (default: shared instance via Container).
     ///   - nowPlayingService: The now-playing service (default: shared instance via Container).
-    ///   - liveActivityManager: The Live Activity manager (default: shared instance, iOS 16.2+).
     init(
         audioPlayer: (any AudioPlayerProtocol)? = nil,
-        nowPlayingService: (any NowPlayingServiceProtocol)? = nil,
-        liveActivityManager: Any? = nil
+        nowPlayingService: (any NowPlayingServiceProtocol)? = nil
     ) {
         // Use injected dependencies or resolve from container
         self._audioPlayer = audioPlayer ?? Container.shared.resolveAudioPlayer()
         self._nowPlayingService = nowPlayingService ?? Container.shared.resolveNowPlayingService()
-        self._liveActivityManager = liveActivityManager ?? {
-            if #available(iOS 16.2, *) {
-                return Container.shared.resolveLiveActivityManager() as Any
-            }
-            return nil
-        }()
+        
+        // Handle Live Activity manager with proper iOS version check
+        if #available(iOS 16.2, *) {
+            self._liveActivityManager = Container.shared.resolveLiveActivityManager()
+        } else {
+            self._liveActivityManager = nil
+        }
 
         // Load last played station
         self.selectedStation = Station.lastPlayed
@@ -165,7 +158,7 @@ final class PlayerViewModel: ObservableObject {
 
     @available(iOS 16.2, *)
     private func restartLiveActivity(for station: Station) {
-        guard let liveActivityManager = getLiveActivityManager() else { return }
+        guard let liveActivityManager = liveActivityManager else { return }
 
         liveActivityManager.endActivity()
         let contentState = SRRadioAttributes.ContentState(
@@ -180,7 +173,7 @@ final class PlayerViewModel: ObservableObject {
 
     @available(iOS 16.2, *)
     func updateLiveActivity() {
-        guard let liveActivityManager = getLiveActivityManager() else { return }
+        guard let liveActivityManager = liveActivityManager else { return }
 
         let data = nowPlayingService.currentData
 
