@@ -50,7 +50,8 @@ final class AudioPlayer: NSObject, ObservableObject {
     private let maxRetries = 3
     private var retryWorkItem: DispatchWorkItem?
     private var preMuteVolume: Double = 0.8
-    
+    private var loadingTimeoutWorkItem: DispatchWorkItem?
+
     /// The currently playing station, if any.
     /// This is public to support the AudioPlayerProtocol.
     private(set) var currentStation: Station?
@@ -164,6 +165,7 @@ final class AudioPlayer: NSObject, ObservableObject {
             .sink { [weak self] rate in
                 guard let self = self else { return }
                 if rate > 0 && self.state == .loading {
+                    self.loadingTimeoutWorkItem?.cancel()
                     self.state = .playing
                     self.retryCount = 0
                     if let station = self.currentStation {
@@ -205,6 +207,7 @@ final class AudioPlayer: NSObject, ObservableObject {
         switch status {
         case .readyToPlay:
             // Player item is ready to play - for live streams this means we're playing
+            loadingTimeoutWorkItem?.cancel()
             if state == .loading {
                 state = .playing
                 retryCount = 0
@@ -234,12 +237,16 @@ final class AudioPlayer: NSObject, ObservableObject {
     /// Starts or resumes audio playback.
     func play() {
         guard let player = player else { return }
+        
+        // Cancel any existing timeout
+        loadingTimeoutWorkItem?.cancel()
+        
         state = .loading
         player.play()
         
-        // Fallback: if still loading after 3 seconds, assume playing for live streams
-        // This handles cases where rate observation or readyToPlay don't fire reliably
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+        // Set a timeout to transition to playing after 2 seconds
+        // This ensures we don't get stuck in loading state
+        let workItem = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             if self.state == .loading {
                 self.state = .playing
@@ -250,11 +257,14 @@ final class AudioPlayer: NSObject, ObservableObject {
                 self.updateNowPlayingInfo()
             }
         }
+        loadingTimeoutWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: workItem)
     }
 
     /// Pauses the current playback.
     func pause() {
         retryWorkItem?.cancel()
+        loadingTimeoutWorkItem?.cancel()
         player?.pause()
         state = .paused
         updateNowPlayingInfo()
@@ -336,6 +346,7 @@ final class AudioPlayer: NSObject, ObservableObject {
 
     private func cleanup() {
         retryWorkItem?.cancel()
+        loadingTimeoutWorkItem?.cancel()
         cancellables.removeAll()
         player?.pause()
         player = nil
