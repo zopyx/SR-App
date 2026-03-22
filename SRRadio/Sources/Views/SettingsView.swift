@@ -19,22 +19,6 @@ struct SettingsView: View {
                         Station.saveDefaultStation(id: newId)
                     }
                 }
-                
-                Section(header: Text("Informationen")) {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(appVersion)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    HStack {
-                        Text("Build")
-                        Spacer()
-                        Text(buildTime)
-                            .foregroundColor(.secondary)
-                    }
-                }
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Einstellungen")
@@ -47,22 +31,6 @@ struct SettingsView: View {
                 }
             }
         }
-    }
-    
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-    }
-    
-    private var buildTime: String {
-        // Get build time from the app's executable modification date
-        if let executablePath = Bundle.main.executablePath,
-           let attributes = try? FileManager.default.attributesOfItem(atPath: executablePath),
-           let modificationDate = attributes[.modificationDate] as? Date {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "dd.MM.yy HH:mm:ss"
-            return formatter.string(from: modificationDate) + " Uhr"
-        }
-        return "Unbekannt"
     }
 }
 
