@@ -30,8 +30,9 @@ struct StationSelector: View {
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 22)
                 .padding(.vertical, 10)
+                .frame(minWidth: 200)
                 .background(
                     Capsule()
                         .fill(Color.black.opacity(isHovering ? 0.45 : 0.35))
