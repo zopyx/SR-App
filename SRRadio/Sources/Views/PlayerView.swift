@@ -172,6 +172,16 @@ struct PlayerView: View {
             audioPlayer.loadStation(selectedStation, autoPlay: true)
             nowPlayingService.startMonitoring(station: selectedStation)
         }
+        .onChange(of: audioPlayer.state) { newState in
+            if #available(iOS 16.2, *) {
+                updateLiveActivity(state: newState)
+            }
+        }
+        .onChange(of: nowPlayingService.currentData) { _ in
+            if #available(iOS 16.2, *) {
+                updateLiveActivity(state: audioPlayer.state)
+            }
+        }
     }
     
     private var logoButton: some View {
@@ -229,6 +239,39 @@ struct PlayerView: View {
         selectedStation = station
         audioPlayer.loadStation(station, autoPlay: true)
         nowPlayingService.startMonitoring(station: station)
+    }
+
+    @available(iOS 16.2, *)
+    private func updateLiveActivity(state: PlaybackState) {
+        let data = nowPlayingService.currentData
+        let isPlaying = state == .playing
+
+        switch state {
+        case .playing:
+            let contentState = SRRadioAttributes.ContentState(
+                isPlaying: true,
+                title: data?.title ?? "",
+                artist: data?.artist ?? "",
+                show: data?.show ?? ""
+            )
+            if LiveActivityManager.shared.currentActivity == nil {
+                LiveActivityManager.shared.startActivity(station: selectedStation, state: contentState)
+            } else {
+                LiveActivityManager.shared.updateActivity(state: contentState)
+            }
+        case .paused:
+            let contentState = SRRadioAttributes.ContentState(
+                isPlaying: false,
+                title: data?.title ?? "",
+                artist: data?.artist ?? "",
+                show: data?.show ?? ""
+            )
+            LiveActivityManager.shared.updateActivity(state: contentState)
+        case .idle:
+            LiveActivityManager.shared.endActivity()
+        case .loading, .error:
+            break
+        }
     }
 }
 

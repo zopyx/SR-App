@@ -10,7 +10,16 @@ struct Station: Identifiable, Equatable, Hashable {
     let logoName: String
     let color: Color
     let website: URL
-    
+
+    var colorHex: String {
+        switch id {
+        case "sr1": return "#2ab3a6"
+        case "sr2": return "#8b7cff"
+        case "sr3": return "#44a1ff"
+        default: return "#FFFFFF"
+        }
+    }
+
     static let sr1 = Station(
         id: "sr1",
         name: "SR 1 Europawelle",
