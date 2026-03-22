@@ -58,7 +58,7 @@ struct AppLogoView: View {
     let size: CGFloat
     
     var body: some View {
-        Image("AppIconLiveActivity")
+        Image("app_logo")
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: size, height: size)
@@ -137,13 +137,7 @@ struct SRRadioLiveActivity: Widget {
         let stationColor = Color(hex: context.attributes.stationColorHex)
 
         HStack(spacing: 12) {
-            LiveActivityLogoView(
-                logoName: context.attributes.stationLogoName,
-                stationColor: stationColor,
-                shortName: context.attributes.stationShortName,
-                size: 48
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            AppLogoView(size: 48)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(context.attributes.stationShortName)
