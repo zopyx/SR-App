@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A20000000000000000000100 /* RadioError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000010 /* RadioError.swift */; };
 		A20000000000000000000101 /* Station.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* Station.swift */; };
 		A20000000000000000000102 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* AudioPlayer.swift */; };
 		A20000000000000000000103 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* NowPlayingService.swift */; };
@@ -14,6 +15,8 @@
 		A20000000000000000000105 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* AboutView.swift */; };
 		A20000000000000000000116 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000026 /* Color+Hex.swift */; };
 		A20000000000000000000117 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* Analytics.swift */; };
+		E428B40B7DC9D7ACF60B9199 /* ServiceProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FE573ED90B3A183B852BD11 /* ServiceProtocols.swift */; };
+		04F6DF03957FBC6ABABE9C89 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA26448892A583867ABC2D37 /* Container.swift */; };
 		A20000000000000000000118 /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000028 /* PlayerViewModel.swift */; };
 		A20000000000000000000115 /* ScreenshotGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000025 /* ScreenshotGenerator.swift */; };
 		A20000000000000000000119 /* AudioPlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* AudioPlayerTests.swift */; };
@@ -64,12 +67,15 @@
 /* Begin PBXFileReference section */
 		A20000000000000000000010 /* SR Radio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SR Radio.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A30000000000000000000010 /* SRRadioLiveActivityExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SRRadioLiveActivityExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000010 /* RadioError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioError.swift; sourceTree = "<group>"; };
 		A10000000000000000000011 /* Station.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
 		A10000000000000000000026 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		A10000000000000000000027 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		4FE573ED90B3A183B852BD11 /* ServiceProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProtocols.swift; sourceTree = "<group>"; };
+		CA26448892A583867ABC2D37 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		A10000000000000000000028 /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		A10000000000000000000025 /* ScreenshotGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGenerator.swift; sourceTree = "<group>"; };
 		A10000000000000000000029 /* AudioPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerTests.swift; sourceTree = "<group>"; };
@@ -161,6 +167,7 @@
 		A10000000000000000000041 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000010 /* RadioError.swift */,
 				A10000000000000000000011 /* Station.swift */,
 				A1000000000000000000001F /* SRRadioAttributes.swift */,
 			);
@@ -174,6 +181,8 @@
 				A10000000000000000000013 /* NowPlayingService.swift */,
 				A10000000000000000000020 /* LiveActivityManager.swift */,
 				A10000000000000000000027 /* Analytics.swift */,
+				4FE573ED90B3A183B852BD11 /* ServiceProtocols.swift */,
+				CA26448892A583867ABC2D37 /* Container.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -321,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000100 /* RadioError.swift in Sources */,
 				A20000000000000000000101 /* Station.swift in Sources */,
 				A20000000000000000000102 /* AudioPlayer.swift in Sources */,
 				A20000000000000000000103 /* NowPlayingService.swift in Sources */,
@@ -328,6 +338,8 @@
 				A20000000000000000000105 /* AboutView.swift in Sources */,
 				A20000000000000000000116 /* Color+Hex.swift in Sources */,
 				A20000000000000000000117 /* Analytics.swift in Sources */,
+				E428B40B7DC9D7ACF60B9199 /* ServiceProtocols.swift in Sources */,
+				04F6DF03957FBC6ABABE9C89 /* Container.swift in Sources */,
 				A20000000000000000000118 /* PlayerViewModel.swift in Sources */,
 				A20000000000000000000115 /* ScreenshotGenerator.swift in Sources */,
 				A20000000000000000000106 /* EqualizerView.swift in Sources */,

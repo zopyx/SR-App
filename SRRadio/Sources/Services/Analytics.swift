@@ -97,19 +97,7 @@ enum Analytics {
         }
         #endif
     }
-    
-    /// Sets a user property for analytics.
-    ///
-    /// - Parameters:
-    ///   - name: The property name
-    ///   - value: The property value
-    static func setUserProperty(_ name: String, value: String?) {
-        // TODO: Implement user property tracking
-        #if DEBUG
-        print("[Analytics] Set user property: \(name) = \(value ?? "nil")")
-        #endif
-    }
-    
+
     /// Records app launch for analytics.
     static func recordAppLaunch() {
         track(.appOpen)

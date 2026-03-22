@@ -22,7 +22,7 @@ enum PlaybackState: Equatable {
 final class AudioPlayer: NSObject, ObservableObject {
     /// The current playback state.
     @Published var state: PlaybackState = .idle
-    
+
     /// The current volume level (0.0 to 1.0).
     @Published var volume: Double = 0.8 {
         didSet {
@@ -31,9 +31,17 @@ final class AudioPlayer: NSObject, ObservableObject {
             player?.volume = Float(clampedVolume)
         }
     }
-    
+
     /// Whether audio is currently muted.
     @Published var isMuted: Bool = false
+
+    /// The current error state, if any.
+    @Published var currentError: RadioError?
+    
+    /// Publisher for currentError changes (required by AudioPlayerProtocol).
+    var currentErrorPublisher: Published<RadioError?>.Publisher {
+        self.$currentError
+    }
 
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
@@ -42,6 +50,9 @@ final class AudioPlayer: NSObject, ObservableObject {
     private let maxRetries = 3
     private var retryWorkItem: DispatchWorkItem?
     private var preMuteVolume: Double = 0.8
+    
+    /// The currently playing station, if any.
+    /// This is public to support the AudioPlayerProtocol.
     private(set) var currentStation: Station?
 
     override init() {
@@ -56,6 +67,7 @@ final class AudioPlayer: NSObject, ObservableObject {
             try session.setCategory(.playback, mode: .default)
             try session.setActive(true)
         } catch {
+            currentError = .audioSessionFailed(error)
             print("Failed to set up audio session: \(error.localizedDescription)")
         }
     }
@@ -123,9 +135,17 @@ final class AudioPlayer: NSObject, ObservableObject {
     ///   - station: The station to load
     ///   - autoPlay: Whether to automatically start playback after loading (default: `false`)
     func loadStation(_ station: Station, autoPlay: Bool = false) {
+        // Validate station URL before attempting to load
+        guard station.isValidStreamURL else {
+            currentError = .invalidURL(station.streamUrl.absoluteString)
+            state = .error("Ungültige Stream-URL")
+            return
+        }
+
         cleanup()
         currentStation = station
         retryCount = 0
+        currentError = nil
 
         let asset = AVURLAsset(url: station.streamUrl, options: nil)
         playerItem = AVPlayerItem(asset: asset)
@@ -237,10 +257,24 @@ final class AudioPlayer: NSObject, ObservableObject {
     }
 
     private func handleError(_ error: Error?) {
+        let radioError: RadioError
+        if let underlyingError = error {
+            // Check for specific AVFoundation error codes
+            let nsError = underlyingError as NSError
+            if nsError.domain == AVFoundationErrorDomain {
+                radioError = .streamLoadFailed(currentStation?.id ?? "unknown")
+            } else {
+                radioError = .networkError(underlyingError)
+            }
+        } else {
+            radioError = .streamLoadFailed(currentStation?.id ?? "unknown")
+        }
+
         if retryCount < maxRetries {
             retryPlayback()
         } else {
-            let errorMessage = error?.localizedDescription ?? "Playback error"
+            currentError = radioError
+            let errorMessage = error?.localizedDescription ?? "Wiedergabefehler"
             state = .error(errorMessage)
             // Track playback error
             if let station = currentStation {
@@ -261,6 +295,14 @@ final class AudioPlayer: NSObject, ObservableObject {
             let newVolume = preMuteVolume > 0 ? preMuteVolume : 0.8
             volume = newVolume
             player?.volume = Float(newVolume)
+        }
+    }
+
+    /// Clears the current error state and attempts to reload the station.
+    func retryAfterError() {
+        currentError = nil
+        if let station = currentStation {
+            loadStation(station, autoPlay: true)
         }
     }
 

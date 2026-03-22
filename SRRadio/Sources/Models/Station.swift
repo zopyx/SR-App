@@ -8,53 +8,37 @@ import SwiftUI
 struct Station: Identifiable, Equatable, Hashable {
     /// Unique identifier for the station (e.g., `"sr1"`, `"radio_salue"`)
     let id: String
-    
+
     /// Full display name of the station (e.g., `"SR 1"`, `"Radio Salü"`)
     let name: String
-    
+
     /// Short name used in compact UI elements (e.g., `"SR1"`, `"Salü"`)
     let shortName: String
-    
+
     /// Human-readable description of the station's format/content
     let description: String
-    
+
     /// URL of the audio stream for playback
     let streamUrl: URL
-    
+
     /// Asset name for the station logo image (empty string if using colored initials)
     let logoName: String
-    
-    /// Brand color associated with the station
-    let color: Color
-    
+
+    /// Hex color string for branding (single source of truth).
+    ///
+    /// This is the primary color storage for the station. All color representations
+    /// are derived from this value.
+    let colorHex: String
+
+    /// Brand color associated with the station, derived from `colorHex`.
+    ///
+    /// This computed property converts the stored hex string to a SwiftUI Color.
+    var color: Color {
+        Color(hex: colorHex)
+    }
+
     /// Official website URL for the station
     let website: URL
-    
-    /// Hex color string representation for use in widgets and extensions.
-    ///
-    /// Returns a 6-digit hex color code (e.g., `"#2ab3a6"`) for the station.
-    /// This is used primarily for sharing color information with widget extensions
-    /// that cannot directly use SwiftUI `Color` objects.
-    var colorHex: String {
-        switch id {
-        case "sr1": return "#2ab3a6"
-        case "sr_kultur": return "#8b7cff"
-        case "sr3": return "#44a1ff"
-        case "unserding": return "#ff6b35"
-        case "antenne_saar": return "#e4002b"
-        case "radio_salue": return "#ff9900"
-        case "bigfm": return "#00c853"
-        case "cityradio_sb": return "#1976d2"
-        case "cityradio_nk": return "#7b1fa2"
-        case "cityradio_hom": return "#00838f"
-        case "cityradio_sls": return "#c62828"
-        case "cityradio_wnd": return "#558b2f"
-        case "radio_rsl": return "#4e342e"
-        case "classic_rock": return "#b71c1c"
-        case "schlagerparadies": return "#e91e63"
-        default: return "#FFFFFF"
-        }
-    }
 
     // MARK: - Saarländischer Rundfunk
 
@@ -212,6 +196,26 @@ struct Station: Identifiable, Equatable, Hashable {
 
     var hasLogo: Bool { !logoName.isEmpty }
 
+    // MARK: - URL Validation
+
+    /// Validates that the station's stream URL is valid.
+    /// - Returns: true if the stream URL is a valid http/https URL
+    var isValidStreamURL: Bool {
+        guard streamUrl.scheme == "http" || streamUrl.scheme == "https" else {
+            return false
+        }
+        return !(streamUrl.host?.isEmpty ?? true)
+    }
+
+    /// Validates that the station's website URL is valid.
+    /// - Returns: true if the website URL is a valid http/https URL
+    var isValidWebsiteURL: Bool {
+        guard website.scheme == "http" || website.scheme == "https" else {
+            return false
+        }
+        return !(website.host?.isEmpty ?? true)
+    }
+
     // MARK: - Factory Methods
 
     /// Creates a Saarländischer Rundfunk (SR) station with standardized configuration.
@@ -225,6 +229,7 @@ struct Station: Identifiable, Equatable, Hashable {
     ///   - logoName: Asset name for station logo
     ///   - colorHex: Hex color code for branding
     /// - Returns: A configured `Station` instance for SR stations
+    /// - Note: This method uses safe URL creation and will use fallback URLs if parsing fails
     private static func srStation(
         id: String,
         name: String,
@@ -234,15 +239,21 @@ struct Station: Identifiable, Equatable, Hashable {
         logoName: String,
         colorHex: String
     ) -> Station {
-        Station(
+        let streamUrlString = "https://sr.audiostream.io/sr/\(streamPath)"
+        let websiteString = "https://www.sr.de/\(id)"
+        
+        let streamUrl = URL(string: streamUrlString) ?? URL(fileURLWithPath: "/dev/null")
+        let website = URL(string: websiteString) ?? URL(fileURLWithPath: "/dev/null")
+        
+        return Station(
             id: id,
             name: name,
             shortName: shortName,
             description: description,
-            streamUrl: url("https://sr.audiostream.io/sr/\(streamPath)"),
+            streamUrl: streamUrl,
             logoName: logoName,
-            color: Color(hex: colorHex),
-            website: url("https://www.sr.de/\(id)")
+            colorHex: colorHex,
+            website: website
         )
     }
 
@@ -257,6 +268,7 @@ struct Station: Identifiable, Equatable, Hashable {
     ///   - websiteString: Full website URL
     ///   - colorHex: Hex color code for branding
     /// - Returns: A configured `Station` instance for private stations
+    /// - Note: This method uses safe URL creation and will use fallback URLs if parsing fails
     private static func privateStation(
         id: String,
         name: String,
@@ -266,31 +278,30 @@ struct Station: Identifiable, Equatable, Hashable {
         websiteString: String,
         colorHex: String
     ) -> Station {
-        Station(
+        let streamUrl = URL(string: streamUrlString) ?? URL(fileURLWithPath: "/dev/null")
+        let website = URL(string: websiteString) ?? URL(fileURLWithPath: "/dev/null")
+        
+        return Station(
             id: id,
             name: name,
             shortName: shortName,
             description: description,
-            streamUrl: url(streamUrlString),
+            streamUrl: streamUrl,
             logoName: "",
-            color: Color(hex: colorHex),
-            website: url(websiteString)
+            colorHex: colorHex,
+            website: website
         )
     }
 
-    /// Safely creates a URL from a string, fatalizing on invalid URLs.
+    /// Safely creates a URL from a string.
     ///
-    /// This helper prevents force-unwrap crashes by providing clear error messages
-    /// during development if a malformed URL is encountered.
+    /// This helper provides safe URL creation without fatal errors.
+    /// For internal use during station initialization.
     ///
     /// - Parameter string: The URL string
-    /// - Returns: A valid `URL` instance
-    /// - FatalError: If the URL string is malformed
-    private static func url(_ string: String) -> URL {
-        guard let url = URL(string: string) else {
-            fatalError("Invalid URL: \(string)")
-        }
-        return url
+    /// - Returns: A valid `URL` instance, or nil if the URL string is malformed
+    private static func url(_ string: String) -> URL? {
+        return URL(string: string)
     }
 
     // MARK: - Station Instances

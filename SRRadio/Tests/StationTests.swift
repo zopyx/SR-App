@@ -136,19 +136,47 @@ final class StationTests: XCTestCase {
     }
     
     // MARK: - Stream URL Tests
-    
+
     func testAllStationsHaveValidStreamURLs() {
         for station in Station.all {
-            XCTAssertNotNil(URL(string: station.streamUrl.absoluteString), 
+            XCTAssertNotNil(URL(string: station.streamUrl.absoluteString),
                           "Station \(station.name) should have a valid stream URL")
         }
     }
-    
+
     func testAllStationsHaveValidWebsiteURLs() {
         for station in Station.all {
-            XCTAssertNotNil(URL(string: station.website.absoluteString), 
+            XCTAssertNotNil(URL(string: station.website.absoluteString),
                           "Station \(station.name) should have a valid website URL")
         }
+    }
+
+    // MARK: - URL Validation Tests
+
+    func testSRStationsHaveValidStreamURLs() {
+        XCTAssertTrue(Station.sr1.isValidStreamURL)
+        XCTAssertTrue(Station.srKultur.isValidStreamURL)
+        XCTAssertTrue(Station.sr3.isValidStreamURL)
+        XCTAssertTrue(Station.unserding.isValidStreamURL)
+        XCTAssertTrue(Station.antenneSaar.isValidStreamURL)
+    }
+
+    func testPrivateStationsHaveValidStreamURLs() {
+        XCTAssertTrue(Station.radioSalue.isValidStreamURL)
+        XCTAssertTrue(Station.bigfm.isValidStreamURL)
+        XCTAssertTrue(Station.cityradioSB.isValidStreamURL)
+    }
+
+    func testSRStationsHaveValidWebsiteURLs() {
+        XCTAssertTrue(Station.sr1.isValidWebsiteURL)
+        XCTAssertTrue(Station.srKultur.isValidWebsiteURL)
+        XCTAssertTrue(Station.sr3.isValidWebsiteURL)
+    }
+
+    func testPrivateStationsHaveValidWebsiteURLs() {
+        XCTAssertTrue(Station.radioSalue.isValidWebsiteURL)
+        XCTAssertTrue(Station.bigfm.isValidWebsiteURL)
+        XCTAssertTrue(Station.cityradioSB.isValidWebsiteURL)
     }
 }
 

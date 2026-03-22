@@ -13,16 +13,19 @@ final class PlayerViewModel: ObservableObject {
     @Published var showAbout = false
     @Published var showSettings = false
     @Published var isHoveringLogo = false
-    
+
+    /// User-friendly error message for display in the UI.
+    @Published var userErrorMessage: String?
+
     // Proxy bindings for AudioPlayer properties
     var volume: Double {
         get { audioPlayer.volume }
         set { audioPlayer.volume = newValue }
     }
-    
+
     var isMuted: Bool {
         get { audioPlayer.isMuted }
-        set { 
+        set {
             if newValue != audioPlayer.isMuted {
                 audioPlayer.toggleMute()
             }
@@ -31,8 +34,31 @@ final class PlayerViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    let audioPlayer: AudioPlayer
-    let nowPlayingService: NowPlayingService
+    private let _audioPlayer: any AudioPlayerProtocol
+    private let _nowPlayingService: any NowPlayingServiceProtocol
+    private let _liveActivityManager: Any?
+    
+    /// The audio player service.
+    var audioPlayer: any AudioPlayerProtocol { _audioPlayer }
+    
+    /// The now playing service.
+    var nowPlayingService: any NowPlayingServiceProtocol { _nowPlayingService }
+    
+    /// The Live Activity manager (iOS 16.2+).
+    var liveActivityManager: Any? {
+        guard #available(iOS 16.2, *) else { return nil }
+        return _liveActivityManager
+    }
+    
+    /// Returns the Live Activity manager if available.
+    @available(iOS 16.2, *)
+    func getLiveActivityManager() -> (any LiveActivityManagerProtocol)? {
+        return liveActivityManager as? (any LiveActivityManagerProtocol)
+    }
+
+    // MARK: - Private Properties
+
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Computed Properties
 
@@ -51,20 +77,58 @@ final class PlayerViewModel: ObservableObject {
         return nil
     }
 
+    /// The current RadioError, if any.
+    var currentRadioError: RadioError? {
+        audioPlayer.currentError
+    }
+
     // MARK: - Initialization
 
-    init(audioPlayer: AudioPlayer = .init(), nowPlayingService: NowPlayingService = .init()) {
-        self.audioPlayer = audioPlayer
-        self.nowPlayingService = nowPlayingService
+    /// Initializes the PlayerViewModel with dependencies.
+    ///
+    /// - Parameters:
+    ///   - audioPlayer: The audio player service (default: shared instance via Container).
+    ///   - nowPlayingService: The now-playing service (default: shared instance via Container).
+    ///   - liveActivityManager: The Live Activity manager (default: shared instance, iOS 16.2+).
+    init(
+        audioPlayer: (any AudioPlayerProtocol)? = nil,
+        nowPlayingService: (any NowPlayingServiceProtocol)? = nil,
+        liveActivityManager: Any? = nil
+    ) {
+        // Use injected dependencies or resolve from container
+        self._audioPlayer = audioPlayer ?? Container.shared.resolveAudioPlayer()
+        self._nowPlayingService = nowPlayingService ?? Container.shared.resolveNowPlayingService()
+        self._liveActivityManager = liveActivityManager ?? {
+            if #available(iOS 16.2, *) {
+                return Container.shared.resolveLiveActivityManager() as Any
+            }
+            return nil
+        }()
 
         // Load last played station
         self.selectedStation = Station.lastPlayed
-    }
 
-    // MARK: - Public Methods
+        // Setup error observation
+        setupErrorObservation()
+    }
+    
+    // MARK: - Error Handling
+
+    /// Sets up observation of audio player errors and converts them to user-friendly messages.
+    private func setupErrorObservation() {
+        audioPlayer.currentErrorPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] (error: RadioError?) in
+                self?.userErrorMessage = error?.userMessage
+            }
+            .store(in: &cancellables)
+    }
 
     /// Changes to a new station and starts playback.
     func changeStation(to station: Station) {
+        // Clear any existing errors
+        userErrorMessage = nil
+        
         selectedStation = station
         audioPlayer.loadStation(station, autoPlay: true)
         nowPlayingService.startMonitoring(station: station)
@@ -91,28 +155,33 @@ final class PlayerViewModel: ObservableObject {
         Analytics.track(.settingsOpen)
     }
 
-    /// Dismisses error state.
+    /// Dismisses error state and retries playback.
     func dismissError() {
-        audioPlayer.state = .idle
+        userErrorMessage = nil
+        audioPlayer.retryAfterError()
     }
 
     // MARK: - Live Activity
 
     @available(iOS 16.2, *)
     private func restartLiveActivity(for station: Station) {
-        LiveActivityManager.shared.endActivity()
+        guard let liveActivityManager = getLiveActivityManager() else { return }
+
+        liveActivityManager.endActivity()
         let contentState = SRRadioAttributes.ContentState(
             isPlaying: true,
             title: "",
             artist: "",
             show: ""
         )
-        LiveActivityManager.shared.startActivity(station: station, state: contentState)
+        liveActivityManager.startActivity(station: station, state: contentState)
         Analytics.track(.liveActivityStart(stationId: station.id))
     }
 
     @available(iOS 16.2, *)
     func updateLiveActivity() {
+        guard let liveActivityManager = getLiveActivityManager() else { return }
+
         let data = nowPlayingService.currentData
 
         switch audioPlayer.state {
@@ -123,10 +192,10 @@ final class PlayerViewModel: ObservableObject {
                 artist: data?.artist ?? "",
                 show: data?.show ?? ""
             )
-            if LiveActivityManager.shared.currentActivity == nil {
-                LiveActivityManager.shared.startActivity(station: selectedStation, state: contentState)
+            if liveActivityManager.currentActivity == nil {
+                liveActivityManager.startActivity(station: selectedStation, state: contentState)
             } else {
-                LiveActivityManager.shared.updateActivity(state: contentState)
+                liveActivityManager.updateActivity(state: contentState)
             }
         case .paused:
             let contentState = SRRadioAttributes.ContentState(
@@ -135,9 +204,9 @@ final class PlayerViewModel: ObservableObject {
                 artist: data?.artist ?? "",
                 show: data?.show ?? ""
             )
-            LiveActivityManager.shared.updateActivity(state: contentState)
+            liveActivityManager.updateActivity(state: contentState)
         case .idle:
-            LiveActivityManager.shared.endActivity()
+            liveActivityManager.endActivity()
         case .loading, .error:
             break
         }

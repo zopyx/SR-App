@@ -107,7 +107,7 @@ struct PlayerView: View {
                 .frame(height: trackInfoHeight)
                 .zIndex(1)
 
-                if let error = viewModel.errorMessage {
+                if let error = viewModel.userErrorMessage {
                     ErrorMessageView(message: error) {
                         viewModel.dismissError()
                     }
@@ -218,11 +218,6 @@ struct PlayerView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isHoveringLogo)
         .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isPlaying)
     }
-}
-
-struct PlayOverlay: View {
-    let color: Color
-    var body: some View { EmptyView() } // Superseded by direct image in logoButton
 }
 
 struct LoadingSpinner: View {

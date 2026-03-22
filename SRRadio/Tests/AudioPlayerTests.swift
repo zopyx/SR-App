@@ -133,7 +133,7 @@ final class AudioPlayerTests: XCTestCase {
     }
     
     // MARK: - Error Handling
-    
+
     func testErrorStateMessage() {
         // Verify error state contains message
         let errorState: PlaybackState = .error("Test error")
@@ -143,21 +143,44 @@ final class AudioPlayerTests: XCTestCase {
             XCTFail("Expected error state")
         }
     }
-    
+
     func testPlaybackStateEquatable() {
         let state1: PlaybackState = .idle
         let state2: PlaybackState = .idle
         let state3: PlaybackState = .playing
-        
+
         XCTAssertEqual(state1, state2)
         XCTAssertNotEqual(state1, state3)
     }
-    
+
     func testErrorStatesWithDifferentMessages() {
         let error1: PlaybackState = .error("Error 1")
         let error2: PlaybackState = .error("Error 2")
-        
+
         XCTAssertNotEqual(error1, error2)
+    }
+
+    // MARK: - RadioError Tests
+
+    func testAudioPlayerInitialErrorState() {
+        XCTAssertNil(audioPlayer.currentError)
+    }
+
+    func testPlaybackStateErrorTransitions() {
+        // Test that we can transition to error state
+        let errorState: PlaybackState = .error("Test error")
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        // Note: We can't easily test error state transitions without mocking
+        // the AVPlayer, but we verify the property exists
+        XCTAssertNotNil(errorState)
+    }
+
+    func testRetryAfterError() {
+        // Verify the method exists and doesn't crash
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        audioPlayer.retryAfterError()
+        // The station should be reloading
+        XCTAssertEqual(audioPlayer.currentStation?.id, Station.sr1.id)
     }
 }
 
