@@ -235,6 +235,22 @@ struct PlayerView: View {
         selectedStation = station
         audioPlayer.loadStation(station, autoPlay: true)
         nowPlayingService.startMonitoring(station: station)
+
+        if #available(iOS 16.2, *) {
+            restartLiveActivity(for: station)
+        }
+    }
+
+    @available(iOS 16.2, *)
+    private func restartLiveActivity(for station: Station) {
+        LiveActivityManager.shared.endActivity()
+        let contentState = SRRadioAttributes.ContentState(
+            isPlaying: true,
+            title: "",
+            artist: "",
+            show: ""
+        )
+        LiveActivityManager.shared.startActivity(station: station, state: contentState)
     }
 
     @available(iOS 16.2, *)
