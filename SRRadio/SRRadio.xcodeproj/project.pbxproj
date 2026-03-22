@@ -24,6 +24,7 @@
 		A20000000000000000000110 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000020 /* LiveActivityManager.swift */; };
 		A20000000000000000000111 /* StationLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* StationLogo.swift */; };
 		A20000000000000000000112 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* Haptics.swift */; };
+		A20000000000000000000113 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000023 /* SettingsView.swift */; };
 		A30000000000000000000001 /* SRRadioLiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000011 /* SRRadioLiveActivityBundle.swift */; };
 		A30000000000000000000002 /* SRRadioLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000012 /* SRRadioLiveActivity.swift */; };
 		A30000000000000000000003 /* SRRadioAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000001F /* SRRadioAttributes.swift */; };
@@ -75,6 +76,7 @@
 		A10000000000000000000020 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		A10000000000000000000021 /* StationLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationLogo.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		A10000000000000000000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A30000000000000000000011 /* SRRadioLiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioLiveActivityBundle.swift; sourceTree = "<group>"; };
 		A30000000000000000000012 /* SRRadioLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SRRadioLiveActivity.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -180,6 +182,7 @@
 				A10000000000000000000016 /* EqualizerView.swift */,
 				A10000000000000000000017 /* NowPlayingView.swift */,
 				A10000000000000000000018 /* PlayerView.swift */,
+				A10000000000000000000023 /* SettingsView.swift */,
 				A10000000000000000000019 /* StationSelector.swift */,
 				A1000000000000000000001A /* VolumeControl.swift */,
 				A10000000000000000000021 /* StationLogo.swift */,
@@ -320,6 +323,7 @@
 				A20000000000000000000110 /* LiveActivityManager.swift in Sources */,
 				A20000000000000000000111 /* StationLogo.swift in Sources */,
 				A20000000000000000000112 /* Haptics.swift in Sources */,
+				A20000000000000000000113 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

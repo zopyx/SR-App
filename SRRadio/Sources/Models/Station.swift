@@ -211,6 +211,27 @@ struct Station: Identifiable, Equatable, Hashable {
     ]
     static let `default` = sr1
 
+    // MARK: - Default Station Persistence
+
+    private static let defaultStationKey = "defaultStationId"
+
+    static var defaultStationId: String {
+        get {
+            UserDefaults.standard.string(forKey: defaultStationKey) ?? Station.default.id
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: defaultStationKey)
+        }
+    }
+
+    static var defaultStation: Station {
+        all.first(where: { $0.id == defaultStationId }) ?? .default
+    }
+
+    static func saveDefaultStation(id: String) {
+        UserDefaults.standard.set(id, forKey: defaultStationKey)
+    }
+
     // MARK: - Last Played Persistence
 
     private static let lastPlayedKey = "lastPlayedStationId"
@@ -218,7 +239,7 @@ struct Station: Identifiable, Equatable, Hashable {
     static var lastPlayed: Station {
         guard let id = UserDefaults.standard.string(forKey: lastPlayedKey),
               let station = all.first(where: { $0.id == id }) else {
-            return .default
+            return defaultStation
         }
         return station
     }

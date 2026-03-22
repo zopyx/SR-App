@@ -52,6 +52,20 @@ struct LiveActivityLogoView: View {
     }
 }
 
+// MARK: - App Logo View
+
+struct AppLogoView: View {
+    let size: CGFloat
+    
+    var body: some View {
+        Image("AppIconLiveActivity")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.2))
+    }
+}
+
 struct SRRadioLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: SRRadioAttributes.self) { context in
@@ -89,9 +103,7 @@ struct SRRadioLiveActivity: Widget {
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Image(systemName: context.state.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.title2)
-                        .foregroundColor(stationColor)
+                    AppLogoView(size: 40)
                 }
             } compactLeading: {
                 // MARK: - Compact Leading
@@ -156,9 +168,7 @@ struct SRRadioLiveActivity: Widget {
 
             Spacer()
 
-            Image(systemName: context.state.isPlaying ? "pause.fill" : "play.fill")
-                .font(.title2)
-                .foregroundColor(stationColor)
+            AppLogoView(size: 40)
         }
         .padding()
         .widgetURL(URL(string: "streamsaar://open")!)

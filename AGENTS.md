@@ -99,3 +99,10 @@ Edit `SRRadio/SRRadioLiveActivity/SRRadioLiveActivity.swift`
 ### UI Language
 - All user-facing strings are in **German**
 - Keep labels concise for mobile display
+
+### Development with Subagents
+For complex multi-file changes or large refactoring tasks, use subagents via the `Task` tool:
+- Spawn subagents for independent workstreams (e.g., UI changes vs. model updates)
+- Use context isolation to keep the main context clean
+- Parallelize work when tasks are independent (e.g., multiple view updates)
+- Example: When adding a new feature that touches Models, Views, and Services, spawn 3 subagents to work on each layer concurrently

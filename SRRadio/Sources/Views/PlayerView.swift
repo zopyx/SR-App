@@ -34,9 +34,10 @@ struct PlayerView: View {
     @StateObject private var audioPlayer = AudioPlayer()
     @StateObject private var nowPlayingService = NowPlayingService()
     
-    @State private var selectedStation: Station = Station.lastPlayed
+    @State private var selectedStation: Station = Station.defaultStation
     @State private var showStationSelector = false
     @State private var showAbout = false
+    @State private var showSettings = false
     @State private var isHoveringLogo = false
 
     private let logoContainerSize: CGFloat = 240
@@ -67,6 +68,21 @@ struct PlayerView: View {
                 // Top Bar
                 ZStack {
                     HStack {
+                        Button(action: {
+                            withAnimation {
+                                showSettings = true
+                            }
+                        }) {
+                            Image(systemName: "gear")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white.opacity(0.95))
+                                .frame(width: 28, height: 28)
+                                .background(Color.black.opacity(0.35))
+                                .clipShape(Circle())
+                                .shadow(color: Color.black.opacity(0.2), radius: 2)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
                         Spacer()
                         
                         Button(action: {
@@ -165,6 +181,12 @@ struct PlayerView: View {
                 )
                 .transition(.opacity)
                 .zIndex(3)
+            }
+            
+            if showSettings {
+                SettingsView(isPresented: $showSettings)
+                    .transition(.opacity)
+                    .zIndex(3)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
