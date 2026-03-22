@@ -210,6 +210,22 @@ struct Station: Identifiable, Equatable, Hashable {
         .radioRSL, .classicRock, .schlagerparadies
     ]
     static let `default` = sr1
+
+    // MARK: - Last Played Persistence
+
+    private static let lastPlayedKey = "lastPlayedStationId"
+
+    static var lastPlayed: Station {
+        guard let id = UserDefaults.standard.string(forKey: lastPlayedKey),
+              let station = all.first(where: { $0.id == id }) else {
+            return .default
+        }
+        return station
+    }
+
+    static func saveLastPlayed(_ station: Station) {
+        UserDefaults.standard.set(station.id, forKey: lastPlayedKey)
+    }
 }
 
 struct NowPlayingData: Codable, Equatable {

@@ -34,7 +34,7 @@ struct PlayerView: View {
     @StateObject private var audioPlayer = AudioPlayer()
     @StateObject private var nowPlayingService = NowPlayingService()
     
-    @State private var selectedStation: Station = .default
+    @State private var selectedStation: Station = Station.lastPlayed
     @State private var showStationSelector = false
     @State private var showAbout = false
     @State private var isHoveringLogo = false
@@ -225,6 +225,7 @@ struct PlayerView: View {
         }
         .onTapGesture {
             audioPlayer.togglePlayPause()
+            Haptics.playPause()
         }
         .scaleEffect(isHoveringLogo ? 1.02 : (isPlaying ? 1.0 : 0.98))
         .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isHoveringLogo)
@@ -235,6 +236,8 @@ struct PlayerView: View {
         selectedStation = station
         audioPlayer.loadStation(station, autoPlay: true)
         nowPlayingService.startMonitoring(station: station)
+        Station.saveLastPlayed(station)
+        Haptics.stationChange()
 
         if #available(iOS 16.2, *) {
             restartLiveActivity(for: station)
