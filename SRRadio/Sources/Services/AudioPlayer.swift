@@ -10,7 +10,7 @@ enum PlaybackState: Equatable {
     case error(String)
 }
 
-final class AudioPlayer: ObservableObject {
+final class AudioPlayer: NSObject, ObservableObject {
     @Published var state: PlaybackState = .idle
     @Published var volume: Double = 0.8 {
         didSet {
@@ -30,7 +30,8 @@ final class AudioPlayer: ObservableObject {
     private var preMuteVolume: Double = 0.8
     private(set) var currentStation: Station?
 
-    init() {
+    override init() {
+        super.init()
         setupAudioSession()
         setupRemoteCommands()
     }
@@ -49,22 +50,36 @@ final class AudioPlayer: ObservableObject {
         let center = MPRemoteCommandCenter.shared()
 
         center.playCommand.isEnabled = true
-        center.playCommand.addTarget { [weak self] _ in
-            self?.play()
-            return .success
-        }
+        center.playCommand.addTarget(self, action: #selector(handlePlayCommand(_:)))
 
         center.pauseCommand.isEnabled = true
-        center.pauseCommand.addTarget { [weak self] _ in
-            self?.pause()
-            return .success
-        }
+        center.pauseCommand.addTarget(self, action: #selector(handlePauseCommand(_:)))
 
         center.togglePlayPauseCommand.isEnabled = true
-        center.togglePlayPauseCommand.addTarget { [weak self] _ in
-            self?.togglePlayPause()
-            return .success
-        }
+        center.togglePlayPauseCommand.addTarget(self, action: #selector(handleTogglePlayPauseCommand(_:)))
+
+        center.stopCommand.isEnabled = true
+        center.stopCommand.addTarget(self, action: #selector(handleStopCommand(_:)))
+    }
+
+    @objc private func handlePlayCommand(_ command: MPRemoteCommand) -> MPRemoteCommandHandlerStatus {
+        play()
+        return .success
+    }
+
+    @objc private func handlePauseCommand(_ command: MPRemoteCommand) -> MPRemoteCommandHandlerStatus {
+        pause()
+        return .success
+    }
+
+    @objc private func handleTogglePlayPauseCommand(_ command: MPRemoteCommand) -> MPRemoteCommandHandlerStatus {
+        togglePlayPause()
+        return .success
+    }
+
+    @objc private func handleStopCommand(_ command: MPRemoteCommand) -> MPRemoteCommandHandlerStatus {
+        pause()
+        return .success
     }
 
     private func updateNowPlayingInfo() {

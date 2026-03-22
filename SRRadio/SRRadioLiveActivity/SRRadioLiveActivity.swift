@@ -14,26 +14,67 @@ extension Color {
     }
 }
 
+// MARK: - Logo View
+
+struct LiveActivityLogoView: View {
+    let logoName: String
+    let stationColor: Color
+    let shortName: String
+    let size: CGFloat
+
+    var body: some View {
+        if !logoName.isEmpty {
+            Image(logoName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+        } else {
+            ZStack {
+                Circle()
+                    .fill(stationColor.opacity(0.3))
+                Text(initials(from: shortName))
+                    .font(.system(size: size * 0.4, weight: .bold))
+                    .foregroundColor(stationColor)
+            }
+            .frame(width: size, height: size)
+        }
+    }
+
+    private func initials(from name: String) -> String {
+        let words = name.split(separator: " ")
+        if words.count >= 2 {
+            return String(words[0].prefix(1)) + String(words[1].prefix(1))
+        } else if let first = name.first {
+            return String(first)
+        }
+        return "?"
+    }
+}
+
 struct SRRadioLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: SRRadioAttributes.self) { context in
             // MARK: - Lock Screen Banner
             lockScreenView(context: context)
         } dynamicIsland: { context in
-            DynamicIsland {
+            let stationColor = Color(hex: context.attributes.stationColorHex)
+
+            return DynamicIsland {
                 // MARK: - Expanded Dynamic Island
                 DynamicIslandExpandedRegion(.leading) {
-                    Image(context.attributes.stationLogoName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
+                    LiveActivityLogoView(
+                        logoName: context.attributes.stationLogoName,
+                        stationColor: stationColor,
+                        shortName: context.attributes.stationShortName,
+                        size: 40
+                    )
                 }
                 DynamicIslandExpandedRegion(.center) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(context.attributes.stationName)
                             .font(.headline)
-                            .foregroundColor(Color(hex: context.attributes.stationColorHex))
+                            .foregroundColor(stationColor)
                         if !context.state.artist.isEmpty {
                             Text(context.state.artist)
                                 .font(.subheadline)
@@ -50,27 +91,29 @@ struct SRRadioLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.trailing) {
                     Image(systemName: context.state.isPlaying ? "pause.fill" : "play.fill")
                         .font(.title2)
-                        .foregroundColor(Color(hex: context.attributes.stationColorHex))
+                        .foregroundColor(stationColor)
                 }
             } compactLeading: {
                 // MARK: - Compact Leading
-                Image(context.attributes.stationLogoName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 24, height: 24)
-                    .clipShape(Circle())
+                LiveActivityLogoView(
+                    logoName: context.attributes.stationLogoName,
+                    stationColor: stationColor,
+                    shortName: context.attributes.stationShortName,
+                    size: 24
+                )
             } compactTrailing: {
                 // MARK: - Compact Trailing
                 Image(systemName: context.state.isPlaying ? "waveform" : "pause.fill")
                     .font(.caption)
-                    .foregroundColor(Color(hex: context.attributes.stationColorHex))
+                    .foregroundColor(stationColor)
             } minimal: {
                 // MARK: - Minimal
-                Image(context.attributes.stationLogoName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 20, height: 20)
-                    .clipShape(Circle())
+                LiveActivityLogoView(
+                    logoName: context.attributes.stationLogoName,
+                    stationColor: stationColor,
+                    shortName: context.attributes.stationShortName,
+                    size: 20
+                )
             }
         }
     }
@@ -82,11 +125,13 @@ struct SRRadioLiveActivity: Widget {
         let stationColor = Color(hex: context.attributes.stationColorHex)
 
         HStack(spacing: 12) {
-            Image(context.attributes.stationLogoName)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 48, height: 48)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            LiveActivityLogoView(
+                logoName: context.attributes.stationLogoName,
+                stationColor: stationColor,
+                shortName: context.attributes.stationShortName,
+                size: 48
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(context.attributes.stationShortName)
