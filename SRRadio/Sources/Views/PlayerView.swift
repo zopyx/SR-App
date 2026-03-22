@@ -99,7 +99,7 @@ struct PlayerView: View {
 
                     NowPlayingView(
                         data: viewModel.nowPlayingService.currentData,
-                        isLoading: viewModel.nowPlayingService.isLoading,
+                        isLoading: viewModel.isLoading,
                         stationColor: viewModel.selectedStation.color
                     )
                 }

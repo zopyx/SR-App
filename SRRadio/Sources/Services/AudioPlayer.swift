@@ -187,6 +187,16 @@ final class AudioPlayer: NSObject, ObservableObject {
 
     private func handlePlayerItemStatus(_ status: AVPlayerItem.Status) {
         switch status {
+        case .readyToPlay:
+            // Player item is ready to play - for live streams this means we're playing
+            if state == .loading {
+                state = .playing
+                retryCount = 0
+                if let station = currentStation {
+                    Analytics.track(.playbackStart(stationId: station.id))
+                }
+                updateNowPlayingInfo()
+            }
         case .failed:
             handleError(playerItem?.error)
         default:
@@ -202,25 +212,48 @@ final class AudioPlayer: NSObject, ObservableObject {
         }
     }
 
+    private var rateObservation: AnyCancellable?
+
     /// Starts or resumes audio playback.
     func play() {
         guard let player = player else { return }
         state = .loading
         player.play()
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        // Cancel any previous rate observation
+        rateObservation?.cancel()
+
+        // Observe player rate changes to detect when playback actually starts
+        // For live streams, rate > 0 means the player is actively playing
+        rateObservation = player.publisher(for: \.rate)
+            .receive(on: DispatchQueue.main)
+            .dropFirst() // Skip initial value (0)
+            .sink { [weak self] rate in
+                guard let self = self else { return }
+                // Only transition to playing if we're still in loading state
+                if rate > 0 && self.state == .loading {
+                    self.state = .playing
+                    self.retryCount = 0
+                    if let station = self.currentStation {
+                        Analytics.track(.playbackStart(stationId: station.id))
+                    }
+                    self.updateNowPlayingInfo()
+                }
+            }
+
+        // Fallback: if still loading after 3 seconds, assume playing for live streams
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
             guard let self = self else { return }
-            if self.player?.rate ?? 0 > 0 {
+            // If still in loading state after timeout, assume stream is playing
+            // (live streams may not report rate > 0 reliably)
+            if self.state == .loading {
                 self.state = .playing
                 self.retryCount = 0
-                // Track successful playback start
                 if let station = self.currentStation {
                     Analytics.track(.playbackStart(stationId: station.id))
                 }
-            } else {
-                self.handleError(nil)
+                self.updateNowPlayingInfo()
             }
-            self.updateNowPlayingInfo()
         }
     }
 
