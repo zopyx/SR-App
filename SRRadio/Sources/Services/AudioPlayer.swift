@@ -88,6 +88,13 @@ final class AudioPlayer: NSObject, ObservableObject {
         info[MPMediaItemPropertyArtist] = currentStation?.description ?? ""
         info[MPNowPlayingInfoPropertyIsLiveStream] = true
         info[MPNowPlayingInfoPropertyPlaybackRate] = state == .playing ? 1.0 : 0.0
+        
+        // Set app logo as artwork
+        if let artworkImage = UIImage(named: "app_logo") {
+            let artwork = MPMediaItemArtwork(boundsSize: artworkImage.size) { _ in artworkImage }
+            info[MPMediaItemPropertyArtwork] = artwork
+        }
+        
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
