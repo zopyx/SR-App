@@ -162,7 +162,7 @@ struct PlayerView: View {
                     )
                     .padding(.bottom, 4)
 
-                    Text("Stream Saar")
+                    Text("Saar Streams")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(Color.white.opacity(0.3))
                         .tracking(2)

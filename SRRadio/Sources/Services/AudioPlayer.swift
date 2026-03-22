@@ -84,7 +84,7 @@ final class AudioPlayer: NSObject, ObservableObject {
 
     private func updateNowPlayingInfo() {
         var info = [String: Any]()
-        info[MPMediaItemPropertyTitle] = currentStation?.name ?? "Stream Saar"
+        info[MPMediaItemPropertyTitle] = currentStation?.name ?? "Saar Streams"
         info[MPMediaItemPropertyArtist] = currentStation?.description ?? ""
         info[MPNowPlayingInfoPropertyIsLiveStream] = true
         info[MPNowPlayingInfoPropertyPlaybackRate] = state == .playing ? 1.0 : 0.0

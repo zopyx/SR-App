@@ -77,7 +77,7 @@ struct AboutView: View {
                 )
                 .padding(.bottom, 4)
 
-            Text("Stream Saar")
+            Text("Saar Streams")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.white)
 

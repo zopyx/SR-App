@@ -1,4 +1,4 @@
-# Stream Saar - Agent Guide
+# Saar Streams - Agent Guide
 
 ## Project Overview
 
