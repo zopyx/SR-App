@@ -31,48 +31,21 @@ struct DynamicBackground: View {
 }
 
 struct PlayerView: View {
-    @StateObject private var audioPlayer = AudioPlayer()
-    @StateObject private var nowPlayingService = NowPlayingService()
-    
-    @State private var selectedStation: Station = Station.defaultStation
-    @State private var showStationSelector = false
-    @State private var showAbout = false
-    @State private var showSettings = false
-    @State private var isHoveringLogo = false
+    @StateObject private var viewModel = PlayerViewModel()
 
     private let logoContainerSize: CGFloat = 240
     private let logoImageSize: CGFloat = 170
     private let stationNameSize: CGFloat = 26
     private let trackInfoHeight: CGFloat = 90
-    
-    private var isPlaying: Bool {
-        if case .playing = audioPlayer.state { return true }
-        return false
-    }
-    
-    private var isLoading: Bool {
-        if case .loading = audioPlayer.state { return true }
-        return false
-    }
-    
-    private var errorMessage: String? {
-        if case .error(let msg) = audioPlayer.state { return msg }
-        return nil
-    }
-    
+
     var body: some View {
         ZStack {
-            DynamicBackground(color: selectedStation.color)
-            
+            DynamicBackground(color: viewModel.selectedStation.color)
+
             VStack(spacing: 0) {
                 // Top Bar
                 HStack {
-                    Button(action: {
-                        withAnimation {
-                            showSettings = true
-                        }
-                        Analytics.track(.settingsOpen)
-                    }) {
+                    Button(action: viewModel.openSettings) {
                         Image(systemName: "gear")
                             .font(.system(size: 16))
                             .foregroundColor(.white.opacity(0.95))
@@ -82,25 +55,20 @@ struct PlayerView: View {
                             .shadow(color: Color.black.opacity(0.2), radius: 2)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    
+
                     Spacer()
-                    
+
                     StationSelector(
-                        selectedStation: $selectedStation,
-                        isExpanded: $showStationSelector,
+                        selectedStation: $viewModel.selectedStation,
+                        isExpanded: $viewModel.showStationSelector,
                         stations: Station.all
                     ) { newStation in
-                        changeStation(to: newStation)
+                        viewModel.changeStation(to: newStation)
                     }
-                    
+
                     Spacer()
-                    
-                    Button(action: {
-                        withAnimation {
-                            showAbout = true
-                        }
-                        Analytics.track(.aboutViewOpen)
-                    }) {
+
+                    Button(action: viewModel.openAbout) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 16))
                             .foregroundColor(.white.opacity(0.95))
@@ -114,53 +82,53 @@ struct PlayerView: View {
                 .padding(.horizontal, 22)
                 .padding(.top, 16)
                 .zIndex(2)
-                
+
                 Spacer()
-                
+
                 // Artwork
                 logoButton
                     .padding(.vertical, 16)
                     .zIndex(1)
-                
+
                 // Track Info
                 VStack(spacing: 8) {
-                    Text(selectedStation.name)
+                    Text(viewModel.selectedStation.name)
                         .font(.system(size: stationNameSize, weight: .bold))
                         .foregroundColor(.white)
                         .shadow(color: Color.black.opacity(0.3), radius: 2, y: 1)
-                    
+
                     NowPlayingView(
-                        data: nowPlayingService.currentData,
-                        isLoading: nowPlayingService.isLoading,
-                        stationColor: selectedStation.color
+                        data: viewModel.nowPlayingService.currentData,
+                        isLoading: viewModel.nowPlayingService.isLoading,
+                        stationColor: viewModel.selectedStation.color
                     )
                 }
                 .padding(.horizontal, 20)
                 .frame(height: trackInfoHeight)
                 .zIndex(1)
-                
-                if let error = errorMessage {
+
+                if let error = viewModel.errorMessage {
                     ErrorMessageView(message: error) {
-                        audioPlayer.state = .idle
+                        viewModel.dismissError()
                     }
                     .padding(.top, 4)
                 }
-                
+
                 Spacer()
-                
+
                 // Volume & Status
                 VStack(spacing: 12) {
                     VolumeControl(
-                        volume: $audioPlayer.volume,
-                        isMuted: $audioPlayer.isMuted,
-                        stationColor: selectedStation.color,
-                        onMuteToggle: { audioPlayer.toggleMute() }
+                        volume: $viewModel.volume,
+                        isMuted: $viewModel.isMuted,
+                        stationColor: viewModel.selectedStation.color,
+                        onMuteToggle: { viewModel.audioPlayer.toggleMute() }
                     )
 
                     StatusIndicator(
-                        isPlaying: isPlaying,
-                        isLoading: isLoading,
-                        stationColor: selectedStation.color
+                        isPlaying: viewModel.isPlaying,
+                        isLoading: viewModel.isLoading,
+                        stationColor: viewModel.selectedStation.color
                     )
                     .padding(.bottom, 4)
 
@@ -175,39 +143,34 @@ struct PlayerView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            if showAbout {
+            if viewModel.showAbout {
                 AboutView(
-                    isPresented: $showAbout,
-                    currentStation: selectedStation,
-                    nowPlayingData: nowPlayingService.currentData
+                    isPresented: $viewModel.showAbout,
+                    currentStation: viewModel.selectedStation,
+                    nowPlayingData: viewModel.nowPlayingService.currentData
                 )
                 .transition(.opacity)
                 .zIndex(3)
             }
-            
-            if showSettings {
-                SettingsView(isPresented: $showSettings)
+
+            if viewModel.showSettings {
+                SettingsView(isPresented: $viewModel.showSettings)
                     .transition(.opacity)
                     .zIndex(3)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
-            audioPlayer.loadStation(selectedStation, autoPlay: true)
-            nowPlayingService.startMonitoring(station: selectedStation)
+            viewModel.onViewAppear()
         }
-        .onChange(of: audioPlayer.state) { newState in
-            if #available(iOS 16.2, *) {
-                updateLiveActivity(state: newState)
-            }
+        .onChange(of: viewModel.audioPlayer.state) { _ in
+            viewModel.onPlaybackStateChange()
         }
-        .onChange(of: nowPlayingService.currentData) { _ in
-            if #available(iOS 16.2, *) {
-                updateLiveActivity(state: audioPlayer.state)
-            }
+        .onChange(of: viewModel.nowPlayingService.currentData) { _ in
+            viewModel.onNowPlayingChange()
         }
     }
-    
+
     private var logoButton: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -217,25 +180,25 @@ struct PlayerView: View {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .stroke(Color.white.opacity(0.2), lineWidth: 0.5)
                 )
-                .shadow(color: selectedStation.color.opacity(0.4), radius: 24, x: 0, y: 10)
+                .shadow(color: viewModel.selectedStation.color.opacity(0.4), radius: 24, x: 0, y: 10)
                 .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 6)
-            
-            StationLogo(station: selectedStation, size: logoImageSize)
-                .opacity(isLoading ? 0.3 : 1.0)
+
+            StationLogo(station: viewModel.selectedStation, size: logoImageSize)
+                .opacity(viewModel.isLoading ? 0.3 : 1.0)
                 .shadow(color: Color.white.opacity(0.1), radius: 10)
-            
-            if isLoading {
+
+            if viewModel.isLoading {
                 LoadingSpinner(color: .white)
-            } else if !isPlaying {
+            } else if !viewModel.isPlaying {
                 Image(systemName: "play.fill")
                     .font(.system(size: 54, weight: .semibold))
                     .foregroundColor(.white)
                     .shadow(color: Color.black.opacity(0.4), radius: 8, x: 0, y: 2)
-                    .opacity(isHoveringLogo ? 1 : 0)
-                    .animation(.easeOut(duration: 0.2), value: isHoveringLogo)
+                    .opacity(viewModel.isHoveringLogo ? 1 : 0)
+                    .animation(.easeOut(duration: 0.2), value: viewModel.isHoveringLogo)
             }
-            
-            if isPlaying {
+
+            if viewModel.isPlaying {
                 VStack {
                     Spacer()
                     EqualizerView(color: .white)
@@ -245,75 +208,15 @@ struct PlayerView: View {
         }
         .frame(width: logoContainerSize, height: logoContainerSize)
         .onHover { hovering in
-            isHoveringLogo = hovering
+            viewModel.isHoveringLogo = hovering
         }
         .onTapGesture {
-            audioPlayer.togglePlayPause()
+            viewModel.audioPlayer.togglePlayPause()
             Haptics.playPause()
         }
-        .scaleEffect(isHoveringLogo ? 1.02 : (isPlaying ? 1.0 : 0.98))
-        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isHoveringLogo)
-        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isPlaying)
-    }
-    
-    private func changeStation(to station: Station) {
-        selectedStation = station
-        audioPlayer.loadStation(station, autoPlay: true)
-        nowPlayingService.startMonitoring(station: station)
-        Station.saveLastPlayed(station)
-        Haptics.stationChange()
-        
-        // Track analytics
-        Analytics.track(.stationChange(stationId: station.id, stationName: station.name))
-
-        if #available(iOS 16.2, *) {
-            restartLiveActivity(for: station)
-        }
-    }
-
-    @available(iOS 16.2, *)
-    private func restartLiveActivity(for station: Station) {
-        LiveActivityManager.shared.endActivity()
-        let contentState = SRRadioAttributes.ContentState(
-            isPlaying: true,
-            title: "",
-            artist: "",
-            show: ""
-        )
-        LiveActivityManager.shared.startActivity(station: station, state: contentState)
-        Analytics.track(.liveActivityStart(stationId: station.id))
-    }
-
-    @available(iOS 16.2, *)
-    private func updateLiveActivity(state: PlaybackState) {
-        let data = nowPlayingService.currentData
-
-        switch state {
-        case .playing:
-            let contentState = SRRadioAttributes.ContentState(
-                isPlaying: true,
-                title: data?.title ?? "",
-                artist: data?.artist ?? "",
-                show: data?.show ?? ""
-            )
-            if LiveActivityManager.shared.currentActivity == nil {
-                LiveActivityManager.shared.startActivity(station: selectedStation, state: contentState)
-            } else {
-                LiveActivityManager.shared.updateActivity(state: contentState)
-            }
-        case .paused:
-            let contentState = SRRadioAttributes.ContentState(
-                isPlaying: false,
-                title: data?.title ?? "",
-                artist: data?.artist ?? "",
-                show: data?.show ?? ""
-            )
-            LiveActivityManager.shared.updateActivity(state: contentState)
-        case .idle:
-            LiveActivityManager.shared.endActivity()
-        case .loading, .error:
-            break
-        }
+        .scaleEffect(viewModel.isHoveringLogo ? 1.02 : (viewModel.isPlaying ? 1.0 : 0.98))
+        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isHoveringLogo)
+        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isPlaying)
     }
 }
 

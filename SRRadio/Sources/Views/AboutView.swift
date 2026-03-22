@@ -172,9 +172,11 @@ struct AboutView: View {
                     .foregroundColor(Color.white.opacity(0.6))
                     .frame(width: 100, alignment: .leading)
 
-                Link("zopyx.com \u{2192}", destination: URL(string: "https://www.zopyx.com")!)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(currentStation.color)
+                if let authorUrl = URL(string: "https://www.zopyx.com") {
+                    Link("zopyx.com \u{2192}", destination: authorUrl)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(currentStation.color)
+                }
             }
 
             InfoRow(label: NSLocalizedString("Lizenz", comment: "License label"), value: "MIT")

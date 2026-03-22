@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 
+/// Represents a playlist entry from the SR music research page.
 struct PlaylistEntry {
     let time: String
     let title: String
@@ -8,10 +9,14 @@ struct PlaylistEntry {
     let date: Date?
 }
 
+/// Service for fetching now-playing information from SR stations.
+///
+/// NowPlayingService polls SR's EPG API and music research page to get
+/// current track and show information. Only works for SR stations.
 final class NowPlayingService: ObservableObject {
     @Published var currentData: NowPlayingData?
     @Published var isLoading = false
-    
+
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
     private let pollInterval: TimeInterval = 30.0
@@ -21,8 +26,30 @@ final class NowPlayingService: ObservableObject {
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
-    
+
     private static let srStationIds: Set<String> = ["sr1", "sr_kultur", "sr3", "unserding", "antenne_saar"]
+
+    /// Timeout for network requests (seconds)
+    private let networkTimeout: TimeInterval = 10.0
+
+    /// Fallback regex patterns for HTML parsing (in order of preference)
+    private let timePatterns = [
+        "musicResearch__Item__Time[^>]*>(\\d{2}:\\d{2})</span>",
+        "class=\"time\"[^>]*>(\\d{2}:\\d{2})<",
+        "(\\d{2}:\\d{2})"
+    ]
+
+    private let titlePatterns = [
+        "musicResearch__Item__Content__Title[^>]*>([^<]+)</div>",
+        "class=\"title\"[^>]*>([^<]+)<",
+        "\"title\"[^>]*>([^<]+)<"
+    ]
+
+    private let artistPatterns = [
+        "musicResearch__Item__Content__Artist[^>]*>([^<]+)</div>",
+        "class=\"artist\"[^>]*>([^<]+)<",
+        "\"artist\"[^>]*>([^<]+)<"
+    ]
 
     func startMonitoring(station: Station) {
         stopMonitoring()
@@ -41,39 +68,50 @@ final class NowPlayingService: ObservableObject {
         }
         RunLoop.main.add(timer!, forMode: .common)
     }
-    
+
     func stopMonitoring() {
         timer?.invalidate()
         timer = nil
         currentStationId = nil
         currentData = nil
     }
-    
+
     private func fetchNowPlaying(for station: Station) {
         guard currentStationId == station.id else { return }
 
         let apiId = station.id == "sr_kultur" ? "sr2" : station.id
-        let songUrl = URL(string: "https://musikrecherche.sr.de/\(apiId)/musicresearch.php")!
-        let showUrl = URL(string: "https://www.sr.de/sr/epg/nowPlaying.jsp?welle=\(apiId)")!
-        
+
+        // Safely create URLs
+        guard let songUrl = URL(string: "https://musikrecherche.sr.de/\(apiId)/musicresearch.php"),
+              let showUrl = URL(string: "https://www.sr.de/sr/epg/nowPlaying.jsp?welle=\(apiId)") else {
+            print("[NowPlaying] Failed to create URLs for station: \(station.id)")
+            isLoading = false
+            return
+        }
+
         var title = ""
         var artist = ""
         var show = ""
         var moderator = ""
         let group = DispatchGroup()
-        
+
         print("[NowPlaying] Fetching for station: \(station.id)")
-        
+
         // Fetch song info from music research page
         group.enter()
-        URLSession.shared.dataTask(with: songUrl) { [weak self] data, response, error in
+        let songTask = URLSession.shared.dataTask(with: songRequest(for: songUrl)) { [weak self] data, response, error in
             defer { group.leave() }
-            
-            guard let self = self, let data = data, let html = String(data: data, encoding: .utf8) else {
-                print("[NowPlaying] Failed to fetch song data")
+
+            if let error = error {
+                print("[NowPlaying] Song fetch error: \(error.localizedDescription)")
                 return
             }
-            
+
+            guard let self = self, let data = data, let html = String(data: data, encoding: .utf8) else {
+                print("[NowPlaying] Failed to parse song data")
+                return
+            }
+
             // Parse all entries and find closest to current time
             let entries = self.parsePlaylistEntries(from: html)
             if let current = self.findCurrentEntry(entries: entries) {
@@ -81,15 +119,21 @@ final class NowPlayingService: ObservableObject {
                 artist = current.artist
                 print("[NowPlaying] Current song at \(current.time): \(artist) - \(title)")
             }
-        }.resume()
-        
+        }
+        songTask.resume()
+
         // Fetch show info from EPG API
         group.enter()
-        URLSession.shared.dataTask(with: showUrl) { data, response, error in
+        let showTask = URLSession.shared.dataTask(with: showRequest(for: showUrl)) { data, response, error in
             defer { group.leave() }
-            
+
+            if let error = error {
+                print("[NowPlaying] Show fetch error: \(error.localizedDescription)")
+                return
+            }
+
             guard let data = data else { return }
-            
+
             do {
                 let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
                 if let nowPlaying = json?["now playing"] as? [String: [String: Any]],
@@ -100,11 +144,12 @@ final class NowPlayingService: ObservableObject {
             } catch {
                 print("[NowPlaying] Show parse error: \(error)")
             }
-        }.resume()
-        
+        }
+        showTask.resume()
+
         group.notify(queue: .main) { [weak self] in
             guard let self = self, self.currentStationId == station.id else { return }
-            
+
             self.currentData = NowPlayingData(
                 title: title,
                 artist: artist,
@@ -114,21 +159,36 @@ final class NowPlayingService: ObservableObject {
             self.isLoading = false
         }
     }
+
+    // MARK: - URL Request Configuration
+
+    private func songRequest(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("text/html,application/xhtml+xml", forHTTPHeaderField: "Accept")
+        request.setValue("de-DE,de;q=0.9", forHTTPHeaderField: "Accept-Language")
+        request.timeoutInterval = networkTimeout
+        return request
+    }
+
+    private func showRequest(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = networkTimeout
+        return request
+    }
     
     // MARK: - HTML Parsing
-    
+
     private func parsePlaylistEntries(from html: String) -> [PlaylistEntry] {
         var entries: [PlaylistEntry] = []
-        
-        // Extract all times, titles, and artists using regex
-        let timePattern = "musicResearch__Item__Time[^>]*>(\\d{2}:\\d{2})</span>"
-        let titlePattern = "musicResearch__Item__Content__Title[^>]*>([^<]+)</div>"
-        let artistPattern = "musicResearch__Item__Content__Artist[^>]*>([^<]+)</div>"
-        
-        let times = extractMatches(from: html, pattern: timePattern)
-        let titles = extractMatches(from: html, pattern: titlePattern)
-        let artists = extractMatches(from: html, pattern: artistPattern)
-        
+
+        // Extract all times, titles, and artists using regex with fallback patterns
+        let times = extractMatches(from: html, patterns: timePatterns)
+        let titles = extractMatches(from: html, patterns: titlePatterns)
+        let artists = extractMatches(from: html, patterns: artistPatterns)
+
         // Combine into entries (they should be in same order)
         let count = min(times.count, titles.count, artists.count)
         for i in 0..<count {
@@ -140,11 +200,24 @@ final class NowPlayingService: ObservableObject {
                 date: date
             ))
         }
-        
+
         print("[NowPlaying] Parsed \(entries.count) entries")
         return entries
     }
-    
+
+    /// Extract matches using multiple patterns (fallback chain)
+    private func extractMatches(from html: String, patterns: [String]) -> [String] {
+        for pattern in patterns {
+            let matches = extractMatches(from: html, pattern: pattern)
+            if !matches.isEmpty {
+                print("[NowPlaying] Pattern matched: \(pattern.prefix(30))...")
+                return matches
+            }
+        }
+        print("[NowPlaying] No patterns matched")
+        return []
+    }
+
     private func findCurrentEntry(entries: [PlaylistEntry]) -> PlaylistEntry? {
         guard !entries.isEmpty else { return nil }
         
