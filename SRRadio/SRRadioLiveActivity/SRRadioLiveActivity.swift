@@ -2,7 +2,10 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
+// MARK: - Color Extension (needed for widget target)
+
 extension Color {
+    /// Initialize a Color from a hex string (e.g. "#2ab3a6", "2ab3a6", "#FFF", "FFF")
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
