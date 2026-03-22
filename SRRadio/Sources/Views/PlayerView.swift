@@ -244,7 +244,6 @@ struct PlayerView: View {
     @available(iOS 16.2, *)
     private func updateLiveActivity(state: PlaybackState) {
         let data = nowPlayingService.currentData
-        let isPlaying = state == .playing
 
         switch state {
         case .playing:
