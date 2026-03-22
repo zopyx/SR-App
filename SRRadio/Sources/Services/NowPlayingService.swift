@@ -22,13 +22,20 @@ final class NowPlayingService: ObservableObject {
         return formatter
     }()
     
+    private static let srStationIds: Set<String> = ["sr1", "sr_kultur", "sr3", "unserding", "antenne_saar"]
+
     func startMonitoring(station: Station) {
         stopMonitoring()
         currentStationId = station.id
         isLoading = true
-        
+
+        guard Self.srStationIds.contains(station.id) else {
+            isLoading = false
+            return
+        }
+
         fetchNowPlaying(for: station)
-        
+
         timer = Timer(timeInterval: pollInterval, repeats: true) { [weak self] _ in
             self?.fetchNowPlaying(for: station)
         }
@@ -44,9 +51,10 @@ final class NowPlayingService: ObservableObject {
     
     private func fetchNowPlaying(for station: Station) {
         guard currentStationId == station.id else { return }
-        
-        let songUrl = URL(string: "https://musikrecherche.sr.de/\(station.id)/musicresearch.php")!
-        let showUrl = URL(string: "https://www.sr.de/sr/epg/nowPlaying.jsp?welle=\(station.id)")!
+
+        let apiId = station.id == "sr_kultur" ? "sr2" : station.id
+        let songUrl = URL(string: "https://musikrecherche.sr.de/\(apiId)/musicresearch.php")!
+        let showUrl = URL(string: "https://www.sr.de/sr/epg/nowPlaying.jsp?welle=\(apiId)")!
         
         var title = ""
         var artist = ""

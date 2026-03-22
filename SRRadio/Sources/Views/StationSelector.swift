@@ -5,9 +5,9 @@ struct StationSelector: View {
     @Binding var isExpanded: Bool
     let stations: [Station]
     let onStationChange: (Station) -> Void
-    
+
     @State private var isHovering = false
-    
+
     var body: some View {
         VStack(spacing: 0) {
             Button(action: {
@@ -20,10 +20,10 @@ struct StationSelector: View {
                         .fill(selectedStation.color)
                         .frame(width: 10, height: 10)
                         .shadow(color: selectedStation.color.opacity(0.8), radius: 4)
-                    
+
                     Text(selectedStation.shortName)
                         .font(.system(size: 16, weight: .bold))
-                    
+
                     Image(systemName: "chevron.down")
                         .font(.system(size: 12, weight: .bold))
                         .opacity(0.9)
@@ -43,77 +43,135 @@ struct StationSelector: View {
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { isHovering = $0 }
-            
-            if isExpanded {
-                dropdown
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.95).combined(with: .opacity).combined(with: .offset(y: -5)),
-                        removal: .scale(scale: 0.95).combined(with: .opacity)
-                    ))
-                    .padding(.top, 8)
+        }
+        .fullScreenCover(isPresented: $isExpanded) {
+            StationPickerSheet(
+                selectedStation: $selectedStation,
+                isPresented: $isExpanded,
+                stations: stations,
+                onStationChange: onStationChange
+            )
+        }
+    }
+}
+
+struct StationPickerSheet: View {
+    @Binding var selectedStation: Station
+    @Binding var isPresented: Bool
+    let stations: [Station]
+    let onStationChange: (Station) -> Void
+
+    @State private var searchText = ""
+
+    private var filteredStations: [Station] {
+        if searchText.isEmpty { return stations }
+        return stations.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.description.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            Color(white: 0.08).ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Header
+                HStack {
+                    Text("Sender wählen")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Spacer()
+
+                    Button(action: { isPresented = false }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(Color.white.opacity(0.5))
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 12)
+
+                // Search
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(Color.white.opacity(0.4))
+                    TextField("Sender suchen...", text: $searchText)
+                        .foregroundColor(.white)
+                        .autocorrectionDisabled()
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(0.08))
+                )
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+
+                // Station list
+                ScrollView {
+                    LazyVStack(spacing: 4) {
+                        ForEach(filteredStations) { station in
+                            StationRow(
+                                station: station,
+                                isSelected: station.id == selectedStation.id
+                            ) {
+                                onStationChange(station)
+                                isPresented = false
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 20)
+                }
             }
         }
     }
-    
-    private var dropdown: some View {
-        VStack(spacing: 2) {
-            ForEach(stations) { station in
-                Button(action: {
-                    if station.id != selectedStation.id {
-                        onStationChange(station)
-                    }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                        isExpanded = false
-                    }
-                }) {
-                    HStack(spacing: 12) {
-                        Circle()
-                            .fill(station.color)
-                            .frame(width: 12, height: 12)
-                            .shadow(color: station.color.opacity(0.6), radius: 3)
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(station.name)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.white)
-                            
-                            Text(station.description)
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.6))
-                                .lineLimit(1)
-                        }
-                        
-                        Spacer()
-                        
-                        if station.id == selectedStation.id {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.white.opacity(0.8))
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(station.id == selectedStation.id ? Color.white.opacity(0.15) : Color.clear)
-                    )
-                    .contentShape(Rectangle())
+}
+
+struct StationRow: View {
+    let station: Station
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            HStack(spacing: 14) {
+                // Color indicator
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(station.color)
+                    .frame(width: 4, height: 36)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(station.name)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+
+                    Text(station.description)
+                        .font(.system(size: 13))
+                        .foregroundColor(Color.white.opacity(0.5))
+                        .lineLimit(1)
                 }
-                .buttonStyle(PlainButtonStyle())
+
+                Spacer()
+
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(station.color)
+                }
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(isSelected ? station.color.opacity(0.15) : Color.white.opacity(0.04))
+            )
+            .contentShape(Rectangle())
         }
-        .padding(8)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(white: 0.1, opacity: 0.6))
-                .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous)))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
-                )
-                .shadow(color: Color.black.opacity(0.4), radius: 15, x: 0, y: 8)
-        )
-        .frame(width: 280)
-        .zIndex(100)
+        .buttonStyle(PlainButtonStyle())
     }
 }

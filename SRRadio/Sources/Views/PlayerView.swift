@@ -2,28 +2,26 @@ import SwiftUI
 
 struct DynamicBackground: View {
     let color: Color
-    
+
     var body: some View {
         ZStack {
-            VisualEffectView()
-            
-            Color.black.opacity(0.55)
-            
+            Color(white: 0.08)
+
             color
-                .opacity(0.4)
+                .opacity(0.2)
                 .blendMode(.overlay)
-            
+
             LinearGradient(
-                colors: [Color.clear, Color.black.opacity(0.8)],
+                colors: [color.opacity(0.15), Color.black.opacity(0.9)],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            
+
             RadialGradient(
-                colors: [color.opacity(0.35), .clear],
+                colors: [color.opacity(0.2), .clear],
                 center: .top,
                 startRadius: 0,
-                endRadius: 350
+                endRadius: 400
             )
             .blendMode(.screen)
         }
@@ -140,13 +138,18 @@ struct PlayerView: View {
                         stationColor: selectedStation.color,
                         onMuteToggle: { audioPlayer.toggleMute() }
                     )
-                    
+
                     StatusIndicator(
                         isPlaying: isPlaying,
                         isLoading: isLoading,
                         stationColor: selectedStation.color
                     )
-                    .padding(.bottom, 6)
+                    .padding(.bottom, 4)
+
+                    Text("Stream Saar")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(Color.white.opacity(0.3))
+                        .tracking(2)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 24)
@@ -158,10 +161,7 @@ struct PlayerView: View {
                 AboutView(
                     isPresented: $showAbout,
                     currentStation: selectedStation,
-                    nowPlayingData: nowPlayingService.currentData,
-                    onStationChange: { station in
-                        changeStation(to: station)
-                    }
+                    nowPlayingData: nowPlayingService.currentData
                 )
                 .transition(.opacity)
                 .zIndex(3)
@@ -196,11 +196,7 @@ struct PlayerView: View {
                 .shadow(color: selectedStation.color.opacity(0.4), radius: 24, x: 0, y: 10)
                 .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 6)
             
-            Image(selectedStation.logoName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: logoImageSize, height: logoImageSize)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            StationLogo(station: selectedStation, size: logoImageSize)
                 .opacity(isLoading ? 0.3 : 1.0)
                 .shadow(color: Color.white.opacity(0.1), radius: 10)
             

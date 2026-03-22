@@ -116,6 +116,6 @@ struct SRRadioLiveActivity: Widget {
                 .foregroundColor(stationColor)
         }
         .padding()
-        .widgetURL(URL(string: "srradio://open")!)
+        .widgetURL(URL(string: "streamsaar://open")!)
     }
 }

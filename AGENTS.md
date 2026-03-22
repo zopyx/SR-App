@@ -1,15 +1,16 @@
-# SR Radio Player - Agent Guide
+# Stream Saar - Agent Guide
 
 ## Project Overview
 
-A native macOS/iOS radio player for Saarländischer Rundfunk (SR) stations, built with:
-- **App**: SwiftUI (shared iOS + macOS code)
-- **UI**: Native macOS vibrancy effects
+A native iOS/iPadOS radio streaming app for Saarland radio stations, built with:
+- **App**: SwiftUI (iOS-only)
+- **Live Activity**: Dynamic Island + Lock Screen via ActivityKit
+- **Streaming**: AVFoundation audio player
 
-### Supported Stations
-- **SR1 Europawelle** (Red) - News and pop music
-- **SR2 KulturRadio** (Gold) - Culture and classical music
-- **SR3 Saarlandwelle** (Blue) - Regional music
+### Supported Stations (15)
+
+**Saarländischer Rundfunk:** SR 1, SR kultur, SR 3 Saarlandwelle, SR UnserDing, Antenne Saar
+**Privatsender:** Radio Salü, bigFM Saarland, CityRadio (Saarbrücken, Neunkirchen, Homburg, Saarlouis, St. Wendel), Radio Saarschleifenland, Classic Rock Radio, Radio Schlagerparadies
 
 ## Architecture
 
@@ -17,17 +18,19 @@ A native macOS/iOS radio player for Saarländischer Rundfunk (SR) stations, buil
 sr2/
 └── SRRadio/
     ├── Sources/
-    │   ├── App/              # App entry point
-    │   ├── Models/           # Station model
-    │   ├── Services/         # Audio + now playing
-    │   ├── Utils/            # Helpers (e.g. VisualEffectView)
-    │   ├── Views/            # SwiftUI views
+    │   ├── App/              # App entry point (SRRadioApp.swift)
+    │   ├── Models/           # Station model + ActivityAttributes
+    │   ├── Services/         # AudioPlayer, NowPlayingService, LiveActivityManager
+    │   ├── Utils/            # VisualEffectView
+    │   ├── Views/            # SwiftUI views (PlayerView, StationSelector, AboutView, StationLogo, etc.)
     │   └── Design/           # Theme constants
     ├── Resources/
-    │   ├── Assets.xcassets   # Logos + AppIcon
-    │   ├── LaunchScreen.storyboard
-    │   ├── Info.plist        # macOS Info.plist
+    │   ├── Assets.xcassets   # Logos (SR only) + AppIcon
     │   └── Info-iOS.plist    # iOS Info.plist
+    ├── SRRadioLiveActivity/  # Widget Extension (Dynamic Island + Lock Screen)
+    │   ├── SRRadioLiveActivity.swift
+    │   ├── SRRadioLiveActivityBundle.swift
+    │   └── Info.plist
     └── SRRadio.xcodeproj
 ```
 
@@ -35,78 +38,64 @@ sr2/
 
 | Feature | Implementation |
 |---------|---------------|
-| Station switching | SwiftUI picker with auto-play |
+| Station switching | Full-screen picker with search |
 | Volume control | Custom SwiftUI slider (0-100%) |
-| Play/Pause | Tap logo |
-| About dialog | SwiftUI modal |
-| Keyboard shortcuts | macOS app menu |
-| Visual effects | macOS vibrancy via `VisualEffectView` |
+| Play/Pause | Tap station logo |
+| Now Playing | SR stations only (HTML scraping + EPG API) |
+| Live Activity | Dynamic Island + Lock Screen (iOS 16.2+) |
+| About dialog | Current stream info + app details |
+| Station logos | SR stations: image assets; others: colored initials |
 
 ## Coding Conventions
 
 ### Swift
-- Use SwiftUI for UI
-- Keep platform-specific code under `#if os(macOS)` / `#if os(iOS)`
-- Prefer `struct` views and `ObservableObject` for state
-- Avoid force unwraps unless proven safe
+- SwiftUI for all UI
+- iOS/iPadOS only — no macOS code
+- `struct` views, `ObservableObject` for state
+- German UI strings (hardcoded, no localization framework)
+- Availability checks: `@available(iOS 16.2, *)` for Live Activity APIs
 
 ## Development Commands
 
 ```bash
-# Build macOS app
-xcodebuild -project SRRadio/SRRadio.xcodeproj -scheme SRRadio -configuration Debug build
+# Build for iOS Simulator
+xcodebuild -project SRRadio/SRRadio.xcodeproj -scheme SRRadio -destination "platform=iOS Simulator,name=iPhone 16,OS=18.5" -configuration Debug build
 
-# Build iOS simulator app (target name may be "SRRadio iOS")
-xcodebuild -project SRRadio/SRRadio.xcodeproj -target "SRRadio iOS" -destination "platform=iOS Simulator,name=iPhone 16 Pro" -configuration Debug build
+# Archive for device
+xcodebuild -project SRRadio/SRRadio.xcodeproj -scheme SRRadio -destination "generic/platform=iOS" -configuration Release archive -archivePath /tmp/SRRadio.xcarchive
 ```
 
 ## Common Tasks
 
-### Update stream URLs
-Edit `SRRadio/Sources/Models/Station.swift`
+### Add/update stations
+Edit `SRRadio/Sources/Models/Station.swift` — add to `Station.all` array. For SR stations, set `logoName` to asset name. For others, set `logoName` to `""` (shows colored initials via `StationLogo`).
 
 ### Modify player behavior
 Edit `SRRadio/Sources/Views/PlayerView.swift`
 
-### Style the UI
-Edit `SRRadio/Sources/Design/Theme.swift`
+### Update Live Activity UI
+Edit `SRRadio/SRRadioLiveActivity/SRRadioLiveActivity.swift`
 
-## Testing
+## CI/CD
 
-Run tests via Xcode (no CLI tests configured yet).
+- **Xcode Cloud** on branch `swift`
+- Widget extension bundle ID: `com.sr2radio.SRRadioLiveActivity`
+- Both App IDs must be registered at developer.apple.com
+- Extension requires explicit `Info.plist` with `NSExtensionPointIdentifier`
 
 ## Known Limitations
 
-- Stream requires internet connection (no offline mode)
+- Stream requires internet (no offline mode)
 - Volume is app-level, not system-level
+- Now Playing metadata only for SR stations (others lack compatible API)
+- Dynamic Island requires iPhone 14 Pro+ (falls back to Lock Screen banner)
 
-## Agent Workflow (Yolo Mode)
-
-This project uses **Yolo Mode** - agents should be decisive and make minimal changes to achieve goals efficiently.
-
-### Versioning
-
-- Use semantic versioning for releases and tags (e.g., `1.2.3`).
-- Update version in Xcode build settings / Info.plist.
+## Agent Workflow
 
 ### Git Workflow
+- Only commit and push when explicitly requested by the user
+- Wait for user confirmation before making git mutations
 
-**Do not commit and push at your own will:**
-- Only commit and push when explicitly requested by the user.
-- Wait for user confirmation before making git mutations.
-
-**No commit, no push if tests are failing:**
-- Always run tests before committing.
-- All tests must pass before commit and push.
-
-### UI Constraints
-
-**No scrolling in default window:**
-- All UI elements must fit within the fixed window size (320x480).
-- No overflow-y or scrollbars in the main player view.
-- Use compact mode or truncation for long text.
-
-## Resources
-
-- [SR Streams](https://www.sr.de/sr/home/radio/index.html)
-- Design: macOS Human Interface Guidelines
+### UI Language
+- All user-facing strings are in **German**
+- Keep labels concise for mobile display

@@ -14,7 +14,7 @@ struct NowPlayingView: View {
         VStack(spacing: 2) {
             Group {
                 if isLoading {
-                    Text("Connecting...")
+                    Text("Verbinde...")
                         .font(.system(size: statusFontSize, weight: .medium))
                         .foregroundColor(Color.white.opacity(0.7))
                 } else if let data = data, let parts = buildParts(from: data) {
@@ -28,7 +28,7 @@ struct NowPlayingView: View {
                             .foregroundColor(Color.white.opacity(0.7))
                     }
                 } else {
-                    Text("Live on Air")
+                    Text("Live auf Sendung")
                         .font(.system(size: statusFontSize, weight: .medium))
                         .foregroundColor(Color.white.opacity(0.7))
                 }
@@ -66,7 +66,7 @@ struct StatusIndicator: View {
                 .opacity(isLoading ? 0.4 : 1.0)
                 .animation(isLoading ? .easeInOut(duration: 0.5).repeatForever(autoreverses: true) : .default, value: isLoading)
             
-            Text(isLoading ? "BUFFERING" : (isPlaying ? "ON AIR" : "PAUSED"))
+            Text(isLoading ? "PUFFERN" : (isPlaying ? "AUF SENDUNG" : "PAUSIERT"))
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(isPlaying && !isLoading ? .white : Color.white.opacity(0.6))
                 .tracking(1.5)
