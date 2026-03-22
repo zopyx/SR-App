@@ -4,15 +4,10 @@ import UIKit
 // MARK: - Screenshot Generator Configuration
 
 enum ScreenshotGenerator {
-    /// Target resolution for App Store screenshots (iPhone 8 Plus / XS Max)
+    /// Target resolution for App Store screenshots (iPhone 8 Plus / XS Max @3x)
+    /// Exact pixel dimensions required by Apple App Store
     static let targetSize = CGSize(width: 1242, height: 2688)
-    
-    /// Logical size at 3x scale
-    static let logicalSize = CGSize(width: 414, height: 896)
-    
-    /// Scale factor for retina display
-    static let scale: CGFloat = 3.0
-    
+
     /// Output directory name in documents
     static let outputDirectoryName = "AppStoreScreenshots"
 }
@@ -20,63 +15,63 @@ enum ScreenshotGenerator {
 // MARK: - Main Screenshot Capture Function
 
 extension ScreenshotGenerator {
-    /// Captures a screenshot of any SwiftUI view and saves it
+    /// Captures a screenshot of any SwiftUI view at exact target resolution (1242×2688)
     /// - Parameters:
     ///   - view: The SwiftUI view to capture
     ///   - name: Filename (without extension)
-    ///   - size: Logical size (default: 414x896 for iPhone 11 Pro Max)
-    ///   - scale: Scale factor (default: 3.0 for retina)
     static func capture<Content: View>(
         view: Content,
-        name: String,
-        size: CGSize = logicalSize,
-        scale: CGFloat = 3.0
+        name: String
     ) {
+        // Use exact target size (no scaling needed)
         let hostingController = UIHostingController(rootView: view)
-        let window = UIWindow(frame: CGRect(origin: .zero, size: size))
+        let window = UIWindow(frame: CGRect(origin: .zero, size: targetSize))
         window.rootViewController = hostingController
         window.makeKeyAndVisible()
-        
-        // Force layout
+
+        // Force layout at full resolution
         hostingController.view.frame = window.bounds
         hostingController.view.layoutIfNeeded()
-        
-        // Render with correct scale
+
+        // Render at 1x scale (already at target resolution)
         let format = UIGraphicsImageRendererFormat()
-        format.scale = scale
+        format.scale = 1.0
         format.opaque = false
         format.preferredRange = .standard
-        
-        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
         let image = renderer.image { context in
             window.layer.render(in: context.cgContext)
         }
-        
-        // Save image
-        saveImage(image, name: name, size: CGSize(width: size.width * scale, height: size.height * scale))
+
+        // Save image with exact dimensions in filename
+        saveImage(image, name: name)
     }
     
     /// Saves the captured image to the documents directory
-    private static func saveImage(_ image: UIImage, name: String, size: CGSize) {
+    private static func saveImage(_ image: UIImage, name: String) {
         guard let data = image.pngData() else {
             print("❌ Failed to convert image to PNG: \(name)")
             return
         }
-        
-        let filename = "\(name)_\(Int(size.width))x\(Int(size.height)).png"
-        
+
+        let width = Int(image.size.width)
+        let height = Int(image.size.height)
+        let filename = "\(name)_\(width)x\(height).png"
+
         // Get documents directory
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let screenshotsDir = documentsPath.appendingPathComponent(outputDirectoryName)
-        
+
         // Create directory if needed
         try? FileManager.default.createDirectory(at: screenshotsDir, withIntermediateDirectories: true)
-        
+
         let filePath = screenshotsDir.appendingPathComponent(filename)
-        
+
         do {
             try data.write(to: filePath)
             print("✅ Screenshot saved: \(filename)")
+            print("   Size: \(width) × \(height) pixels")
             print("   Path: \(filePath.path)")
         } catch {
             print("❌ Failed to save screenshot '\(filename)': \(error)")
@@ -388,6 +383,7 @@ struct AboutScreenScreenshotView: View {
             .padding(.horizontal, 22)
             .padding(.vertical, 70)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -461,6 +457,7 @@ struct SettingsScreenScreenshotView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private func settingsSectionHeader(_ title: String) -> some View {
@@ -501,15 +498,15 @@ struct ScreenshotPreviews_Previews: PreviewProvider {
         Group {
             MainScreenScreenshotView()
                 .previewDisplayName("Main Screen")
-                .previewLayout(.fixed(width: 414, height: 896))
-            
+                .previewLayout(.fixed(width: 1242, height: 2688))
+
             AboutScreenScreenshotView()
                 .previewDisplayName("About Screen")
-                .previewLayout(.fixed(width: 414, height: 896))
-            
+                .previewLayout(.fixed(width: 1242, height: 2688))
+
             SettingsScreenScreenshotView()
                 .previewDisplayName("Settings Screen")
-                .previewLayout(.fixed(width: 414, height: 896))
+                .previewLayout(.fixed(width: 1242, height: 2688))
         }
     }
 }
