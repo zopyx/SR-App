@@ -93,15 +93,17 @@ Edit `SRRadio/SRRadioLiveActivity/SRRadioLiveActivity.swift`
 ## Agent Workflow
 
 ### Git Workflow
-- Only commit and push when explicitly requested by the user
-- Wait for user confirmation before making git mutations
+- **NEVER commit or push automatically** - Only commit/push when the user explicitly requests it
+- Wait for explicit user confirmation before making any git mutations
+- Do NOT commit after every fix - batch changes and wait for user instruction
+- Always show the user what files would be committed before committing
 
 ### Test Requirement
 **IMPORTANT:** Before claiming a task is complete or terminated:
 1. Run the build: `xcodebuild -project SRRadio/SRRadio.xcodeproj -scheme SRRadio -destination "platform=iOS Simulator,name=iPhone 16,OS=18.5" -configuration Debug build`
 2. Verify **BUILD SUCCEEDED** with no errors
 3. Run tests if test files were modified
-4. Do NOT commit until all tests pass
+4. Do NOT commit until all tests pass AND user explicitly requests commit
 
 ### UI Language
 - All user-facing strings are in **German**
