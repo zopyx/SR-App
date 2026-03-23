@@ -200,9 +200,8 @@ final class AudioPlayer: NSObject, ObservableObject {
         updateNowPlayingInfo()
 
         if autoPlay {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                self?.play()
-            }
+            // Call play() immediately instead of asyncAfter to ensure observation is active
+            play()
         }
     }
 
