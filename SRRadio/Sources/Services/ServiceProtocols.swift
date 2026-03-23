@@ -10,7 +10,7 @@ import ActivityKit
 /// dependency injection and easier testing.
 protocol AudioPlayerProtocol: ObservableObject {
     /// The current playback state.
-    var state: PlaybackState { get }
+    var state: PlayerState { get }
     
     /// The current volume level (0.0 to 1.0).
     var volume: Double { get set }

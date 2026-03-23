@@ -95,36 +95,3 @@ struct SkeletonLine: View {
             .frame(width: width, height: height)
     }
 }
-
-struct StatusIndicator: View {
-    let isPlaying: Bool
-    let isLoading: Bool
-    let stationColor: Color
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(isPlaying ? stationColor : Color.white.opacity(0.4))
-                .frame(width: 6, height: 6)
-                .shadow(color: isPlaying ? stationColor.opacity(0.6) : .clear, radius: 4)
-                .opacity(isLoading && !isPlaying ? 0.4 : 1.0)
-                .animation(isLoading && !isPlaying ? .easeInOut(duration: 0.5).repeatForever(autoreverses: true) : .default, value: isLoading)
-
-            Text(statusText)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundColor(isPlaying ? .white : Color.white.opacity(0.6))
-                .tracking(1.5)
-        }
-    }
-    
-    private var statusText: String {
-        // Priority: playing > loading > paused
-        if isPlaying {
-            return NSLocalizedString("AUF SENDUNG", comment: "On air status")
-        } else if isLoading {
-            return NSLocalizedString("PUFFERN", comment: "Buffering status")
-        } else {
-            return NSLocalizedString("PAUSIERT", comment: "Paused status")
-        }
-    }
-}

@@ -80,13 +80,17 @@ final class AudioPlayerTests: XCTestCase {
     // MARK: - Playback State Tests
     
     func testInitialState() {
-        XCTAssertEqual(audioPlayer.state, .idle)
+        XCTAssertEqual(audioPlayer.state, .started)
     }
     
-    func testTogglePlayPause_fromIdle() {
-        audioPlayer.togglePlayPause()
-        // Should transition to loading then playing (async)
-        // For now, just verify it doesn't crash
+    func testTogglePlayPause_fromStarted() {
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        XCTAssertEqual(audioPlayer.state, .started)
+        
+        // Toggle should start playing
+        audioPlayer.play()
+        // State should transition to buffering or playing
+        XCTAssertTrue(audioPlayer.state == .buffering || audioPlayer.state.isPlaying)
     }
     
     // MARK: - Station Loading Tests
@@ -121,11 +125,13 @@ final class AudioPlayerTests: XCTestCase {
     
     func testPlaybackStateTransitions() {
         // Initial state
-        XCTAssertEqual(audioPlayer.state, .idle)
+        XCTAssertEqual(audioPlayer.state, .started)
         
-        // After calling play (will be loading initially)
+        // After calling play (will be buffering initially)
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
         audioPlayer.play()
-        // State should be loading or playing (async)
+        // State should be buffering or playing
+        XCTAssertTrue(audioPlayer.state == .buffering || audioPlayer.state.isPlaying)
         
         // Pause
         audioPlayer.pause()
@@ -136,7 +142,7 @@ final class AudioPlayerTests: XCTestCase {
 
     func testErrorStateMessage() {
         // Verify error state contains message
-        let errorState: PlaybackState = .error("Test error")
+        let errorState: PlayerState = .error("Test error")
         if case .error(let message) = errorState {
             XCTAssertEqual(message, "Test error")
         } else {
@@ -145,17 +151,17 @@ final class AudioPlayerTests: XCTestCase {
     }
 
     func testPlaybackStateEquatable() {
-        let state1: PlaybackState = .idle
-        let state2: PlaybackState = .idle
-        let state3: PlaybackState = .playing
+        let state1: PlayerState = .started
+        let state2: PlayerState = .started
+        let state3: PlayerState = .playing
 
         XCTAssertEqual(state1, state2)
         XCTAssertNotEqual(state1, state3)
     }
 
     func testErrorStatesWithDifferentMessages() {
-        let error1: PlaybackState = .error("Error 1")
-        let error2: PlaybackState = .error("Error 2")
+        let error1: PlayerState = .error("Error 1")
+        let error2: PlayerState = .error("Error 2")
 
         XCTAssertNotEqual(error1, error2)
     }
@@ -168,7 +174,7 @@ final class AudioPlayerTests: XCTestCase {
 
     func testPlaybackStateErrorTransitions() {
         // Test that we can transition to error state
-        let errorState: PlaybackState = .error("Test error")
+        let errorState: PlayerState = .error("Test error")
         audioPlayer.loadStation(Station.sr1, autoPlay: false)
         // Note: We can't easily test error state transitions without mocking
         // the AVPlayer, but we verify the property exists
@@ -181,6 +187,105 @@ final class AudioPlayerTests: XCTestCase {
         audioPlayer.retryAfterError()
         // The station should be reloading
         XCTAssertEqual(audioPlayer.currentStation?.id, Station.sr1.id)
+    }
+    
+    // MARK: - PlayerState Helper Tests
+    
+    func testPlayerStateIsPlaying() {
+        XCTAssertTrue(PlayerState.playing.isPlaying)
+        XCTAssertTrue(PlayerState.muted(underlying: .playing).isPlaying)
+        
+        XCTAssertFalse(PlayerState.started.isPlaying)
+        XCTAssertFalse(PlayerState.buffering.isPlaying)
+        XCTAssertFalse(PlayerState.paused.isPlaying)
+        XCTAssertFalse(PlayerState.muted(underlying: .paused).isPlaying)
+        XCTAssertFalse(PlayerState.error("test").isPlaying)
+    }
+    
+    func testPlayerStateIsBuffering() {
+        XCTAssertTrue(PlayerState.buffering.isBuffering)
+        
+        XCTAssertFalse(PlayerState.started.isBuffering)
+        XCTAssertFalse(PlayerState.playing.isBuffering)
+        XCTAssertFalse(PlayerState.paused.isBuffering)
+        XCTAssertFalse(PlayerState.muted(underlying: .playing).isBuffering)
+        XCTAssertFalse(PlayerState.error("test").isBuffering)
+    }
+    
+    func testPlayerStateIsPaused() {
+        XCTAssertTrue(PlayerState.paused.isPaused)
+        
+        XCTAssertFalse(PlayerState.started.isPaused)
+        XCTAssertFalse(PlayerState.buffering.isPaused)
+        XCTAssertFalse(PlayerState.playing.isPaused)
+        XCTAssertFalse(PlayerState.muted(underlying: .paused).isPaused)
+        XCTAssertFalse(PlayerState.error("test").isPaused)
+    }
+    
+    func testPlayerStateIsMuted() {
+        XCTAssertTrue(PlayerState.muted(underlying: .playing).isMuted)
+        XCTAssertTrue(PlayerState.muted(underlying: .paused).isMuted)
+        
+        XCTAssertFalse(PlayerState.started.isMuted)
+        XCTAssertFalse(PlayerState.buffering.isMuted)
+        XCTAssertFalse(PlayerState.playing.isMuted)
+        XCTAssertFalse(PlayerState.paused.isMuted)
+        XCTAssertFalse(PlayerState.error("test").isMuted)
+    }
+    
+    func testPlayerStateStatusText() {
+        XCTAssertEqual(PlayerState.started.statusText, "BEREIT")
+        XCTAssertEqual(PlayerState.buffering.statusText, "PUFFERN")
+        XCTAssertEqual(PlayerState.playing.statusText, "AUF SENDUNG")
+        XCTAssertEqual(PlayerState.paused.statusText, "PAUSIERT")
+        XCTAssertEqual(PlayerState.muted(underlying: .playing).statusText, "STUMM")
+        XCTAssertEqual(PlayerState.muted(underlying: .paused).statusText, "PAUSIERT")
+        XCTAssertEqual(PlayerState.error("test").statusText, "FEHLER")
+    }
+    
+    // MARK: - Pause vs Mute Tests
+    
+    func testPauseShowsPausedState() {
+        // Start playing
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        audioPlayer.play()
+        // Simulate transition to playing
+        audioPlayer.state = .playing
+        
+        // Pause
+        audioPlayer.pause()
+        
+        // Should show paused, not muted
+        XCTAssertEqual(audioPlayer.state, .paused)
+        XCTAssertEqual(audioPlayer.state.statusText, "PAUSIERT")
+    }
+    
+    func testMuteWhilePlayingShowsMuted() {
+        // Start playing
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        audioPlayer.state = .playing
+        
+        // Mute
+        audioPlayer.toggleMute()
+        
+        // Should show muted with underlying playing
+        XCTAssertEqual(audioPlayer.state, .muted(underlying: .playing))
+        XCTAssertEqual(audioPlayer.state.statusText, "STUMM")
+    }
+    
+    func testPauseWhileMutedShowsMutedPaused() {
+        // Start playing muted
+        audioPlayer.loadStation(Station.sr1, autoPlay: false)
+        audioPlayer.state = .muted(underlying: .playing)
+        audioPlayer.isMuted = true
+        
+        // Pause
+        audioPlayer.pause()
+        
+        // Should show muted with underlying paused
+        XCTAssertEqual(audioPlayer.state, .muted(underlying: .paused))
+        // Status text is "PAUSIERT" but the indicator shows mute icon
+        XCTAssertEqual(audioPlayer.state.statusText, "PAUSIERT")
     }
 }
 
@@ -197,6 +302,7 @@ extension AudioPlayerTests {
             ("testInitialState", testInitialState),
             ("testLoadStation_setsCurrentStation", testLoadStation_setsCurrentStation),
             ("testPlaybackStateEquatable", testPlaybackStateEquatable),
+            ("testPauseShowsPausedState", testPauseShowsPausedState),
         ]
     }
 }

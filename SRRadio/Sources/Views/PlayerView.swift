@@ -85,7 +85,7 @@ struct PlayerView: View {
 
                 Spacer()
 
-                // Artwork
+                // Artwork with state-based overlay
                 logoButton
                     .padding(.vertical, 16)
                     .zIndex(1)
@@ -99,7 +99,7 @@ struct PlayerView: View {
 
                     NowPlayingView(
                         data: viewModel.nowPlayingService.currentData,
-                        isLoading: viewModel.isLoading,
+                        isLoading: viewModel.isBuffering,
                         stationColor: viewModel.selectedStation.color
                     )
                 }
@@ -117,7 +117,7 @@ struct PlayerView: View {
                 Spacer()
 
                 // Volume & Status
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     VolumeControl(
                         volume: $viewModel.volume,
                         isMuted: $viewModel.isMuted,
@@ -125,9 +125,9 @@ struct PlayerView: View {
                         onMuteToggle: { viewModel.audioPlayer.toggleMute() }
                     )
 
-                    StatusIndicator(
-                        isPlaying: viewModel.isPlaying,
-                        isLoading: viewModel.isLoading,
+                    // New status indicator showing all 4 states
+                    StatusIndicatorView(
+                        state: viewModel.playerState,
                         stationColor: viewModel.selectedStation.color
                     )
                     .padding(.bottom, 4)
@@ -163,7 +163,7 @@ struct PlayerView: View {
         .onAppear {
             viewModel.onViewAppear()
         }
-        .onChange(of: viewModel.audioPlayer.state) { _ in
+        .onChange(of: viewModel.playerState) { _ in
             viewModel.onPlaybackStateChange()
         }
         .onChange(of: viewModel.nowPlayingService.currentData) { _ in
@@ -173,6 +173,7 @@ struct PlayerView: View {
 
     private var logoButton: some View {
         ZStack {
+            // Background card
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .fill(Color.white.opacity(0.05))
                 .background(VisualEffectView().clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous)))
@@ -183,13 +184,19 @@ struct PlayerView: View {
                 .shadow(color: viewModel.selectedStation.color.opacity(0.4), radius: 24, x: 0, y: 10)
                 .shadow(color: Color.black.opacity(0.5), radius: 12, x: 0, y: 6)
 
+            // Station logo
             StationLogo(station: viewModel.selectedStation, size: logoImageSize)
-                .opacity(viewModel.isLoading ? 0.3 : 1.0)
+                .opacity(viewModel.isBuffering ? 0.4 : 1.0)
                 .shadow(color: Color.white.opacity(0.1), radius: 10)
 
-            if viewModel.isLoading {
-                LoadingSpinner(color: .white)
-            } else if !viewModel.isPlaying {
+            // Loading spinner - only shows during buffering
+            LoadingSpinnerView(
+                isVisible: viewModel.isBuffering,
+                color: viewModel.selectedStation.color
+            )
+
+            // Play button overlay - shows when not playing and not buffering
+            if !viewModel.isPlaying && !viewModel.isBuffering {
                 Image(systemName: "play.fill")
                     .font(.system(size: 54, weight: .semibold))
                     .foregroundColor(.white)
@@ -198,6 +205,7 @@ struct PlayerView: View {
                     .animation(.easeOut(duration: 0.2), value: viewModel.isHoveringLogo)
             }
 
+            // Equalizer - only shows when actively playing
             if viewModel.isPlaying {
                 VStack {
                     Spacer()
@@ -217,28 +225,6 @@ struct PlayerView: View {
         .scaleEffect(viewModel.isHoveringLogo ? 1.02 : (viewModel.isPlaying ? 1.0 : 0.98))
         .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isHoveringLogo)
         .animation(.spring(response: 0.4, dampingFraction: 0.6), value: viewModel.isPlaying)
-    }
-}
-
-struct LoadingSpinner: View {
-    let color: Color
-    @State private var rotation: Double = 0
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(color.opacity(0.3), lineWidth: 3)
-            
-            Circle()
-                .trim(from: 0, to: 0.75)
-                .stroke(color, lineWidth: 3)
-                .rotationEffect(.degrees(rotation))
-                .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: rotation)
-        }
-        .frame(width: 48, height: 48)
-        .onAppear {
-            rotation = 360
-        }
     }
 }
 

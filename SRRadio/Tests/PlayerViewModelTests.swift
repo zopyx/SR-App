@@ -104,12 +104,13 @@ final class PlayerViewModelTests: XCTestCase {
 
         // When
         mockAudioPlayer.state = .playing
+        viewModel.onPlaybackStateChange() // Sync state from audio player
 
         // Then
         XCTAssertTrue(viewModel.isPlaying)
     }
 
-    func testIsLoading_DelegatesToAudioPlayer() {
+    func testIsBuffering_DelegatesToAudioPlayer() {
         // Given
         let viewModel = PlayerViewModel(
             audioPlayer: mockAudioPlayer,
@@ -117,10 +118,26 @@ final class PlayerViewModelTests: XCTestCase {
         )
 
         // When
-        mockAudioPlayer.state = .loading
+        mockAudioPlayer.state = .buffering
+        viewModel.onPlaybackStateChange() // Sync state from audio player
 
         // Then
-        XCTAssertTrue(viewModel.isLoading)
+        XCTAssertTrue(viewModel.isBuffering)
+    }
+
+    func testIsMutedState_DelegatesToAudioPlayer() {
+        // Given
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+
+        // When
+        mockAudioPlayer.state = .muted(isPlaying: true)
+        viewModel.onPlaybackStateChange() // Sync state from audio player
+
+        // Then
+        XCTAssertTrue(viewModel.isMutedState)
     }
 
     func testVolume_GetterDelegatesToAudioPlayer() {
@@ -190,6 +207,7 @@ final class PlayerViewModelTests: XCTestCase {
             nowPlayingService: mockNowPlayingService
         )
         mockAudioPlayer.state = .error("Test error")
+        viewModel.onPlaybackStateChange() // Sync state from audio player
 
         // When
         let errorMessage = viewModel.errorMessage
@@ -302,6 +320,295 @@ final class PlayerViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.audioPlayer, "AudioPlayer should be injected")
         XCTAssertNotNil(viewModel.nowPlayingService, "NowPlayingService should be injected")
     }
+
+    // MARK: - Computed Property Tests
+
+    func testIsPlaying_DelegatesToPlayerState() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .playing
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertTrue(viewModel.isPlaying)
+    }
+
+    func testIsBuffering_DelegatesToPlayerState() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .buffering
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertTrue(viewModel.isBuffering)
+    }
+
+    func testIsMutedState_DelegatesToPlayerState() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .muted(isPlaying: true)
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertTrue(viewModel.isMutedState)
+    }
+
+    func testErrorMessage_ExtractsFromPlayerState() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .error("Test error message")
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertEqual(viewModel.errorMessage, "Test error message")
+    }
+
+    func testErrorMessage_WhenNoError() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .playing
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testCurrentRadioError_DelegatesToAudioPlayer() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.currentError = .noData
+
+        XCTAssertEqual(viewModel.currentRadioError, .noData)
+    }
+
+    func testCurrentRadioError_WhenNil() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+
+        XCTAssertNil(viewModel.currentRadioError)
+    }
+
+    // MARK: - UI State Tests
+
+    func testShowStationSelector_Toggle() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        XCTAssertFalse(viewModel.showStationSelector)
+        viewModel.showStationSelector = true
+        XCTAssertTrue(viewModel.showStationSelector)
+    }
+
+    func testShowAbout_Toggle() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        XCTAssertFalse(viewModel.showAbout)
+        viewModel.showAbout = true
+        XCTAssertTrue(viewModel.showAbout)
+    }
+
+    func testShowSettings_Toggle() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        XCTAssertFalse(viewModel.showSettings)
+        viewModel.showSettings = true
+        XCTAssertTrue(viewModel.showSettings)
+    }
+
+    func testIsHoveringLogo_Toggle() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        XCTAssertFalse(viewModel.isHoveringLogo)
+        viewModel.isHoveringLogo = true
+        XCTAssertTrue(viewModel.isHoveringLogo)
+    }
+
+    // MARK: - Action Method Tests
+
+    func testOpenAbout_SetsShowAboutTrue() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.openAbout()
+        XCTAssertTrue(viewModel.showAbout)
+    }
+
+    func testOpenSettings_SetsShowSettingsTrue() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.openSettings()
+        XCTAssertTrue(viewModel.showSettings)
+    }
+
+    func testDismissError_ClearsUserErrorMessage() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.userErrorMessage = "Test error"
+        viewModel.dismissError()
+
+        XCTAssertNil(viewModel.userErrorMessage)
+        XCTAssertTrue(mockAudioPlayer.retryAfterErrorCalled)
+    }
+
+    func testOnViewAppear_LoadsStationAndStartsMonitoring() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        let initialStation = viewModel.selectedStation
+
+        viewModel.onViewAppear()
+
+        XCTAssertTrue(mockAudioPlayer.loadStationCalled)
+        XCTAssertEqual(mockAudioPlayer.loadStationCalledWith, initialStation)
+        XCTAssertTrue(mockAudioPlayer.loadStationAutoPlay)
+        XCTAssertTrue(mockNowPlayingService.startMonitoringCalled)
+        XCTAssertEqual(mockNowPlayingService.startMonitoringCalledWith, initialStation)
+    }
+
+    func testOnPlaybackStateChange_SyncsState() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        mockAudioPlayer.state = .playing
+
+        viewModel.onPlaybackStateChange()
+
+        XCTAssertEqual(viewModel.playerState, .playing)
+    }
+
+    // MARK: - Station Persistence Tests
+
+    func testChangeStation_SavesLastPlayed() {
+        UserDefaults.standard.removeObject(forKey: "lastPlayedStationId")
+
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.changeStation(to: .sr3)
+
+        XCTAssertEqual(Station.lastPlayed.id, Station.sr3.id)
+
+        // Clean up
+        UserDefaults.standard.removeObject(forKey: "lastPlayedStationId")
+    }
+
+    func testViewModelInitializesWithLastPlayedStation() {
+        UserDefaults.standard.removeObject(forKey: "lastPlayedStationId")
+        Station.saveLastPlayed(.sr3)
+
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+
+        XCTAssertEqual(viewModel.selectedStation.id, Station.sr3.id)
+
+        // Clean up
+        UserDefaults.standard.removeObject(forKey: "lastPlayedStationId")
+    }
+
+    // MARK: - Error Handling Edge Cases
+
+    func testChangeStation_ClearsUserErrorMessage() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.userErrorMessage = "Previous error"
+
+        viewModel.changeStation(to: .sr1)
+
+        XCTAssertNil(viewModel.userErrorMessage)
+    }
+
+    func testUserErrorMessage_Published() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+
+        let expectation = XCTestExpectation(description: "Error message published")
+        viewModel.$userErrorMessage
+            .dropFirst()
+            .sink { message in
+                XCTAssertEqual(message, "Verbindungsfehler")
+                expectation.fulfill()
+            }
+            .store(in: &viewModel.cancellables)
+
+        mockAudioPlayer.currentError = .invalidURL("test://url")
+
+        wait(for: [expectation], timeout: 1.0)
+    }
+
+    // MARK: - Volume and Mute Tests
+
+    func testVolume_SetterUpdatesAudioPlayer() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.volume = 0.5
+
+        XCTAssertEqual(mockAudioPlayer.volume, 0.5, accuracy: 0.01)
+    }
+
+    func testIsMuted_SetterTogglesAudioPlayer() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        viewModel.isMuted = true
+
+        XCTAssertTrue(mockAudioPlayer.toggleMuteCalled)
+    }
+
+    func testIsMuted_SetterNoOpWhenSameValue() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+        // Initial isMuted is false, setting to false should not call toggle
+        viewModel.isMuted = false
+
+        XCTAssertFalse(mockAudioPlayer.toggleMuteCalled)
+    }
+
+    // MARK: - Cancellables Tests
+
+    func testCancellables_IsNotEmpty_AfterSetup() {
+        let viewModel = PlayerViewModel(
+            audioPlayer: mockAudioPlayer,
+            nowPlayingService: mockNowPlayingService
+        )
+
+        // Should have subscriptions for state and error observation
+        XCTAssertFalse(viewModel.cancellables.isEmpty)
+    }
 }
 
 // MARK: - Linux Support
@@ -317,6 +624,13 @@ extension PlayerViewModelTests {
             ("testContainer_SingletonLifetime", testContainer_SingletonLifetime),
             ("testAppStartup_DoesNotCrash", testAppStartup_DoesNotCrash),
             ("testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash", testPlayerViewModel_InitWithDefaultDependencies_DoesNotCrash),
+            ("testIsPlaying_DelegatesToPlayerState", testIsPlaying_DelegatesToPlayerState),
+            ("testIsBuffering_DelegatesToPlayerState", testIsBuffering_DelegatesToPlayerState),
+            ("testErrorMessage_ExtractsFromPlayerState", testErrorMessage_ExtractsFromPlayerState),
+            ("testOpenAbout_SetsShowAboutTrue", testOpenAbout_SetsShowAboutTrue),
+            ("testDismissError_ClearsUserErrorMessage", testDismissError_ClearsUserErrorMessage),
+            ("testChangeStation_SavesLastPlayed", testChangeStation_SavesLastPlayed),
+            ("testVolume_SetterUpdatesAudioPlayer", testVolume_SetterUpdatesAudioPlayer),
         ]
     }
 }

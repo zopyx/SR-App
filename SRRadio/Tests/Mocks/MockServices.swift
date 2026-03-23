@@ -6,7 +6,7 @@ import Combine
 
 /// Mock implementation of AudioPlayerProtocol for testing.
 final class MockAudioPlayer: AudioPlayerProtocol {
-    @Published var state: PlaybackState = .idle
+    @Published var state: PlayerState = .started
     @Published var volume: Double = 0.8
     @Published var isMuted: Bool = false
     @Published var currentError: RadioError?
@@ -30,37 +30,76 @@ final class MockAudioPlayer: AudioPlayerProtocol {
         loadStationAutoPlay = autoPlay
         currentStation = station
         if autoPlay {
-            state = .playing
+            state = .started  // Will transition to buffering/playing when play() is called
+        } else {
+            state = .started
         }
     }
     
     func play() {
         playCalled = true
-        state = .playing
+        if isMuted {
+            state = .muted(underlying: .playing)
+        } else {
+            state = .playing
+        }
     }
     
     func pause() {
         pauseCalled = true
+        // When paused, always show paused (not muted)
         state = .paused
     }
     
     func togglePlayPause() {
         togglePlayPauseCalled = true
-        state = state == .playing ? .paused : .playing
+        switch state {
+        case .playing:
+            pause()
+        case .started, .paused, .error:
+            play()
+        case .buffering:
+            pause()
+        case .muted(let underlying):
+            switch underlying {
+            case .playing:
+                pause()
+            case .paused:
+                play()
+            }
+        }
     }
     
     func toggleMute() {
         toggleMuteCalled = true
         isMuted.toggle()
+        // Update state to reflect mute change
+        switch state {
+        case .playing:
+            state = isMuted ? .muted(underlying: .playing) : .playing
+        case .paused:
+            state = isMuted ? .muted(underlying: .paused) : .paused
+        case .muted(let underlying):
+            // Unmuting - restore to appropriate state
+            switch underlying {
+            case .playing:
+                state = .playing
+            case .paused:
+                state = .paused
+            }
+        default:
+            break
+        }
     }
     
     func retryAfterError() {
         retryAfterErrorCalled = true
         currentError = nil
+        state = .started
     }
     
     func reset() {
-        state = .idle
+        state = .started
         volume = 0.8
         isMuted = false
         currentError = nil
