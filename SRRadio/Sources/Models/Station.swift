@@ -49,7 +49,8 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Saarlands beste Musik und Nachrichten",
         streamPath: "1009/mp3/128/sr1",
         logoName: "sr1_logo",
-        colorHex: "#2ab3a6"
+        colorHex: "#2ab3a6",
+        websiteString: "https://www.sr.de/sr/sr1"
     )
 
     static let srKultur = srStation(
@@ -59,7 +60,8 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Kultur, Wort und klassische Musik",
         streamPath: "1010/mp3/128/sr2",
         logoName: "sr2_logo",
-        colorHex: "#8b7cff"
+        colorHex: "#8b7cff",
+        websiteString: "https://www.sr2.de"
     )
 
     static let sr3 = srStation(
@@ -69,7 +71,8 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Die beste Musik für das Saarland",
         streamPath: "1011/mp3/128/sr3",
         logoName: "sr3_logo",
-        colorHex: "#44a1ff"
+        colorHex: "#44a1ff",
+        websiteString: "https://www.sr.de/sr/sr3"
     )
 
     static let unserding = srStation(
@@ -79,7 +82,8 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Das junge Radio im Saarland",
         streamPath: "1012/mp3/128/ud",
         logoName: "",
-        colorHex: "#ff6b35"
+        colorHex: "#ff6b35",
+        websiteString: "https://www.unserding.de"
     )
 
     static let antenneSaar = srStation(
@@ -89,7 +93,8 @@ struct Station: Identifiable, Equatable, Hashable {
         description: "Hits und gute Laune",
         streamPath: "1013/mp3/128/as",
         logoName: "",
-        colorHex: "#e4002b"
+        colorHex: "#e4002b",
+        websiteString: "https://www.sr.de/sr/antennesaar/index.html"
     )
 
     // MARK: - Privatsender
@@ -120,7 +125,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CR SB",
         description: "Dein Stadtradio für Saarbrücken",
         streamUrlString: "https://radiogroup-stream32.radiohost.de/cityradio-saarbruecken_mp3-192",
-        websiteString: "https://www.cityradio-saarbruecken.de",
+        websiteString: "https://cityradio.saarland/saarbruecken/",
         colorHex: "#1976d2"
     )
 
@@ -130,7 +135,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CR NK",
         description: "Dein Stadtradio für Neunkirchen",
         streamUrlString: "https://radiogroup-stream31.radiohost.de/cityradio-neunkirchen_mp3-192",
-        websiteString: "https://www.cityradio-neunkirchen.de",
+        websiteString: "https://cityradio.saarland/neunkirchen/",
         colorHex: "#7b1fa2"
     )
 
@@ -140,7 +145,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CR HOM",
         description: "Dein Stadtradio für Homburg",
         streamUrlString: "https://stream.radiogroup.de/cityradio-homburg/mp3-192",
-        websiteString: "https://www.cityradio-homburg.de",
+        websiteString: "https://cityradio.saarland/homburg/",
         colorHex: "#00838f"
     )
 
@@ -150,7 +155,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CR SLS",
         description: "Dein Stadtradio für Saarlouis",
         streamUrlString: "https://stream.radiogroup.de/cityradio-saarlouis_mp3-192",
-        websiteString: "https://www.cityradio-saarlouis.de",
+        websiteString: "https://cityradio.saarland/saarlouis/",
         colorHex: "#c62828"
     )
 
@@ -160,7 +165,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CR WND",
         description: "Dein Stadtradio für St. Wendel",
         streamUrlString: "https://radiogroup-stream32.radiohost.de/cityradio-stwendel_mp3-192",
-        websiteString: "https://www.cityradio-stwendel.de",
+        websiteString: "https://cityradio.saarland/stwendel/",
         colorHex: "#558b2f"
     )
 
@@ -180,7 +185,7 @@ struct Station: Identifiable, Equatable, Hashable {
         shortName: "CRR",
         description: "Die besten Classic Rock Hits",
         streamUrlString: "https://internetradio.salue.de:8443/classicrock.mp3",
-        websiteString: "https://www.classicrockradio.de",
+        websiteString: "https://www.classicrock-radio.de",
         colorHex: "#b71c1c"
     )
 
@@ -228,6 +233,7 @@ struct Station: Identifiable, Equatable, Hashable {
     ///   - streamPath: Stream path segment for SR CDN URL
     ///   - logoName: Asset name for station logo
     ///   - colorHex: Hex color code for branding
+    ///   - websiteString: Optional custom website URL (default: auto-generated from id)
     /// - Returns: A configured `Station` instance for SR stations
     /// - Note: This method uses safe URL creation and will use fallback URLs if parsing fails
     private static func srStation(
@@ -237,14 +243,15 @@ struct Station: Identifiable, Equatable, Hashable {
         description: String,
         streamPath: String,
         logoName: String,
-        colorHex: String
+        colorHex: String,
+        websiteString: String? = nil
     ) -> Station {
         let streamUrlString = "https://sr.audiostream.io/sr/\(streamPath)"
-        let websiteString = "https://www.sr.de/\(id)"
-        
+        let website = websiteString.map { URL(string: $0) ?? URL(fileURLWithPath: "/dev/null") }
+            ?? URL(string: "https://www.sr.de/\(id)") ?? URL(fileURLWithPath: "/dev/null")
+
         let streamUrl = URL(string: streamUrlString) ?? URL(fileURLWithPath: "/dev/null")
-        let website = URL(string: websiteString) ?? URL(fileURLWithPath: "/dev/null")
-        
+
         return Station(
             id: id,
             name: name,
