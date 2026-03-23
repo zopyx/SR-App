@@ -51,6 +51,7 @@ final class AudioPlayer: NSObject, ObservableObject {
     private var retryWorkItem: DispatchWorkItem?
     private var preMuteVolume: Double = 0.8
     private var loadingTimeoutWorkItem: DispatchWorkItem?
+    private var timeControlObservation: AnyCancellable?
 
     /// The currently playing station, if any.
     /// This is public to support the AudioPlayerProtocol.
@@ -159,22 +160,24 @@ final class AudioPlayer: NSObject, ObservableObject {
             }
             .store(in: &cancellables)
 
-        // Observe player rate to detect when playback actually starts
-        player?.publisher(for: \.rate)
+        // Observe player timeControlStatus to detect when playback actually starts
+        // timeControlStatus is more reliable than rate for live streams
+        timeControlObservation = player?.publisher(for: \.timeControlStatus)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] rate in
+            .sink { [weak self] status in
                 guard let self = self else { return }
-                if rate > 0 && self.state == .loading {
+                print("[AudioPlayer] timeControlStatus: \(status), state: \(self.state)")
+                if status == .playing && self.state == .loading {
                     self.loadingTimeoutWorkItem?.cancel()
                     self.state = .playing
                     self.retryCount = 0
+                    print("[AudioPlayer] Transitioned to .playing via timeControlStatus")
                     if let station = self.currentStation {
                         Analytics.track(.playbackStart(stationId: station.id))
                     }
                     self.updateNowPlayingInfo()
                 }
             }
-            .store(in: &cancellables)
 
         NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
             .receive(on: DispatchQueue.main)
@@ -207,10 +210,12 @@ final class AudioPlayer: NSObject, ObservableObject {
         switch status {
         case .readyToPlay:
             // Player item is ready to play - for live streams this means we're playing
+            print("[AudioPlayer] readyToPlay received, state: \(state)")
             loadingTimeoutWorkItem?.cancel()
             if state == .loading {
                 state = .playing
                 retryCount = 0
+                print("[AudioPlayer] Transitioned to .playing via readyToPlay")
                 if let station = currentStation {
                     Analytics.track(.playbackStart(stationId: station.id))
                 }
@@ -220,6 +225,7 @@ final class AudioPlayer: NSObject, ObservableObject {
             handleError(playerItem?.error)
         case .unknown:
             // Wait for status to change to readyToPlay or failed
+            print("[AudioPlayer] Status unknown, waiting...")
             break
         @unknown default:
             break
@@ -244,11 +250,13 @@ final class AudioPlayer: NSObject, ObservableObject {
         state = .loading
         player.play()
         
-        // Set a timeout to transition to playing after 2 seconds
-        // This ensures we don't get stuck in loading state
+        // Set a timeout to transition to playing after 5 seconds
+        // This is a fallback for streams that don't report readyToPlay or rate changes
         let workItem = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
+            // Only transition if still loading (no readyToPlay or rate event received)
             if self.state == .loading {
+                print("[AudioPlayer] Timeout: forcing transition to .playing")
                 self.state = .playing
                 self.retryCount = 0
                 if let station = self.currentStation {
@@ -258,7 +266,7 @@ final class AudioPlayer: NSObject, ObservableObject {
             }
         }
         loadingTimeoutWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: workItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0, execute: workItem)
     }
 
     /// Pauses the current playback.
@@ -347,6 +355,7 @@ final class AudioPlayer: NSObject, ObservableObject {
     private func cleanup() {
         retryWorkItem?.cancel()
         loadingTimeoutWorkItem?.cancel()
+        timeControlObservation?.cancel()
         cancellables.removeAll()
         player?.pause()
         player = nil
